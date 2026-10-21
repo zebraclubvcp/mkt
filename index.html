@@ -5,13 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#151714">
 <style>[hidden]{display:none!important} html,body{margin:0;min-height:100%} :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<title>Zebra Mkt</title>
+<title>Marcebra</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: barra lateral fija en escritorio, pestañas arriba en el celu; tarjetas blancas sobre gris casi blanco, como App Calle */
+/* colores por formato en el calendario */
 :root {
+  --c-hist: #c2337a; --c-hist-bg: #fbe6f0;
+  --c-feed: #2b5fd9; --c-feed-bg: #e7eefc;
+  --c-reu: #a86300; --c-reu-bg: #fbf0dc;
+  --c-pauta: #1f8a4c; --c-pauta-bg: #e5f4ea;
+  --c-otro: #5d625a; --c-otro-bg: #eef0ec;
   --bg: #f3f4f2;
   --surface: #ffffff;
   --surface-2: #f7f8f6;
@@ -34,13 +40,13 @@
   --ink: #eef0ec; --ink-fg: #121412;
   --ok: #5cc98a; --ok-bg: #1d3326; --warn: #e6a64a; --warn-bg: #3a2c15; --bad: #f07a6f; --bad-bg: #3d1f1c; --info: #8eaefc; --info-bg: #1d2740;
   --b-zebra: #eef0ec; --b-kosmos: #a98af0; --b-before: #f2925a; --b-beach: #4cc7bd;
-  --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark; } }
+  --shadow: 0 1px 2px rgba(0,0,0,.4); --c-hist: #f08cbc; --c-hist-bg: #3d1a2b; --c-feed: #8eaefc; --c-feed-bg: #1d2740; --c-reu: #e6a64a; --c-reu-bg: #3a2c15; --c-pauta: #5cc98a; --c-pauta-bg: #1d3326; --c-otro: #b5bab2; --c-otro-bg: #262a26; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #121412; --surface: #1b1e1b; --surface-2: #222622; --line: #2e332e; --fg: #eef0ec; --muted: #9aa097;
   --ink: #eef0ec; --ink-fg: #121412;
   --ok: #5cc98a; --ok-bg: #1d3326; --warn: #e6a64a; --warn-bg: #3a2c15; --bad: #f07a6f; --bad-bg: #3d1f1c; --info: #8eaefc; --info-bg: #1d2740;
   --b-zebra: #eef0ec; --b-kosmos: #a98af0; --b-before: #f2925a; --b-beach: #4cc7bd;
-  --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark; }
+  --shadow: 0 1px 2px rgba(0,0,0,.4); --c-hist: #f08cbc; --c-hist-bg: #3d1a2b; --c-feed: #8eaefc; --c-feed-bg: #1d2740; --c-reu: #e6a64a; --c-reu-bg: #3a2c15; --c-pauta: #5cc98a; --c-pauta-bg: #1d3326; --c-otro: #b5bab2; --c-otro-bg: #262a26; color-scheme: dark; }
 
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.45; font-variant-numeric: tabular-nums; }
@@ -224,6 +230,15 @@ select.chip { padding-right: 8px; }
 .toggles button { border: 1px solid var(--line); background: var(--surface); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--muted); }
 .toggles button[aria-pressed="true"] { background: var(--ink); color: var(--ink-fg); border-color: var(--ink); }
 .toggles button[disabled] { cursor: default; }
+.ev.k-hist { background: var(--c-hist-bg); color: var(--c-hist); font-weight: 600; }
+.ev.k-feed { background: var(--c-feed-bg); color: var(--c-feed); font-weight: 600; }
+.ev.k-reu { background: var(--c-reu-bg); color: var(--c-reu); font-weight: 600; }
+.ev.k-pauta { background: var(--c-pauta-bg); color: var(--c-pauta); font-weight: 600; }
+.ev.k-otro { background: var(--c-otro-bg); color: var(--c-otro); font-weight: 600; }
+.ev .fd { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 3px; vertical-align: 1px; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+.cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.cal-legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
 .ev.pub { background: var(--ok-bg); color: var(--ok); font-weight: 600; }
 .gate { position: fixed; inset: 0; z-index: 80; background: var(--bg); display: grid; place-items: center; padding: 24px; }
 .gate-box { display: grid; gap: 14px; justify-items: center; text-align: center; max-width: 340px; }
@@ -235,6 +250,18 @@ select.chip { padding-right: 8px; }
 .sync { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
 .sync i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); display: inline-block; }
 .sync.off i { background: var(--warn); }
+.pdata, .pnotas { display: grid; gap: 8px; padding: 12px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--line); }
+.pdata-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pdata dl { margin: 0; display: grid; grid-template-columns: minmax(110px, 180px) minmax(0, 1fr); gap: 6px 12px; font-size: 13px; }
+.pdata dt { color: var(--muted); }
+.pdata dd { margin: 0; min-width: 0; }
+.pnota { display: grid; gap: 2px; padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; }
+.pnota small { color: var(--muted); font-size: 11px; }
+.pnota span { white-space: pre-wrap; }
+.pnota-add { display: grid; gap: 6px; }
+.pnota-add textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.pnota-add .btn { justify-self: start; }
+@media (max-width: 520px) { .pdata dl { grid-template-columns: 1fr; } }
 .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--ink-fg); padding: 10px 16px; border-radius: 999px; font-weight: 500; z-index: 60; box-shadow: var(--shadow); }
 
 @media (max-width: 900px) {
@@ -276,7 +303,7 @@ select.chip { padding-right: 8px; }
 <div class="gate" id="gate">
   <div class="gate-box">
     <span class="brand-mark" aria-hidden="true"></span>
-    <h1>Zebra Mkt</h1>
+    <h1>Marcebra</h1>
     <p id="gate-msg">Cargando…</p>
     <button class="btn primary" id="gate-login" hidden>Entrar con Google</button>
     <button class="btn" id="gate-out" hidden>Usar otra cuenta</button>
@@ -284,7 +311,7 @@ select.chip { padding-right: 8px; }
 </div>
 <div class="app">
   <aside class="side" aria-label="Menú">
-    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Zebra Mkt</b><small>Zebra Club · Kosmos · Before · Zebra Beach</small></div></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b><small>Zebra Club · Kosmos · Before · Zebra Beach</small></div></div>
     <nav class="nav" id="nav"></nav>
     <div class="me"><div><b id="me-name">—</b><small id="me-mail"></small></div><span class="sync" id="sync"><i></i>Sincronizado</span><button class="btn small" id="logout">Salir</button></div>
   </aside>
@@ -292,7 +319,7 @@ select.chip { padding-right: 8px; }
     <div class="main-inner">
       <div class="topbar">
         <div class="topbar-row">
-          <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Zebra Mkt</b></div></div>
+          <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b></div></div>
           <button class="btn small" id="logout-m">Salir</button>
         </div>
         <div class="tabs" id="tabs"></div>
@@ -315,10 +342,10 @@ const EQUIPO = [
   { id: 'manu', nombre: 'Manu', rol: 'Jefe de marketing', admin: true, email: 'manucontreras3@gmail.com' },
   { id: 'mica', nombre: 'Mica', rol: 'Planificación · CM Zebra · Pauta', admin: true, email: 'colanskymica@gmail.com' },
   { id: 'agus', nombre: 'Agustina', rol: 'Creatividad · CM Kosmos · Pauta', admin: true, email: 'agustinan.contacto@gmail.com' },
-  { id: 'luciano', nombre: 'Luciano', rol: 'Diseño' },
-  { id: 'salva', nombre: 'Salvador', rol: 'Diseño' },
-  { id: 'maxi', nombre: 'Maxi', rol: 'Edición de video' },
-  { id: 'santi', nombre: 'Santi', rol: 'Pauta', pauta: true },
+  { id: 'luciano', nombre: 'Luciano', rol: 'Diseño principal', email: 'luchixo34@gmail.com' },
+  { id: 'salva', nombre: 'Salvador', rol: 'Diseño', email: 'salvacontre.c@gmail.com' },
+  { id: 'maxi', nombre: 'Maxi', rol: 'Edición de video y diseño', email: 'bishelsalexismaximiliano@gmail.com' },
+  { id: 'santi', nombre: 'Santi', rol: 'Pauta', pauta: true, email: 'maxterom@gmail.com' },
 ];
 const TIPOS = ['Post', 'Carrusel', 'Reel', 'Historias', 'Flyer', 'Video', 'Fotos', 'Diseño', 'Copy', 'Pauta', 'Otro'];
 const ESTADOS = [
@@ -655,9 +682,19 @@ function vistaCalendario() {
   const ts = filtrar(S.tareas, true).filter((t) => t.estado !== 'publicado');
   const fs = S.fechas.filter((f) => ui.marca === 'todas' || f.marca === ui.marca || f.marca === 'general');
   const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...ts.filter((t) => t.publica === s).map((t) => ({ t, pub: true })), ...ts.filter((t) => t.entrega === s).map((t) => ({ t }))];
+  const cats = (formatos, tipo) => {
+    const f = (formatos || []).concat(tipo ? [tipo] : []);
+    const out = [];
+    if (f.some((x) => /histori/i.test(x))) out.push('hist');
+    if (f.some((x) => /^(post|carrusel|reel|flyer|video|fotos|diseño)$/i.test(x))) out.push('feed');
+    if (f.some((x) => /pauta/i.test(x))) out.push('pauta');
+    if (f.some((x) => /reuni|llamad/i.test(x))) out.push('reu');
+    return out.length ? out : ['otro'];
+  };
+  const dots = (cs) => cs.length > 1 ? cs.map((c) => h('span', { class: 'fd', style: 'background:var(--c-' + c + ')' })) : [];
   const item = (x) => x.f
-    ? h('button', { class: 'ev fecha' + (x.f.tipo === 'Publicación' ? ' pub' : ''), style: '--bcol:' + marca(x.f.marca).color, onclick: () => abrirFecha(x.f), title: x.f.titulo + ((x.f.formatos || []).length ? ' · ' + x.f.formatos.join(', ') : '') }, (x.f.estado === 'publicado' ? '✓ ' : '') + (x.f.hora ? x.f.hora + ' ' : '') + ((x.f.formatos || []).length ? '[' + x.f.formatos.join(' · ') + '] ' : '') + x.f.titulo + (resps(x.f).length ? ' · ' + nombresResp(x.f) : ''))
-    : x.pub ? h('button', { class: 'ev pub', style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Se publica: ' + x.t.titulo }, 'Publica · ' + x.t.titulo)
+    ? ((cs) => h('button', { class: 'ev k-' + cs[0], style: '--bcol:' + marca(x.f.marca).color, onclick: () => abrirFecha(x.f), title: x.f.titulo + ((x.f.formatos || []).length ? ' · ' + x.f.formatos.join(', ') : '') }, ...dots(cs), (x.f.estado === 'publicado' ? '✓ ' : '') + (x.f.hora ? x.f.hora + ' ' : '') + ((x.f.formatos || []).length ? '[' + x.f.formatos.join(' · ') + '] ' : '') + x.f.titulo + (resps(x.f).length ? ' · ' + nombresResp(x.f) : '')))(cats(x.f.formatos, x.f.tipo === 'Publicación' ? '' : x.f.tipo))
+    : x.pub ? h('button', { class: 'ev k-' + cats([], x.t.tipo)[0], style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Se publica: ' + x.t.titulo }, 'Publica · ' + x.t.tipo + ' · ' + x.t.titulo)
     : h('button', { class: 'ev' + (vencida(x.t) ? ' late' : ''), style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Entrega: ' + x.t.titulo }, 'Entrega · ' + nombresResp(x.t) + ' · ' + x.t.titulo);
   const mover = (k) => { const d = new Date(y, m + k, 1); ui.calMes = d.getFullYear() + '-' + pad(d.getMonth() + 1); guardarUi(); render(); };
   const grilla = h('div', { class: 'cal-wrap' }, h('div', { class: 'cal' },
@@ -671,7 +708,9 @@ function vistaCalendario() {
       h('button', { class: 'btn small', onclick: () => { ui.calMes = null; guardarUi(); render(); } }, 'Hoy'),
       h('button', { class: 'btn small', onclick: () => mover(1), 'aria-label': 'Mes siguiente' }, '→'),
       esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirFecha(null) }, '+ Fecha') : null),
-    filtros(true), grilla, agenda);
+    filtros(true),
+    h('div', { class: 'cal-legend' }, ...[['hist', 'Historia'], ['feed', 'Feed (post, carrusel, reel)'], ['pauta', 'Pauta'], ['reu', 'Reunión / llamada'], ['otro', 'Evento y otros']].map(([k, l]) => h('span', {}, h('i', { style: 'background:var(--c-' + k + ')' }), l)), h('span', {}, h('i', { style: 'background:var(--surface-2);border:1px solid var(--line)' }), 'Entrega de un pedido')),
+    grilla, agenda);
 }
 
 function vistaCarga() {
@@ -727,6 +766,49 @@ function semaforo(c) {
   if (peor >= 0.7) return { cls: 'p-warn', txt: 'Atención' };
   return { cls: 'p-bad', txt: 'Mal' };
 }
+const CAMPOS_PAUTA = [
+  ['pieza', 'Pieza a pautar (link de Drive o del post)', 'url'],
+  ['copy', 'Copy / texto del anuncio', 'area'],
+  ['publico', 'Público (edad, zona, intereses)', 'area'],
+  ['presupuestoDiario', 'Presupuesto diario ($)', 'number'],
+  ['destino', 'A dónde lleva (link de Alpogo, WhatsApp, perfil…)', 'url'],
+  ['cta', 'Botón / llamado a la acción', 'text'],
+];
+function bloquePauta(c) {
+  const d = c.data || {};
+  const lleno = CAMPOS_PAUTA.filter(([k]) => d[k]);
+  const val = (k, tipo) => tipo === 'url' && /^https?:\/\//.test(d[k]) ? h('a', { href: d[k], target: '_blank', rel: 'noopener', style: 'color:var(--info);word-break:break-all' }, d[k] + ' ↗') : tipo === 'number' ? ars(d[k]) : h('span', { style: 'white-space:pre-wrap' }, d[k]);
+  return h('div', { class: 'pdata' },
+    h('div', { class: 'pdata-h' }, h('b', {}, 'Qué hay que pautar'), esAdmin() ? h('button', { class: 'btn small', onclick: () => abrirDataPauta(c) }, lleno.length ? 'Editar' : 'Completar') : null),
+    lleno.length ? h('dl', {}, ...lleno.flatMap(([k, l, tipo]) => [h('dt', {}, l.replace(/ \(.*\)$/, '')), h('dd', {}, val(k, tipo))]))
+      : h('p', { class: 'note', style: 'margin:0' }, esAdmin() ? 'Cargá la pieza, el copy, el público y a dónde lleva para que Santi arme la campaña.' : 'Todavía no cargaron la data de esta campaña.'));
+}
+function abrirDataPauta(c) {
+  const d = c.data || {};
+  const f = {};
+  const campos = CAMPOS_PAUTA.map(([k, l, tipo]) => {
+    f[k] = tipo === 'area' ? h('textarea', { id: 'pd-' + k, style: 'min-height:70px' }, d[k] || '') : h('input', { id: 'pd-' + k, type: tipo === 'number' ? 'number' : tipo === 'url' ? 'url' : 'text', value: d[k] || '' });
+    return campo(l, f[k], true);
+  });
+  modal('Data para pautar · ' + c.nombre, h('div', { class: 'form' }, ...campos),
+    h('div', { class: 'sheet-foot' }, h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'), h('button', { class: 'btn primary', onclick: () => {
+      const nd = {}; CAMPOS_PAUTA.forEach(([k, , tipo]) => { const v = f[k].value.trim(); if (v) nd[k] = tipo === 'number' ? Number(v) : v; });
+      c.data = nd; guardar(); cerrarModal(); render(); toast('Data de pauta guardada');
+    } }, 'Guardar'))));
+}
+function bloqueNotas(c) {
+  const notas = c.notas || [];
+  const puede = puedePauta();
+  const ta = h('textarea', { id: 'nota-' + c.id, placeholder: 'Anotación para la campaña (cambios, resultados, ideas…)', style: 'min-height:54px' });
+  return h('div', { class: 'pnotas' },
+    h('b', {}, 'Anotaciones' + (notas.length ? ' (' + notas.length + ')' : '')),
+    ...notas.slice().reverse().map((n) => h('div', { class: 'pnota' }, h('small', {}, persona(n.autor).nombre + ' · ' + cuando(n.fecha)), h('span', {}, n.texto))),
+    puede ? h('div', { class: 'pnota-add' }, ta, h('button', { class: 'btn small', onclick: () => {
+      const t = ta.value.trim(); if (!t) { toast('Escribí la anotación'); return; }
+      c.notas = [...notas, { autor: ui.yo, fecha: HOY, texto: t }]; guardar(); render(); toast('Anotación agregada');
+    } }, 'Agregar')) : null);
+}
+
 function vistaPauta() {
   const cs = S.campanias.filter((c) => ui.marca === 'todas' || c.marca === ui.marca);
   const activas = cs.filter((c) => diff(c.inicio) <= 0 && diff(c.fin) >= 0);
@@ -755,7 +837,9 @@ function vistaPauta() {
       h('div', { class: 'budget' },
         h('div', { class: 'track' }, h('span', { class: 'real' + (c.invertido > c.presupuesto ? ' over' : ''), style: 'width:' + pctInv + '%' })),
         h('small', {}, 'Invertido ', h('b', {}, ars(c.invertido)), ' de ', ars(c.presupuesto), ' · ', editaValores ? h('button', { class: 'btn small', style: 'margin-left:6px', onclick: () => abrirInversion(c) }, 'Cargar inversión') : null)),
+      bloquePauta(c),
       tabla, add,
+      bloqueNotas(c),
       h('small', { style: 'color:var(--muted);font-size:12px' }, c.actualizado ? 'Último dato cargado ' + cuando(c.actualizado) : 'Santi todavía no cargó datos'));
   };
   return h('div', { style: 'display:grid;gap:14px' },
@@ -940,7 +1024,7 @@ function abrirFecha(fe, fechaInicial) {
   const hReal = h('input', { id: 'fe-hreal', type: 'number', min: '0', step: '0.5', value: x.horasReal || '', readonly: !(admin || mia) || null });
   const f = {
     titulo: h('input', { id: 'fe-titulo', value: x.titulo, placeholder: 'Ej. Anuncio line up Halloween', readonly: !admin || null }),
-    tipo: sel('fe-tipo', [['Publicación', 'Publicación'], ['Reunión', 'Reunión'], ['Evento', 'Evento'], ['Sesión de fotos', 'Sesión de fotos'], ['Otro', 'Otro']], x.tipo, !admin),
+    tipo: sel('fe-tipo', [['Publicación', 'Publicación'], ['Reunión', 'Reunión / llamada'], ['Evento', 'Evento'], ['Sesión de fotos', 'Sesión de fotos'], ['Otro', 'Otro']], x.tipo, !admin),
     marca: sel('fe-marca', [['general', 'General'], ...MARCAS.map((m) => [m.id, m.nombre])], x.marca, !admin),
     fecha: h('input', { id: 'fe-fecha', type: 'date', value: x.fecha, readonly: !admin || null }),
     hora: h('input', { id: 'fe-hora', type: 'time', value: x.hora, readonly: !admin || null }),
