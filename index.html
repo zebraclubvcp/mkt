@@ -802,7 +802,7 @@ function bloqueNotas(c) {
   const ta = h('textarea', { id: 'nota-' + c.id, placeholder: 'Anotación para la campaña (cambios, resultados, ideas…)', style: 'min-height:54px' });
   return h('div', { class: 'pnotas' },
     h('b', {}, 'Anotaciones' + (notas.length ? ' (' + notas.length + ')' : '')),
-    ...notas.slice().reverse().map((n) => h('div', { class: 'pnota' }, h('small', {}, persona(n.autor).nombre + ' · ' + cuando(n.fecha)), h('span', {}, n.texto))),
+    ...notas.slice().reverse().map((n) => h('div', { class: 'pnota' }, h('div', { style: 'display:flex;justify-content:space-between;align-items:center;gap:8px' }, h('small', {}, persona(n.autor).nombre + ' · ' + cuando(n.fecha)), esAdmin() ? h('button', { class: 'btn small', 'aria-label': 'Borrar anotación', onclick: () => { c.notas = notas.filter((y) => y !== n); guardar(); render(); toast('Anotación borrada'); } }, '×') : null), h('span', {}, n.texto))),
     puede ? h('div', { class: 'pnota-add' }, ta, h('button', { class: 'btn small', onclick: () => {
       const t = ta.value.trim(); if (!t) { toast('Escribí la anotación'); return; }
       c.notas = [...notas, { autor: ui.yo, fecha: HOY, texto: t }]; guardar(); render(); toast('Anotación agregada');
@@ -840,7 +840,9 @@ function vistaPauta() {
       bloquePauta(c),
       tabla, add,
       bloqueNotas(c),
-      h('small', { style: 'color:var(--muted);font-size:12px' }, c.actualizado ? 'Último dato cargado ' + cuando(c.actualizado) : 'Santi todavía no cargó datos'));
+      h('div', { style: 'display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px' },
+        h('small', { style: 'color:var(--muted);font-size:12px' }, c.actualizado ? 'Último dato cargado ' + cuando(c.actualizado) : 'Santi todavía no cargó datos'),
+        esAdmin() ? botonPeligro('Eliminar campaña', () => { S.campanias = S.campanias.filter((y) => y !== c); guardar(); render(); toast('Campaña eliminada'); }) : null));
   };
   return h('div', { style: 'display:grid;gap:14px' },
     cabecera('Pauta', 'Mica y Agus piden los datos que necesitan en cada campaña; Santi los completa.', esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirCampania(null) }, '+ Campaña') : null),
