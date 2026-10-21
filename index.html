@@ -141,6 +141,8 @@ select.chip { padding-right: 8px; }
 .cal .dow { padding: 8px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: var(--surface-2); border-bottom: 1px solid var(--line); }
 .cal .day { min-height: 104px; padding: 6px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: grid; align-content: start; gap: 4px; }
 .cal .day:nth-child(7n) { border-right: 0; }
+.cal .day.clickable { cursor: pointer; }
+.cal .day.clickable:hover { background: var(--surface-2); }
 .cal .day.out { background: var(--surface-2); color: var(--muted); }
 .cal .num { font-size: 12px; font-weight: 600; }
 .cal .today .num { background: var(--ink); color: var(--ink-fg); border-radius: 6px; padding: 0 6px; justify-self: start; }
@@ -580,7 +582,7 @@ function tarjeta(t, opts = {}) {
   const sig = siguiente(t);
   const card = h('div', { class: 'task', style: '--bcol:' + marca(t.marca).color },
     h('div', { class: 'task-top' }, h('span', { class: 'task-title' }, t.titulo), estadoPill(t.estado)),
-    h('div', { class: 'task-meta' }, marcaChip(t.marca), h('span', {}, t.tipo), ent, t.prioridad === 'Urgente' || t.prioridad === 'Alta' ? h('span', { class: 'pill ' + (t.prioridad === 'Urgente' ? 'p-bad' : 'p-warn') }, t.prioridad) : null),
+    h('div', { class: 'task-meta' }, marcaChip(t.marca), h('span', {}, t.tipo), ent, t.publica ? h('span', {}, 'Publica ' + fCorta(t.publica)) : null, t.prioridad === 'Urgente' || t.prioridad === 'Alta' ? h('span', { class: 'pill ' + (t.prioridad === 'Urgente' ? 'p-bad' : 'p-warn') }, t.prioridad) : null),
     h('div', { class: 'task-meta' }, opts.sinResp ? null : h('span', { style: 'display:inline-flex;gap:6px;align-items:center' }, ...resps(t).map(av), nombresResp(t)),
       h('span', {}, (t.horasReal || 0) + ' / ' + (t.horasEst || 0) + ' h'), t.link ? h('span', {}, 'Entregable en Drive') : null, t.imagenes && t.imagenes.length ? h('span', {}, t.imagenes.length + ' imág.') : null, t.devoluciones && t.devoluciones.length ? h('span', {}, t.devoluciones.length + (t.devoluciones.length === 1 ? ' devolución' : ' devoluciones')) : null),
     ultimaDevol(t) ? h('div', { class: 'devol' }, h('b', {}, 'Cambios pedidos por ' + persona(ultimaDevol(t).autor).nombre + ' · ' + cuando(ultimaDevol(t).fecha)), ultimaDevol(t).texto) : null,
@@ -642,18 +644,19 @@ function vistaCalendario() {
   const dias = []; for (let i = 0; i < 42; i++) { const d = new Date(desde); d.setDate(desde.getDate() + i); dias.push(d); }
   const ts = filtrar(S.tareas, true).filter((t) => t.estado !== 'publicado');
   const fs = S.fechas.filter((f) => ui.marca === 'todas' || f.marca === ui.marca || f.marca === 'general');
-  const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...ts.filter((t) => t.entrega === s).map((t) => ({ t }))];
+  const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...ts.filter((t) => t.publica === s).map((t) => ({ t, pub: true })), ...ts.filter((t) => t.entrega === s).map((t) => ({ t }))];
   const item = (x) => x.f
     ? h('button', { class: 'ev fecha' + (x.f.tipo === 'Publicación' ? ' pub' : ''), style: '--bcol:' + marca(x.f.marca).color, onclick: () => abrirFecha(x.f), title: x.f.titulo + ((x.f.formatos || []).length ? ' · ' + x.f.formatos.join(', ') : '') }, (x.f.estado === 'publicado' ? '✓ ' : '') + (x.f.hora ? x.f.hora + ' ' : '') + ((x.f.formatos || []).length ? '[' + x.f.formatos.join(' · ') + '] ' : '') + x.f.titulo + (resps(x.f).length ? ' · ' + nombresResp(x.f) : ''))
-    : h('button', { class: 'ev' + (vencida(x.t) ? ' late' : ''), style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: x.t.titulo }, nombresResp(x.t) + ' · ' + x.t.titulo);
+    : x.pub ? h('button', { class: 'ev pub', style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Se publica: ' + x.t.titulo }, 'Publica · ' + x.t.titulo)
+    : h('button', { class: 'ev' + (vencida(x.t) ? ' late' : ''), style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Entrega: ' + x.t.titulo }, 'Entrega · ' + nombresResp(x.t) + ' · ' + x.t.titulo);
   const mover = (k) => { const d = new Date(y, m + k, 1); ui.calMes = d.getFullYear() + '-' + pad(d.getMonth() + 1); guardarUi(); render(); };
   const grilla = h('div', { class: 'cal-wrap' }, h('div', { class: 'cal' },
     ...['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'].map((d) => h('div', { class: 'dow' }, d)),
-    ...dias.map((d) => { const s = iso(d); return h('div', { class: 'day' + (d.getMonth() !== m ? ' out' : '') + (s === HOY ? ' today' : '') }, h('span', { class: 'num' }, d.getDate()), ...enDia(s).map(item)); })));
+    ...dias.map((d) => { const s = iso(d); return h('div', { class: 'day' + (d.getMonth() !== m ? ' out' : '') + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá para crear algo este día' : null, onclick: (e) => { if (!e.target.closest('.ev')) abrirDia(s); } }, h('span', { class: 'num' }, d.getDate()), ...enDia(s).map(item)); })));
   const proximos = dias.map(iso).filter((s) => s >= HOY && parse(s).getMonth() === m && enDia(s).length);
   const agenda = h('div', { class: 'agenda' }, ...(proximos.length ? proximos.map((s) => h('div', { class: 'group' }, h('h3', {}, s === HOY ? 'Hoy' : fCorta(s)), h('div', { class: 'list' }, ...enDia(s).map(item)))) : [h('div', { class: 'empty' }, 'Nada en lo que queda del mes.')]));
   return h('div', { style: 'display:grid;gap:14px' },
-    cabecera(MESES[m].charAt(0).toUpperCase() + MESES[m].slice(1) + ' ' + y, 'Entregas de tareas, publicaciones planificadas y fechas de las marcas.',
+    cabecera(MESES[m].charAt(0).toUpperCase() + MESES[m].slice(1) + ' ' + y, esAdmin() ? 'Tocá un día para crear un pedido o una fecha.' : 'Entregas, publicaciones y fechas de las marcas.',
       h('button', { class: 'btn small', onclick: () => mover(-1), 'aria-label': 'Mes anterior' }, '←'),
       h('button', { class: 'btn small', onclick: () => { ui.calMes = null; guardarUi(); render(); } }, 'Hoy'),
       h('button', { class: 'btn small', onclick: () => mover(1), 'aria-label': 'Mes siguiente' }, '→'),
@@ -797,6 +800,25 @@ function modal(titulo, cuerpo, pie) {
 const campo = (label, input, full) => h('div', { class: 'field' + (full ? ' full' : '') }, h('label', { for: input.id }, label), input);
 const sel = (id, opciones, valor, dis) => { const s = h('select', { id, disabled: dis || null }, ...opciones.map(([v, l]) => h('option', { value: v }, l))); s.value = valor; return s; };
 
+async function duplicar(t) {
+  let imgs = [];
+  try { imgs = await Promise.all((t.imagenes || []).map((ref) => ref.startsWith('data:') ? ref : cargarImagen(ref))); } catch (e) { imgs = []; }
+  const copia = JSON.parse(JSON.stringify(t));
+  ['id', 'creado', 'link', 'devoluciones', 'horasReal'].forEach((k) => delete copia[k]);
+  Object.assign(copia, { titulo: t.titulo + ' (copia)', estado: 'pedido', horasReal: 0, devoluciones: [], link: '', imagenes: imgs.filter(Boolean), pedidoPor: ui.yo });
+  cerrarModal(); abrirTarea(null, copia); toast('Copia lista: cambiá lo que necesites y creala');
+}
+
+function abrirDia(s) {
+  if (!esAdmin()) return;
+  const antes = (() => { const d = parse(s); d.setDate(d.getDate() - 1); const r = iso(d); return r < HOY ? (s < HOY ? s : HOY) : r; })();
+  modal(fCorta(s).replace(/^./, (c) => c.toUpperCase()), h('div', { style: 'display:grid;gap:10px' },
+      h('button', { class: 'btn primary', style: 'justify-content:center;padding:12px', onclick: () => { cerrarModal(); abrirTarea(null, { publica: s, entrega: antes }); } }, 'Nuevo pedido para publicar este día'),
+      h('button', { class: 'btn', style: 'justify-content:center;padding:12px', onclick: () => { cerrarModal(); abrirFecha(null, s); } }, 'Nueva fecha en el calendario (publicación, reunión, evento…)'),
+      h('p', { style: 'margin:0;font-size:12px;color:var(--muted)' }, 'El pedido queda con fecha de publicación ' + fCorta(s) + ' y entrega ' + fCorta(antes) + '. Las dos se pueden cambiar.')),
+    h('div', { class: 'sheet-foot' }, h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'))));
+}
+
 function selectorPersonas(inicial, soloLectura) {
   let elegidos = inicial.slice();
   const el = h('div', { class: 'toggles', role: 'group', 'aria-label': 'Responsables' });
@@ -807,12 +829,12 @@ function selectorPersonas(inicial, soloLectura) {
   return { el, valor: () => elegidos.slice() };
 }
 
-function abrirTarea(t) {
+function abrirTarea(t, base) {
   const nueva = !t;
   const admin = esAdmin();
   const propia = t && esDe(t, ui.yo);
   if (nueva && !admin) return;
-  const x = t || { titulo: '', marca: ui.marca !== 'todas' ? ui.marca : 'zebra', tipo: 'Post', resp: '', estado: 'pedido', entrega: dia(3), prioridad: 'Normal', horasEst: 2, horasReal: 0, pedidoPor: ui.yo, brief: '', contenido: '', referencias: '', imagenes: [], devoluciones: [], link: '' };
+  const x = t || { titulo: '', marca: ui.marca !== 'todas' ? ui.marca : 'zebra', tipo: 'Post', resp: '', estado: 'pedido', entrega: dia(3), prioridad: 'Normal', horasEst: 2, horasReal: 0, pedidoPor: ui.yo, brief: '', contenido: '', referencias: '', imagenes: [], devoluciones: [], link: '', publica: '', ...(base || {}) };
   let imagenes = (x.imagenes || []).slice();
   const soloLectura = !admin;
   const respSel = selectorPersonas(resps(x), soloLectura);
@@ -824,6 +846,7 @@ function abrirTarea(t) {
     tipo: sel('tt-tipo', TIPOS.map((v) => [v, v]), x.tipo, soloLectura),
     estado: sel('tt-estado', estadosPermitidos.map((e) => [e.id, e.nombre]), x.estado, !puedeEntregar),
     entrega: h('input', { id: 'tt-entrega', type: 'date', value: x.entrega, readonly: soloLectura || null }),
+    publica: h('input', { id: 'tt-publica', type: 'date', value: x.publica || '', readonly: soloLectura || null }),
     prioridad: sel('tt-prio', PRIORIDADES.map((v) => [v, v]), x.prioridad, soloLectura),
     horasEst: h('input', { id: 'tt-hest', type: 'number', min: '0', step: '0.5', value: x.horasEst, readonly: soloLectura || null }),
     horasReal: h('input', { id: 'tt-hreal', type: 'number', min: '0', step: '0.5', value: x.horasReal, readonly: !puedeEntregar || null }),
@@ -856,7 +879,7 @@ function abrirTarea(t) {
   const cuerpo = h('div', { class: 'form' },
     seccion('El pedido'),
     campo('Qué hay que hacer', f.titulo, true), campo('Marca', f.marca), campo('Tipo', f.tipo),
-    h('div', { class: 'field full' }, h('label', {}, 'Responsables (podés marcar más de uno)'), respSel.el), campo('Fecha de entrega', f.entrega), campo('Prioridad', f.prioridad),
+    h('div', { class: 'field full' }, h('label', {}, 'Responsables (podés marcar más de uno)'), respSel.el), campo('Fecha de entrega', f.entrega), campo('Fecha de publicación', f.publica), campo('Prioridad', f.prioridad),
     campo('Contenido que tiene que ir', f.contenido, true),
     seccion('Referencias'),
     campo('Links de referencia', f.referencias, true),
@@ -874,7 +897,7 @@ function abrirTarea(t) {
     if (admin) {
       const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné qué hay que hacer'); f.titulo.focus(); return; }
       if (!respSel.valor().length) { toast('Elegí al menos un responsable'); return; }
-      Object.assign(x, { titulo, marca: f.marca.value, tipo: f.tipo.value, resps: respSel.valor(), resp: respSel.valor()[0], entrega: f.entrega.value || dia(3), prioridad: f.prioridad.value, horasEst: Number(f.horasEst.value) || 0,
+      Object.assign(x, { titulo, marca: f.marca.value, tipo: f.tipo.value, resps: respSel.valor(), resp: respSel.valor()[0], entrega: f.entrega.value || dia(3), publica: f.publica.value || '', prioridad: f.prioridad.value, horasEst: Number(f.horasEst.value) || 0,
         contenido: f.contenido.value, referencias: f.referencias.value.trim(), brief: f.brief.value, imagenes });
     }
     if (puedeEntregar) {
@@ -888,6 +911,7 @@ function abrirTarea(t) {
   const pie = h('div', { class: 'sheet-foot' },
     t && admin ? botonPeligro('Eliminar tarea', () => { S.tareas = S.tareas.filter((y) => y !== t); guardar(); cerrarModal(); render(); toast('Tarea eliminada'); }) : null,
     h('div', { class: 'right' },
+      t && admin ? h('button', { class: 'btn', onclick: () => duplicar(t) }, 'Duplicar') : null,
       t && admin && x.estado === 'revision' ? h('button', { class: 'btn', onclick: () => { cerrarModal(); devolver(t); } }, 'Devolver con cambios') : null,
       h('button', { class: 'btn', onclick: cerrarModal }, puedeEntregar ? 'Cancelar' : 'Cerrar'),
       puedeEntregar ? h('button', { class: 'btn primary', onclick: guardarTarea }, nueva ? 'Crear tarea' : 'Guardar') : null));
@@ -895,9 +919,9 @@ function abrirTarea(t) {
 }
 
 const FORMATOS = ['Historia', 'Post', 'Carrusel', 'Reel', 'Pauta'];
-function abrirFecha(fe) {
+function abrirFecha(fe, fechaInicial) {
   const admin = esAdmin();
-  const x = fe || { titulo: '', tipo: 'Publicación', formatos: [], marca: 'zebra', fecha: dia(1), hora: '', notas: '', resps: [], estado: 'pedido' };
+  const x = fe || { titulo: '', tipo: 'Publicación', formatos: [], marca: 'zebra', fecha: fechaInicial || dia(1), hora: '', notas: '', resps: [], estado: 'pedido' };
   let formatos = (x.formatos || []).slice();
   const mia = fe && esDe(fe, ui.yo);
   const respSel = selectorPersonas(resps(x), !admin);
