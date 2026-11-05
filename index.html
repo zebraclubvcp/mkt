@@ -370,6 +370,51 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .scrim.drawer .sheet { grid-template-columns: minmax(0, 1fr); }
 .scrim.drawer .d-body, .scrim.drawer .d-foot, .form > * { min-width: 0; }
 .sheet-foot .right { flex-wrap: wrap; justify-content: flex-end; }
+/* hoja de ruta */
+.board.ruta { grid-auto-columns: minmax(270px, 1fr); }
+.col-n { color: var(--muted); font-size: 11px; margin-top: -6px; }
+.col-h b { font-size: 13px; }
+.proy { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 12px 12px 15px; position: relative; overflow: hidden; }
+.proy::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--bcol, var(--line)); }
+.proy:hover { border-color: var(--muted); }
+.proy:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+.proy-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.proy-top b { font-weight: 600; line-height: 1.3; }
+.proy-obj { margin: 0; font-size: 12.5px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.proy-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 11.5px; color: var(--muted); }
+.proy-meta .late { color: var(--bad); font-weight: 600; }
+.proy-avs { margin-left: auto; display: inline-flex; }
+.prog { height: 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--ok); border-radius: 999px; }
+.proy-next { display: grid; gap: 1px; font-size: 12.5px; background: var(--surface-2); border-radius: 8px; padding: 7px 9px; }
+.proy-next small { font-size: 11px; color: var(--muted); }
+.ruta-done { display: grid; gap: 8px; padding: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.paso { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 9px 14px; border-top: 1px solid var(--line); }
+.sec-h + .paso, .pasos-ed > .paso:first-child { border-top: 0; }
+.pasos-ed { display: grid; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); }
+.pasos-ed > p { padding: 10px 12px; }
+.pasos-ed .paso { grid-template-columns: auto minmax(0, 1fr) auto auto auto; padding: 8px 10px; }
+.pc { width: 18px; height: 18px; accent-color: var(--ok); margin: 0; cursor: pointer; }
+.paso-t { min-width: 0; display: grid; gap: 1px; }
+.paso-t .tx { font-size: 13.5px; }
+.paso.hecho .tx { text-decoration: line-through; color: var(--muted); }
+.paso-pr { all: unset; cursor: pointer; font-size: 11.5px; color: var(--info); justify-self: start; }
+.paso-pr:hover { text-decoration: underline; }
+.paso-f { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.paso-f.late { color: var(--bad); font-weight: 600; }
+.paso-f.hoy { color: var(--info); font-weight: 600; }
+.paso-act { display: flex; gap: 4px; }
+.paso-add { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 6px; margin-top: 8px; }
+.paso-add input, .paso-add select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0; }
+@media (max-width: 600px) {
+  .paso { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .paso > .av { display: none; }
+  .pasos-ed .paso { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .pasos-ed .paso .paso-f { grid-column: 2; grid-row: 2; }
+  .pasos-ed .paso .paso-act { grid-column: 3; grid-row: 1 / span 2; }
+  .paso-add { grid-template-columns: 1fr 1fr; }
+  .paso-add input:first-child { grid-column: 1 / -1; }
+}
 .coment { display: grid; gap: 8px; }
 .coment .c { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; font-size: 13px; }
 .coment .c div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; }
@@ -492,6 +537,7 @@ const ESTADOS = [
 const PRIORIDADES = ['Baja', 'Normal', 'Alta', 'Urgente'];
 const VISTAS = [
   { id: 'resumen', nombre: 'Resumen', admin: true },
+  { id: 'ruta', nombre: 'Hoja de ruta', admin: true },
   { id: 'temas', nombre: 'Temas', admin: true },
   { id: 'mis', nombre: 'Mis tareas' },
   { id: 'novedades', nombre: 'Novedades' },
@@ -660,10 +706,12 @@ function escucharTemas() {
       const o = viejos.get(d.id) || {};
       Object.keys(o).forEach((k) => { if (k !== 'id' && !(k in data)) delete o[k]; });
       Object.assign(o, data, { id: d.id }); o.opiniones = o.opiniones || []; o.pedidos = o.pedidos || []; o.resps = o.resps || [];
+      if (o.tipo === 'proyecto') { o.pasos = o.pasos || []; o.notas = o.notas || []; }
       nuevos.push(o);
     });
     S.temas = nuevos;
     temasListo = true; temasBloqueado = false;
+    if (migrarMacro()) guardar();
     if (listo) pedirRender();
   }, (err) => { console.error(err); temasBloqueado = true; temasListo = true; if (listo) pedirRender(); }));
 }
@@ -770,6 +818,8 @@ const TXT_AVISO = {
   devuelta: (o, a, ev) => a + ' te devolvió "' + o.titulo + '" con cambios' + (ev.txt ? ': ' + ev.txt : ''),
   aprobada: (o, a) => a + ' aprobó "' + o.titulo + '"',
   publicada: (o, a) => a + ' marcó publicada "' + o.titulo + '"',
+  paso: (o, a, ev) => a + ' te asignó un paso en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
+  proyecto: (o, a) => a + ' te puso a cargo del proyecto "' + o.titulo + '"',
   comentario: (o, a, ev) => a + ' comentó en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
   dato: (o, a, ev) => a + ' te pidió un dato en la campaña "' + (o.nombre || o.titulo) + '"' + (ev.txt ? ': ' + ev.txt : ''),
 };
@@ -808,7 +858,7 @@ const LEIDO_KEY = () => KEY + '-leido-' + ui.yo;
 const leidoHasta = () => { try { return Number(localStorage.getItem(LEIDO_KEY())) || 0; } catch (e) { return 0; } };
 function misAvisos() {
   const out = [];
-  [...S.tareas, ...S.fechas, ...S.campanias].forEach((o) => (o.log || []).forEach((ev) => { if ((ev.para || []).includes(ui.yo) && ev.autor !== ui.yo) out.push({ o, ev }); }));
+  [...S.tareas, ...S.fechas, ...S.campanias, ...S.temas].forEach((o) => (o.log || []).forEach((ev) => { if ((ev.para || []).includes(ui.yo) && ev.autor !== ui.yo) out.push({ o, ev }); }));
   return out.sort((a, b) => b.ev.ts - a.ev.ts).slice(0, 80);
 }
 const sinLeer = () => { const l = leidoHasta(); return misAvisos().filter((x) => x.ev.ts > l).length; };
@@ -819,7 +869,7 @@ function vistaNovedades() {
   /* Al abrir Novedades queda todo marcado como leído (lo nuevo se ve resaltado esta vez). */
   try { localStorage.setItem(LEIDO_KEY(), String(Date.now())); } catch (e) {}
   setTimeout(pintarNav, 0);
-  const abrirO = (o) => (S.campanias.includes(o) ? ir('pauta') : abrir(o));
+  const abrirO = (o) => (S.campanias.includes(o) ? ir('pauta') : o.tipo === 'proyecto' ? abrirProyecto(o) : abrir(o));
   return h('div', { style: 'display:grid;gap:16px' },
     cabecera('Novedades', 'Lo que te asignaron, devolvieron, comentaron o pidieron.'),
     items.length ? h('div', { class: 'sec' }, ...items.map(({ o, ev }) => h('div', { class: 'row aviso' + (ev.ts > l ? ' nuevo' : ''), tabindex: '0', role: 'button', onclick: () => abrirO(o), onkeydown: (e) => { if (e.key === 'Enter') abrirO(o); } },
@@ -833,8 +883,8 @@ function vistaNovedades() {
 function contarVencidasMias() { return trabajos().filter((t) => esDe(t, ui.yo) && vencida(t)).length; }
 function pintarNav() {
   const mk = (v) => {
-    const n = v.id === 'mis' ? contarVencidasMias() : v.id === 'novedades' ? (ui.vista === 'novedades' ? 0 : sinLeer()) : v.id === 'temas' ? S.temas.filter((t) => t.estado !== 'decidido' && t.tipo === 'urgente' && t.resps.includes(ui.yo)).length : 0;
-    return h('button', { 'aria-current': ui.vista === v.id ? 'page' : null, onclick: () => ir(v.id) }, v.nombre, n ? h('span', { class: 'count', title: v.id === 'temas' ? 'Temas urgentes tuyos' : v.id === 'novedades' ? 'Sin leer' : 'Vencidas' }, n) : null);
+    const n = v.id === 'mis' ? contarVencidasMias() : v.id === 'novedades' ? (ui.vista === 'novedades' ? 0 : sinLeer()) : v.id === 'ruta' ? pasosPendientes(ui.yo).filter((x) => x.p.fecha && diff(x.p.fecha) <= 0).length : v.id === 'temas' ? S.temas.filter((t) => t.estado !== 'decidido' && t.tipo === 'urgente' && t.resps.includes(ui.yo)).length : 0;
+    return h('button', { 'aria-current': ui.vista === v.id ? 'page' : null, onclick: () => ir(v.id) }, v.nombre, n ? h('span', { class: 'count', title: v.id === 'temas' ? 'Temas urgentes tuyos' : v.id === 'ruta' ? 'Pasos para hoy o atrasados' : v.id === 'novedades' ? 'Sin leer' : 'Vencidas' }, n) : null);
   };
   const vis = VISTAS.filter((v) => !v.admin || esAdmin());
   $('#nav').replaceChildren(...vis.map(mk));
@@ -1281,7 +1331,7 @@ function tarjetaTema(t) {
   return h('div', { class: 'task', style: '--bcol:' + (t.tipo === 'urgente' ? 'var(--bad)' : 'var(--info)') },
     h('div', { class: 'task-top' }, h('span', { class: 'task-title' }, t.titulo), h('span', { class: 'pill ' + est.cls }, est.nombre)),
     h('div', { class: 'task-meta' },
-      h('span', { class: 'pill ' + (t.tipo === 'urgente' ? 'p-bad' : 'p-muted') }, t.tipo === 'urgente' ? 'Urgente' : 'Macro'),
+      h('span', { class: 'pill p-bad' }, 'Urgente'),
       h('span', { style: 'display:inline-flex;gap:6px;align-items:center' }, ...t.resps.map(av), nombresResp(t)),
       lim,
       t.opiniones.length ? h('span', {}, t.opiniones.length + (t.opiniones.length === 1 ? ' opinión' : ' opiniones')) : null,
@@ -1296,7 +1346,7 @@ function vistaTemas() {
   const filtro = ui.temasFiltro || 'abiertos';
   const quien = ui.temasQuien || 'todos';
   const chip = (k, v, txt) => h('button', { class: 'chip', 'aria-pressed': String((ui[k] || (k === 'temasFiltro' ? 'abiertos' : 'todos')) === v), onclick: () => { ui[k] = v; guardarUi(); render(); } }, txt);
-  const base = S.temas.filter((t) => quien === 'todos' || t.resps.includes(ui.yo));
+  const base = S.temas.filter((t) => t.tipo !== 'proyecto' && (quien === 'todos' || t.resps.includes(ui.yo)));
   const abiertos = base.filter((t) => t.estado !== 'decidido').sort(ordenTemas);
   const decididos = base.filter((t) => t.estado === 'decidido').sort((a, b) => (b.decididoEl || '').localeCompare(a.decididoEl || ''));
   const grupo = (titulo, ts, cls) => ts.length ? h('div', { class: 'group' + (cls ? ' ' + cls : '') }, h('h3', {}, titulo, h('span', { class: 'n' }, ts.length)), h('div', { class: 'list' }, ...ts.map(tarjetaTema))) : null;
@@ -1304,10 +1354,10 @@ function vistaTemas() {
     ? h('div', { class: 'warnbox' }, 'Firebase todavía no deja guardar temas. Hay que agregar la colección "temas" en las reglas de Firestore del proyecto zebra-mkt (pedile a Claude la línea exacta).')
     : !temasListo ? h('div', { class: 'empty' }, 'Cargando temas…')
     : filtro === 'abiertos'
-      ? (abiertos.length ? [grupo('Urgentes', abiertos.filter((t) => t.tipo === 'urgente'), 'late'), grupo('Macro', abiertos.filter((t) => t.tipo !== 'urgente'))] : h('div', { class: 'empty' }, 'No hay temas abiertos.'))
+      ? (abiertos.length ? grupo('Urgentes', abiertos, 'late') : h('div', { class: 'empty' }, 'No hay temas abiertos.'))
       : (decididos.length ? grupo('Decididos', decididos) : h('div', { class: 'empty' }, 'Todavía no hay temas decididos.'));
   return h('div', { style: 'display:grid;gap:18px' },
-    cabecera('Temas', 'Puntos a ver y decidir entre Manu, Mica y Agus. Diseño, edición y pauta no los ven.', h('button', { class: 'btn primary', onclick: () => abrirTema(null) }, '+ Tema')),
+    cabecera('Temas', 'Urgencias y decisiones entre Manu, Mica y Agus. Las ideas grandes van en Hoja de ruta.', h('button', { class: 'btn primary', onclick: () => abrirTema(null) }, '+ Tema')),
     h('div', { class: 'chips' }, chip('temasFiltro', 'abiertos', 'Abiertos'), chip('temasFiltro', 'decididos', 'Decididos'), h('span', { style: 'width:8px' }), chip('temasQuien', 'todos', 'De todas'), chip('temasQuien', 'mios', 'Míos')),
     cuerpo);
 }
@@ -1321,7 +1371,7 @@ function abrirTema(t, decidir) {
   pintar();
   const f = {
     titulo: h('input', { id: 'tm-titulo', value: x.titulo, placeholder: 'Ej. Halloween: qué se pauta y cuánta plata hace falta' }),
-    tipo: sel('tm-tipo', [['urgente', 'Urgente'], ['macro', 'Macro']], x.tipo),
+    tipo: { value: 'urgente' },
     estado: sel('tm-estado', ESTADOS_TEMA.map((e) => [e.id, e.nombre]), decidir ? 'decidido' : x.estado),
     limite: h('input', { id: 'tm-limite', type: 'date', value: x.limite || '' }),
     detalle: h('textarea', { id: 'tm-detalle', placeholder: 'Qué hay que ver, preguntas a responder, contexto…', style: 'min-height:80px' }, x.detalle || ''),
@@ -1357,7 +1407,7 @@ function abrirTema(t, decidir) {
       h('div', { class: 'task-meta' }, h('span', {}, nombresResp(p)), h('span', { class: vencida(p) ? 'late' : '' }, (vencida(p) ? 'Vencida · ' : 'Entrega ') + cuando(p.entrega))))))) : null;
   const seccion = (txt) => h('p', { class: 'full', style: 'margin:6px 0 0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)' }, txt);
   const cuerpo = h('div', { class: 'form' },
-    campo('Tema', f.titulo, true), campo('Tipo', f.tipo), campo('Para cuándo (opcional)', f.limite),
+    campo('Tema', f.titulo, true), campo('Para cuándo (opcional)', f.limite),
     h('div', { class: 'field full' }, h('label', {}, 'Responsables'), tg),
     campo('Qué hay que ver', f.detalle, true),
     seccion('Charla y decisión'),
@@ -1381,6 +1431,210 @@ function abrirTema(t, decidir) {
   if (decidir) setTimeout(() => f.decision.focus(), 50);
 }
 
+/* ===== hoja de ruta: ideas macro bajadas a pasos diarios (solo Manu, Mica y Agus) =====
+   Se guarda en la colección "temas" con tipo "proyecto", así no hace falta tocar las reglas de Firebase. */
+const TIPOS_PROY = [
+  { id: 'planificacion', nombre: 'Planificación' },
+  { id: 'pauta', nombre: 'Pauta' },
+  { id: 'implementacion', nombre: 'Implementación' },
+  { id: 'investigacion', nombre: 'Investigación' },
+  { id: 'creatividad', nombre: 'Creatividad' },
+];
+const ESTADOS_PROY = [
+  { id: 'idea', nombre: 'Idea', cls: 'p-muted' },
+  { id: 'desarrollo', nombre: 'En desarrollo', cls: 'p-warn' },
+  { id: 'marcha', nombre: 'En marcha', cls: 'st-proceso' },
+  { id: 'terminado', nombre: 'Terminado', cls: 'p-ok' },
+  { id: 'pausado', nombre: 'Pausado', cls: 'p-muted' },
+];
+const HORIZONTES = [
+  { id: 'ahora', nombre: 'Ahora', nota: 'Lo que se está moviendo este mes' },
+  { id: 'proximo', nombre: 'Próximo', nota: 'Arranca cuando se libere algo de Ahora' },
+  { id: 'despues', nombre: 'Más adelante', nota: 'Ideas para retomar' },
+];
+const proyectos = () => S.temas.filter((t) => t.tipo === 'proyecto');
+const estadoProy = (id) => ESTADOS_PROY.find((e) => e.id === id) || ESTADOS_PROY[0];
+const tipoProy = (id) => TIPOS_PROY.find((e) => e.id === id) || { nombre: 'Sin tipo' };
+const avance = (pr) => { const n = (pr.pasos || []).length, d = (pr.pasos || []).filter((p) => p.hecho).length; return { n, d, pct: n ? d / n : 0 }; };
+const mesTxt = (m) => { if (!m) return ''; const [y, mm] = m.split('-').map(Number); return MESES[mm - 1] + (y !== Number(HOY.slice(0, 4)) ? ' ' + y : ''); };
+function pasosPendientes(quien) {
+  const out = [];
+  proyectos().forEach((pr) => { if (pr.estado === 'terminado' || pr.estado === 'pausado') return; (pr.pasos || []).forEach((p) => { if (!p.hecho && (!quien || p.resp === quien)) out.push({ pr, p }); }); });
+  return out.sort((a, b) => (a.p.fecha || '9999').localeCompare(b.p.fecha || '9999'));
+}
+/* Los temas "Macro" de antes pasan a ser proyectos de la hoja de ruta (una sola vez, por quien los vea primero). */
+function migrarMacro() {
+  if (!esAdmin()) return false;
+  let hubo = false;
+  S.temas.forEach((t) => {
+    if (t.tipo !== 'macro') return;
+    hubo = true;
+    const notas = (t.opiniones || []).map((o) => ({ autor: o.autor, fecha: o.fecha, texto: o.texto }));
+    if (t.decision) notas.push({ autor: t.creadoPor || 'manu', fecha: t.decididoEl || HOY, texto: 'Decisión: ' + t.decision });
+    Object.assign(t, { tipo: 'proyecto', objetivo: t.detalle || '', categoria: 'planificacion', marca: 'general', mes: (t.limite || '').slice(0, 7),
+      horizonte: t.estado === 'charla' ? 'ahora' : 'proximo', estado: t.estado === 'decidido' ? 'terminado' : t.estado === 'charla' ? 'desarrollo' : 'idea',
+      pasos: [], notas });
+  });
+  return hubo;
+}
+function marcarPaso(pr, p, hecho) {
+  p.hecho = hecho; p.hechoEl = hecho ? HOY : '';
+  if (hecho && pr.estado === 'idea') pr.estado = 'desarrollo';
+  guardar(); render();
+  toast(hecho ? 'Paso hecho' : 'Paso reabierto');
+}
+const fechaPaso = (p) => !p.fecha ? 'Sin fecha' : diff(p.fecha) < 0 ? 'Atrasado · ' + cuando(p.fecha) : cuando(p.fecha).replace(/^./, (c) => c.toUpperCase());
+function filaPaso(pr, p, conProyecto) {
+  const late = !p.hecho && p.fecha && diff(p.fecha) < 0;
+  const ck = h('input', { type: 'checkbox', class: 'pc', 'aria-label': 'Hecho: ' + p.texto, onclick: (e) => e.stopPropagation(), onchange: (e) => marcarPaso(pr, p, e.target.checked) });
+  ck.checked = !!p.hecho;
+  return h('div', { class: 'paso' + (p.hecho ? ' hecho' : '') },
+    ck,
+    h('div', { class: 'paso-t' }, h('span', { class: 'tx' }, p.texto),
+      conProyecto ? h('button', { class: 'paso-pr', onclick: () => abrirProyecto(pr) }, pr.titulo) : null),
+    h('span', { class: 'paso-f' + (late ? ' late' : !p.hecho && p.fecha === HOY ? ' hoy' : '') }, fechaPaso(p)),
+    av(p.resp));
+}
+function tarjetaProyecto(pr) {
+  const a = avance(pr), est = estadoProy(pr.estado);
+  const prox = (pr.pasos || []).filter((p) => !p.hecho).sort((x, y) => (x.fecha || '9999').localeCompare(y.fecha || '9999'))[0];
+  const atras = (pr.pasos || []).filter((p) => !p.hecho && p.fecha && diff(p.fecha) < 0).length;
+  return h('button', { class: 'proy', style: '--bcol:' + marca(pr.marca).color, onclick: () => abrirProyecto(pr) },
+    h('div', { class: 'proy-top' }, h('b', {}, pr.titulo), h('span', { class: 'pill ' + est.cls }, est.nombre)),
+    pr.objetivo ? h('p', { class: 'proy-obj' }, pr.objetivo) : null,
+    h('div', { class: 'proy-meta' }, h('span', { class: 'pill p-muted' }, tipoProy(pr.categoria).nombre), pr.marca && pr.marca !== 'general' ? h('span', {}, marca(pr.marca).nombre) : null,
+      pr.mes ? h('span', {}, 'Para ' + mesTxt(pr.mes)) : null, h('span', { class: 'proy-avs' }, ...pr.resps.map(av))),
+    h('div', { class: 'prog', title: a.d + ' de ' + a.n + ' pasos hechos' }, h('i', { style: 'width:' + Math.round(a.pct * 100) + '%' })),
+    h('div', { class: 'proy-meta' }, h('span', {}, a.n ? a.d + '/' + a.n + ' pasos' : 'Sin pasos todavía'), atras ? h('span', { class: 'late' }, atras + (atras === 1 ? ' atrasado' : ' atrasados')) : null),
+    prox ? h('div', { class: 'proy-next' }, h('small', {}, 'Próximo paso · ' + fechaPaso(prox)), h('span', {}, prox.texto + ' · ' + persona(prox.resp).nombre)) : null);
+}
+function vistaRuta() {
+  const modo = ui.rutaModo || 'hoy';
+  const seg = (v, t) => h('button', { 'aria-pressed': String(modo === v), onclick: () => { ui.rutaModo = v; guardarUi(); render(); } }, t);
+  const cab = cabecera('Hoja de ruta', 'Ideas grandes de Manu, Mica y Agus, bajadas a pasos de todos los días. Diseño, edición y pauta no la ven.',
+    h('button', { class: 'btn primary', onclick: () => abrirProyecto(null) }, '+ Proyecto'));
+  const barra = h('div', { class: 'toolbar' }, h('div', { class: 'left' }, h('div', { class: 'seg', role: 'group', 'aria-label': 'Vista' }, seg('hoy', 'Hoy'), seg('ruta', 'Proyectos'))),
+    modo === 'hoy' ? h('div', { class: 'right' }, h('div', { class: 'seg', role: 'group', 'aria-label': 'De quién' },
+      ...[['mio', 'Lo mío'], ['todos', 'Los tres']].map(([v, t]) => h('button', { 'aria-pressed': String((ui.rutaQuien || 'mio') === v), onclick: () => { ui.rutaQuien = v; guardarUi(); render(); } }, t)))) : null);
+  if (temasBloqueado) return h('div', { style: 'display:grid;gap:16px' }, cab, h('div', { class: 'warnbox' }, 'Firebase no deja leer la hoja de ruta. Revisá las reglas de la colección "temas".'));
+  if (!temasListo) return h('div', { style: 'display:grid;gap:16px' }, cab, h('div', { class: 'empty' }, 'Cargando…'));
+  let cuerpo;
+  if (modo === 'hoy') {
+    const quien = (ui.rutaQuien || 'mio') === 'mio' ? ui.yo : null;
+    const ps = pasosPendientes(quien);
+    const atr = ps.filter((x) => x.p.fecha && diff(x.p.fecha) < 0), hoy = ps.filter((x) => x.p.fecha === HOY);
+    const sem = ps.filter((x) => x.p.fecha && diff(x.p.fecha) >= 1 && diff(x.p.fecha) <= 7), mas = ps.filter((x) => !x.p.fecha || diff(x.p.fecha) > 7);
+    const hechosHoy = proyectos().flatMap((pr) => (pr.pasos || []).filter((p) => p.hecho && p.hechoEl === HOY && (!quien || p.resp === quien)).map((p) => ({ pr, p })));
+    const sec = (cls, t, nota, xs, cerrada) => {
+      if (!xs.length) return null;
+      const head = [h('span', {}, t), nota ? h('small', {}, nota) : null, h('span', { class: 'n' }, xs.length)];
+      const filas = xs.map((x) => filaPaso(x.pr, x.p, true));
+      return cerrada ? h('details', { class: 'sec ' + cls }, h('summary', { class: 'sec-h' }, ...head), ...filas) : h('div', { class: 'sec ' + cls }, h('div', { class: 'sec-h' }, ...head), ...filas);
+    };
+    const grupos = [sec('late', 'Atrasados', 'Pasó el día y siguen abiertos', atr), sec('hoy', 'Para hoy', '', hoy), sec('sem', 'Esta semana', '', sem), sec('mas', 'Más adelante o sin fecha', '', mas, true), sec('ok', 'Hechos hoy', '', hechosHoy, true)].filter(Boolean);
+    cuerpo = grupos.length ? grupos : [h('div', { class: 'empty' }, proyectos().length ? 'No hay pasos pendientes. Abrí un proyecto para sumar los próximos.' : 'Todavía no hay proyectos. Creá el primero con "+ Proyecto".')];
+  } else {
+    const activos = proyectos().filter((p) => p.estado !== 'terminado');
+    const terminados = proyectos().filter((p) => p.estado === 'terminado');
+    cuerpo = [h('div', { class: 'board ruta' }, ...HORIZONTES.map((hz) => {
+      const ps = activos.filter((p) => (p.horizonte || 'proximo') === hz.id).sort((a, b) => (a.mes || '9999').localeCompare(b.mes || '9999'));
+      return h('div', { class: 'col' }, h('div', { class: 'col-h' }, h('b', {}, hz.nombre), h('span', {}, ps.length)), h('small', { class: 'col-n' }, hz.nota),
+        ...(ps.length ? ps.map(tarjetaProyecto) : [h('div', { class: 'empty' }, 'Nada acá')]));
+    })),
+    terminados.length ? h('details', { class: 'sec ok' }, h('summary', { class: 'sec-h' }, h('span', {}, 'Terminados'), h('span', { class: 'n' }, terminados.length)),
+      h('div', { class: 'ruta-done' }, ...terminados.map(tarjetaProyecto))) : null];
+  }
+  return h('div', { style: 'display:grid;gap:16px' }, cab, barra, ...cuerpo);
+}
+function abrirProyecto(pr) {
+  const nuevo = !pr;
+  const x = pr || { tipo: 'proyecto', titulo: '', objetivo: '', categoria: 'planificacion', marca: 'general', resps: [ui.yo], mes: '', horizonte: 'ahora', estado: 'idea', pasos: [], notas: [], pedidos: [], creadoPor: ui.yo };
+  let pasos = (x.pasos || []).map((p) => ({ ...p }));
+  const f = {
+    titulo: h('input', { id: 'pr-titulo', value: x.titulo, placeholder: 'Ej. Rebranding de Kosmos' }),
+    objetivo: h('textarea', { id: 'pr-obj', placeholder: 'Qué queremos lograr y cómo nos damos cuenta de que salió bien', style: 'min-height:64px' }, x.objetivo || ''),
+    categoria: chipSel('pr-tipo', TIPOS_PROY.map((t) => [t.id, t.nombre]), x.categoria),
+    marca: chipSel('pr-marca', [['general', 'General'], ...MARCAS.map((m) => [m.id, m.nombre, m.color])], x.marca || 'general'),
+    resp: chipSel('pr-resp', admins().map((p) => [p.id, p.nombre]), x.resps[0] || ui.yo),
+    horizonte: chipSel('pr-hz', HORIZONTES.map((hz) => [hz.id, hz.nombre]), x.horizonte || 'ahora'),
+    estado: chipSel('pr-estado', ESTADOS_PROY.map((e) => [e.id, e.nombre]), x.estado),
+    mes: h('input', { id: 'pr-mes', type: 'month', value: x.mes || '' }),
+  };
+  /* Pasos: en un proyecto que ya existe se guardan al momento; en uno nuevo, al crearlo. */
+  const listaPasos = h('div', { class: 'pasos-ed' });
+  const tituloPasos = h('p', { class: 'full', style: 'margin:6px 0 0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)' });
+  const commit = () => { if (nuevo) return; x.pasos = pasos.map((p) => ({ ...p })); guardar(); render(); };
+  const pintarPasos = () => {
+    const av0 = avance({ pasos }); tituloPasos.textContent = 'Pasos' + (av0.n ? ' · ' + av0.d + ' de ' + av0.n + ' hechos' : '');
+    const orden = pasos.slice().sort((a, b) => Number(a.hecho) - Number(b.hecho) || (a.fecha || '9999').localeCompare(b.fecha || '9999'));
+    listaPasos.replaceChildren(...(orden.length ? orden.map((p) => {
+      const ck = h('input', { type: 'checkbox', class: 'pc', 'aria-label': 'Hecho: ' + p.texto, onchange: (e) => { p.hecho = e.target.checked; p.hechoEl = p.hecho ? HOY : ''; commit(); pintarPasos(); } });
+      ck.checked = !!p.hecho;
+      return h('div', { class: 'paso' + (p.hecho ? ' hecho' : '') }, ck,
+        h('div', { class: 'paso-t' }, h('span', { class: 'tx' }, p.texto)),
+        h('span', { class: 'paso-f' + (!p.hecho && p.fecha && diff(p.fecha) < 0 ? ' late' : '') }, fechaPaso(p)), av(p.resp),
+        h('div', { class: 'paso-act' },
+          !nuevo ? h('button', { class: 'btn small', title: 'Crea un pedido para diseño, edición o pauta', onclick: () => {
+            cerrarModal(); abrirTarea(null, { titulo: p.texto, contenido: x.objetivo || '', entrega: p.fecha && diff(p.fecha) >= 0 ? p.fecha : dia(3), temaId: x.id, marca: x.marca !== 'general' ? x.marca : 'zebra' });
+            toast('Completá el pedido y elegí quién lo hace'); } }, 'Pedido') : null,
+          h('button', { class: 'btn small', 'aria-label': 'Borrar paso', onclick: () => { pasos = pasos.filter((y) => y !== p); commit(); pintarPasos(); } }, '×')));
+    }) : [h('p', { class: 'note', style: 'margin:0' }, 'Bajá la idea a pasos chicos: una acción, una persona, un día.')]));
+  };
+  pintarPasos();
+  const nTexto = h('input', { id: 'pr-paso', placeholder: 'Nuevo paso, ej. Pedir 3 presupuestos de imprenta' });
+  const nResp = sel('pr-paso-resp', admins().map((p) => [p.id, p.nombre]), ui.yo);
+  const nFecha = h('input', { id: 'pr-paso-fecha', type: 'date', value: HOY });
+  const agregar = () => {
+    const t = nTexto.value.trim(); if (!t) { nTexto.focus(); return; }
+    const p = { id: uid(), texto: t, resp: nResp.value, fecha: nFecha.value || '', hecho: false, ts: Date.now() };
+    pasos.push(p);
+    if (!nuevo && p.resp !== ui.yo) avisar(x, 'paso', [p.resp], t);
+    commit(); pintarPasos(); nTexto.value = ''; nTexto.focus();
+  };
+  nTexto.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); agregar(); } });
+  const addRow = h('div', { class: 'paso-add' }, nTexto, nResp, nFecha, h('button', { type: 'button', class: 'btn small primary', onclick: agregar }, 'Agregar'));
+  /* notas de avance */
+  const listaNotas = h('div', { style: 'display:grid;gap:6px' });
+  const pintarNotas = () => listaNotas.replaceChildren(...((x.notas || []).length ? x.notas.slice().reverse().map((n) => h('div', { class: 'pnota' }, h('small', {}, persona(n.autor).nombre + ' · ' + cuando(n.fecha)), h('span', {}, n.texto)))
+    : [h('p', { class: 'note', style: 'margin:0' }, 'Sin notas todavía.')]));
+  pintarNotas();
+  const notaTxt = h('textarea', { id: 'pr-nota', placeholder: 'Avance, idea, link, lo que se habló…', style: 'min-height:48px' });
+  const notas = nuevo ? null : h('div', { class: 'field full' }, h('label', { for: 'pr-nota' }, 'Notas de avance'), h('div', { class: 'pnotas' }, listaNotas,
+    h('div', { class: 'pnota-add' }, notaTxt, h('button', { class: 'btn small', onclick: () => {
+      const t = notaTxt.value.trim(); if (!t) { notaTxt.focus(); return; }
+      x.notas = [...(x.notas || []), { autor: ui.yo, fecha: HOY, texto: t }]; notaTxt.value = ''; guardar(); pintarNotas(); toast('Nota guardada');
+    } }, 'Sumar nota'))));
+  const peds = (x.pedidos || []).map((id) => S.tareas.find((y) => y.id === id)).filter(Boolean);
+  const pedidos = peds.length ? h('div', { class: 'field full' }, h('label', {}, 'Pedidos que salieron de este proyecto'), h('div', { class: 'list' }, ...peds.map((p) => fila(p)))) : null;
+  const cuerpo = h('div', { class: 'form' },
+    campo('Proyecto', f.titulo, true), campo('Qué queremos lograr', f.objetivo, true),
+    campo('Tipo', f.categoria, true), campo('Marca', f.marca, true),
+    campo('Responsable principal', f.resp), campo('Para cuándo (mes)', f.mes),
+    campo('En la hoja de ruta', f.horizonte), campo('Estado', f.estado),
+    tituloPasos,
+    h('div', { class: 'field full' }, listaPasos, addRow),
+    notas, pedidos,
+    pr ? h('p', { class: 'full', style: 'margin:0;font-size:12px;color:var(--muted)' }, 'Creado por ' + persona(x.creadoPor).nombre + (x.creado ? ' · ' + cuando(x.creado) : '')) : null);
+  const guardarProy = () => {
+    const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné el nombre del proyecto'); f.titulo.focus(); return; }
+    const antes = x.resps[0];
+    Object.assign(x, { titulo, objetivo: f.objetivo.value.trim(), categoria: f.categoria.value, marca: f.marca.value, resps: [f.resp.value], mes: f.mes.value || '', horizonte: f.horizonte.value, estado: f.estado.value, pasos: pasos.map((p) => ({ ...p })) });
+    if (nuevo) {
+      x.id = uid(); x.creado = HOY; S.temas.push(x);
+      const otros = [...new Set(pasos.map((p) => p.resp).filter((r) => r !== ui.yo))];
+      otros.forEach((r) => registrarAviso(x, 'paso', [r], pasos.filter((p) => p.resp === r).map((p) => p.texto).join(' · ')));
+    }
+    let r = null;
+    if (x.resps[0] !== ui.yo && x.resps[0] !== antes) r = registrarAviso(x, 'proyecto', x.resps);
+    if (r) setTimeout(() => ofrecerWa(r), 0);
+    guardar(); cerrarModal(); render(); toast(nuevo ? 'Proyecto creado' : 'Proyecto guardado');
+  };
+  const pie = h('div', { class: 'sheet-foot' },
+    pr ? botonPeligro('Eliminar proyecto', () => { S.temas = S.temas.filter((y) => y !== pr); guardar(); cerrarModal(); render(); toast('Proyecto eliminado'); }) : null,
+    h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cerrar'), h('button', { class: 'btn primary', onclick: guardarProy }, nuevo ? 'Crear proyecto' : 'Guardar')));
+  modal(nuevo ? 'Nuevo proyecto' : x.titulo, cuerpo, pie, { panel: true, cabeza: nuevo ? null : h('span', { class: 'pill ' + estadoProy(x.estado).cls }, estadoProy(x.estado).nombre) });
+}
+
 /* ===== resumen del equipo ===== */
 function metricasPersona(id) {
   const ts = trabajos().filter((t) => esDe(t, id));
@@ -1395,7 +1649,7 @@ function metricasPersona(id) {
     activas: activas.length, vencidas: activas.filter(vencida).length, revision: ts.filter((t) => t.estado === 'revision').length,
     entregadas: entregadas.length, pct: entregadas.length ? Math.round(aTiempo / entregadas.length * 100) : null, devol,
     est: r1(mes.reduce((s, t) => s + parte(t, 'horasEst'), 0)), real: r1(mes.reduce((s, t) => s + parte(t, 'horasReal'), 0)),
-    temas: S.temas.filter((t) => t.estado !== 'decidido' && t.resps.includes(id)).length,
+    temas: S.temas.filter((t) => t.tipo !== 'proyecto' && t.estado !== 'decidido' && t.resps.includes(id)).length,
     proxima: activas.filter((t) => !vencida(t) && !ENTREGADO.includes(t.estado)).sort((a, b) => a.entrega.localeCompare(b.entrega))[0],
   };
 }
@@ -1787,7 +2041,7 @@ function abrirFreelancer(fr) {
 function render() {
   pintarNav();
   const def = VISTAS.find((x) => x.id === ui.vista);
-  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, carga: vistaCarga, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
+  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, carga: vistaCarga, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
   $('#view').replaceChildren(listo ? v() : h('div', { class: 'empty', style: 'margin-top:40px' }, 'Cargando datos del equipo…'));
 }
 iniciar();
