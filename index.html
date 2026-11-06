@@ -471,6 +471,85 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
   .toast { animation: up .2s ease-out; }
   @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } }
 }
+/* calendario: tarjetas (título · responsable · estado · formato · prioridad) */
+.seg { display: inline-flex; gap: 4px; }
+.week { display: grid; grid-template-columns: repeat(7, minmax(150px, 1fr)); gap: 8px; min-width: 1090px; align-items: start; }
+.wday { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; display: grid; gap: 8px; align-content: start; min-height: 220px; }
+.wday.clickable { cursor: pointer; }
+.wday.clickable:hover { border-color: var(--muted); }
+.wday.today { border: 1.5px solid var(--kosmos-ring, var(--b-kosmos)); background: var(--surface); }
+.wday-h { display: flex; align-items: center; gap: 6px; padding: 0 2px 2px; }
+.wday-h .num { font-size: 15px; font-weight: 700; }
+.wday.today .wday-h .num { background: var(--b-kosmos); color: #fff; border-radius: 50%; width: 24px; height: 24px; display: inline-grid; place-items: center; font-size: 13px; }
+.wday-h .dw { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.wday-h .cnt { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 600; }
+.cc { all: unset; box-sizing: border-box; display: grid; gap: 6px; width: 100%; min-width: 0; padding: 8px 9px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); cursor: pointer; text-align: left; font-size: 12px; line-height: 1.3; }
+.cc:hover { border-color: var(--muted); }
+.cc:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+.cc.cc-prio { border-color: var(--bad); box-shadow: inset 3px 0 0 var(--bad); }
+.cc.cc-pub { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, var(--line)); }
+.cc.cc-ent { border-style: dashed; }
+.cc.cc-late .cc-t { color: var(--bad); }
+.cc-top { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.cc-hora { background: var(--ink); color: var(--ink-fg); font-weight: 700; font-size: 11px; padding: 1px 6px; border-radius: 5px; }
+.cc-tag { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; padding: 0 6px; border-radius: 5px; }
+.cc-t { font-weight: 600; font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+.cc-t .mk { display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 5px; vertical-align: 1px; }
+.cc-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.cc-foot { justify-content: space-between; }
+.cc-fmts { display: flex; flex-wrap: wrap; gap: 3px; min-width: 0; }
+.cc-fmt { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 5px; border: 1px solid currentColor; }
+.cc-fmt.k-hist { color: var(--c-hist); background: var(--c-hist-bg); }
+.cc-fmt.k-feed { color: var(--c-feed); background: var(--c-feed-bg); }
+.cc-fmt.k-pauta { color: var(--c-pauta); background: var(--c-pauta-bg); }
+.cc-fmt.k-reu { color: var(--c-reu); background: var(--c-reu-bg); }
+.cc-fmt.k-otro { color: var(--c-otro); background: var(--c-otro-bg); }
+.cc-avs { display: inline-flex; align-items: center; flex: none; }
+.cc-avs .av + .av { margin-left: -6px; }
+.cc-mas { font-size: 11px; color: var(--muted); font-weight: 600; margin-left: 3px; }
+.cc-sin { font-size: 11px; color: var(--muted); }
+.cal .day .cc { padding: 6px 7px; gap: 4px; }
+.cal .day .cc-t { font-size: 12px; }
+.cal { min-width: 980px; grid-template-columns: repeat(7, minmax(140px, 1fr)); }
+.cc-list { gap: 8px; }
+/* balance */
+.stat.area { display: grid; gap: 6px; }
+.stat.area .area-n { font-size: 12px; font-weight: 600; color: var(--fg); }
+.stat.area b.ok { color: var(--ok); } .stat.area b.warn { color: var(--warn); } .stat.area b.bad { color: var(--bad); }
+.stat.area .track { height: 6px; }
+.stat.area .track .real { top: 0; bottom: 0; background: var(--ok); }
+.stat.area .track .real.over { background: var(--bad); }
+.bal .metrics-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bal-pct { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.bal-pct.ok { color: var(--ok); } .bal-pct.warn { color: var(--warn); } .bal-pct.bad { color: var(--bad); }
+.bal-det { border-top: 1px solid var(--line); padding-top: 10px; }
+.bal-det > summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--info); list-style: none; }
+.bal-det > summary::-webkit-details-marker { display: none; }
+.bal-det > summary::before { content: "▸ "; }
+.bal-det[open] > summary::before { content: "▾ "; }
+.bal-det[open] { display: grid; gap: 12px; }
+.bal-sec { display: grid; gap: 6px; }
+.bal-sec h4 { margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.bal-sec h4.bad { color: var(--bad); } .bal-sec h4.ok { color: var(--ok); }
+.bal-list { display: grid; gap: 6px; }
+.bal-it { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; padding: 6px 8px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); }
+.bal-it .bal-tt { all: unset; cursor: pointer; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bal-it .bal-tt:hover { text-decoration: underline; }
+.bal-it .bal-tt .mk { display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 6px; }
+.bal-it small { grid-column: 1; font-size: 11px; color: var(--muted); }
+.bal-it .pill { grid-column: 2; grid-row: 1; justify-self: end; }
+.bal-it .btn { grid-column: 2; grid-row: 2; justify-self: end; padding: 2px 8px; font-size: 11px; }
+.bal { align-self: start; align-content: start; }
+.bal-people { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); align-items: start; }
+.cc.cc-prio.cc-alta { border-color: var(--warn); box-shadow: inset 3px 0 0 var(--warn); }
+.notas { display: grid; gap: 6px; }
+.nota { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
+.nota:hover { border-color: var(--muted); }
+.nota-t { display: grid; gap: 2px; font-size: 13px; min-width: 0; }
+.nota-t span { color: var(--muted); white-space: pre-wrap; }
+.nota-t .nota-ref { color: var(--muted); font-weight: 500; }
+.nota small { font-size: 11px; color: var(--muted); white-space: nowrap; }
+@media (max-width: 600px) { .nota { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -537,6 +616,7 @@ const ESTADOS = [
 const PRIORIDADES = ['Baja', 'Normal', 'Alta', 'Urgente'];
 const VISTAS = [
   { id: 'resumen', nombre: 'Resumen', admin: true },
+  { id: 'balance', nombre: 'Balance', admin: true },
   { id: 'ruta', nombre: 'Hoja de ruta', admin: true },
   { id: 'temas', nombre: 'Temas', admin: true },
   { id: 'mis', nombre: 'Mis tareas' },
@@ -577,9 +657,10 @@ const FIREBASE_CONFIG = {
 const COLS = ['tareas', 'fechas', 'campanias', 'freelancers'];
 
 /* ===== estado ===== */
-let S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [] };
+let S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [] };
 let temasBloqueado = false, temasListo = false;
-const ultimo = { tareas: new Map(), fechas: new Map(), campanias: new Map(), freelancers: new Map(), temas: new Map() };
+let notasBloqueado = false, notasListo = false;
+const ultimo = { tareas: new Map(), fechas: new Map(), campanias: new Map(), freelancers: new Map(), temas: new Map(), notas: new Map() };
 const imgCache = new Map();
 let db = null, listo = false;
 const KEY = 'zebra-mkt';
@@ -611,7 +692,7 @@ function marcarEntregas() {
     setPrev(o);
   });
 }
-const colsActivas = () => (esAdmin() && temasListo && !temasBloqueado ? [...COLS, 'temas'] : COLS);
+const colsActivas = () => [...COLS, ...(esAdmin() && temasListo && !temasBloqueado ? ['temas'] : []), ...(esAdmin() && notasListo && !notasBloqueado ? ['notas'] : [])];
 async function guardar() {
   if (!db) return;
   marcarEntregas();
@@ -666,9 +747,9 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function cortarEscucha() {
   desuscribir.forEach((f) => { try { f(); } catch (e) {} }); desuscribir = [];
   document.querySelectorAll('.wa-bar').forEach((x) => x.remove());
-  S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [] };
+  S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [] };
   Object.values(ultimo).forEach((m) => m.clear());
-  listo = false; temasListo = false; temasBloqueado = false;
+  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false;
 }
 function escuchar() {
   let pendientes = new Set(COLS);
@@ -694,7 +775,7 @@ function escuchar() {
     const cambios = typeof qs.docChanges === 'function' ? qs.docChanges().length : 1;
     if (!pendientes.size && (!listo || primera || cambios)) { listo = true; pedirRender(); }
   }, (err) => { console.error(err); gate('No tenés permiso para ver estos datos. Pedile a Manu que agregue tu mail.', true); })));
-  if (esAdmin()) escucharTemas();
+  if (esAdmin()) { escucharTemas(); escucharNotas(); }
 }
 function escucharTemas() {
   desuscribir.push(db.collection('temas').onSnapshot((qs) => {
@@ -714,6 +795,24 @@ function escucharTemas() {
     if (migrarMacro()) guardar();
     if (listo) pedirRender();
   }, (err) => { console.error(err); temasBloqueado = true; temasListo = true; if (listo) pedirRender(); }));
+}
+/* Anotaciones: Manu lee todas; Mica y Agus solo las no privadas (la consulta tiene que coincidir con la regla de Firestore). */
+function escucharNotas() {
+  const q = yo().jefe ? db.collection('notas') : db.collection('notas').where('privada', '==', false);
+  desuscribir.push(q.onSnapshot((qs) => {
+    const viejos = new Map(S.notas.map((o) => [o.id, o]));
+    const nuevos = [];
+    ultimo.notas.clear();
+    qs.forEach((d) => {
+      const data = d.data(); ultimo.notas.set(d.id, JSON.stringify(data));
+      const o = viejos.get(d.id) || {};
+      Object.keys(o).forEach((k) => { if (k !== 'id' && !(k in data)) delete o[k]; });
+      Object.assign(o, data, { id: d.id }); nuevos.push(o);
+    });
+    S.notas = nuevos;
+    notasListo = true; notasBloqueado = false;
+    if (listo) pedirRender();
+  }, (err) => { console.error(err); notasBloqueado = true; notasListo = true; if (listo) pedirRender(); }));
 }
 async function cargarImagen(id) {
   if (imgCache.has(id)) return imgCache.get(id);
@@ -1108,48 +1207,87 @@ function vistaTablero() {
     })));
 }
 
+/* Calendario con tarjetas legibles de un vistazo: título, responsable, estado, formato y prioridad.
+   Vista Semana (por defecto, columnas por día) o Mes (grilla). En el celu se ve como lista por día. */
+const formatoDe = (x) => x.f ? ((x.f.formatos || []).length ? x.f.formatos : [x.f.tipo === 'Publicación' ? 'Publicación' : x.f.tipo]) : [x.t.tipo];
+const claseFormato = (fm) => /histori/i.test(fm) ? 'hist' : /pauta/i.test(fm) ? 'pauta' : /reuni|llamad/i.test(fm) ? 'reu' : /^(post|carrusel|reel|flyer|video|fotos|diseño)$/i.test(fm) ? 'feed' : 'otro';
+function calCard(x) {
+  const o = x.f || x.t;
+  const esEntrega = !x.f && !x.pub;
+  const prio = o.prioridad === 'Urgente' || o.prioridad === 'Alta' ? o.prioridad : '';
+  const late = esEntrega ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
+  const top = [
+    x.f && o.hora ? h('span', { class: 'cc-hora' }, o.hora) : null,
+    esEntrega ? h('span', { class: 'cc-tag' }, 'Entrega') : null,
+    prio ? h('span', { class: 'prio ' + prio }, prio) : null,
+  ].filter(Boolean);
+  const rs = resps(o);
+  return h('button', { class: 'cc' + (prio ? ' cc-prio' + (prio === 'Alta' ? ' cc-alta' : '') : '') + (o.estado === 'publicado' ? ' cc-pub' : '') + (esEntrega ? ' cc-ent' : '') + (late ? ' cc-late' : ''), type: 'button',
+      title: (esEntrega ? 'Entrega: ' : '') + o.titulo, onclick: (e) => { e.stopPropagation(); abrir(o); } },
+    top.length ? h('span', { class: 'cc-top' }, ...top) : null,
+    h('span', { class: 'cc-t' }, h('i', { class: 'mk', style: 'background:' + marca(o.marca).color, title: marca(o.marca).nombre }), o.titulo),
+    h('span', { class: 'cc-row' }, estadoPill(o.estado || 'pedido')),
+    h('span', { class: 'cc-row cc-foot' },
+      h('span', { class: 'cc-fmts' }, ...formatoDe(x).map((fm) => h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm))),
+      h('span', { class: 'cc-avs', title: nombresResp(o) }, ...(rs.length ? rs.slice(0, 2).map(av) : [h('span', { class: 'cc-sin' }, 'Sin asignar')]), rs.length > 2 ? h('span', { class: 'cc-mas' }, '+' + (rs.length - 2)) : null)));
+}
+
 function vistaCalendario() {
-  const base = ui.calMes ? parse(ui.calMes + '-01') : parse(HOY.slice(0, 8) + '01');
-  const y = base.getFullYear(), m = base.getMonth();
-  const primero = new Date(y, m, 1);
-  const desde = new Date(y, m, 1 - ((primero.getDay() + 6) % 7));
-  const dias = []; for (let i = 0; i < 42; i++) { const d = new Date(desde); d.setDate(desde.getDate() + i); dias.push(d); }
+  const semana = (ui.calVista || 'semana') === 'semana';
+  const lunesDe = (d) => { const r = new Date(d); r.setDate(r.getDate() - ((r.getDay() + 6) % 7)); return r; };
+  let dias = [], m = null, y = null, titulo = '';
+  if (semana) {
+    const lun = ui.calSem ? parse(ui.calSem) : lunesDe(parse(HOY));
+    for (let i = 0; i < 7; i++) { const d = new Date(lun); d.setDate(lun.getDate() + i); dias.push(d); }
+    const a = dias[0], b = dias[6];
+    titulo = 'Semana del ' + a.getDate() + (a.getMonth() !== b.getMonth() ? ' de ' + MESES[a.getMonth()] : '') + ' al ' + b.getDate() + ' de ' + MESES[b.getMonth()];
+  } else {
+    const base = ui.calMes ? parse(ui.calMes + '-01') : parse(HOY.slice(0, 8) + '01');
+    y = base.getFullYear(); m = base.getMonth();
+    const desde = new Date(y, m, 1 - ((new Date(y, m, 1).getDay() + 6) % 7));
+    for (let i = 0; i < 42; i++) { const d = new Date(desde); d.setDate(desde.getDate() + i); dias.push(d); }
+    titulo = MESES[m].charAt(0).toUpperCase() + MESES[m].slice(1) + ' ' + y;
+  }
+  const verEntregas = ui.calEntregas !== false;
   const todas = filtrar(S.tareas, true);
   const ts = todas.filter((t) => t.estado !== 'publicado');
   const fs = S.fechas.filter((f) => (ui.marca === 'todas' || f.marca === ui.marca || f.marca === 'general') && (ui.persona === 'todas' || !resps(f).length || esDe(f, ui.persona)));
-  const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...todas.filter((t) => t.publica === s).map((t) => ({ t, pub: true })), ...ts.filter((t) => t.entrega === s).map((t) => ({ t }))];
-  const cats = (formatos, tipo) => {
-    const f = (formatos || []).concat(tipo ? [tipo] : []);
-    const out = [];
-    if (f.some((x) => /histori/i.test(x))) out.push('hist');
-    if (f.some((x) => /^(post|carrusel|reel|flyer|video|fotos|diseño)$/i.test(x))) out.push('feed');
-    if (f.some((x) => /pauta/i.test(x))) out.push('pauta');
-    if (f.some((x) => /reuni|llamad/i.test(x))) out.push('reu');
-    return out.length ? out : ['otro'];
+  const orden = (a, b) => ((a.f && a.f.hora) || (a.pub || a.f ? '00' : '99')).localeCompare((b.f && b.f.hora) || (b.pub || b.f ? '00' : '99'));
+  const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...todas.filter((t) => t.publica === s).map((t) => ({ t, pub: true })), ...(verEntregas ? ts.filter((t) => t.entrega === s && t.publica !== s).map((t) => ({ t })) : [])].sort(orden);
+  const mover = (k) => {
+    if (semana) { const d = ui.calSem ? parse(ui.calSem) : lunesDe(parse(HOY)); d.setDate(d.getDate() + 7 * k); ui.calSem = iso(d); }
+    else { const d = new Date(y, m + k, 1); ui.calMes = d.getFullYear() + '-' + pad(d.getMonth() + 1); }
+    guardarUi(); render();
   };
-  const dots = (cs) => cs.length > 1 ? cs.map((c) => h('span', { class: 'fd', style: 'background:var(--c-' + c + ')' })) : [];
-  const item = (x) => x.f
-    ? ((cs) => h('button', { class: 'ev k-' + cs[0], style: '--bcol:' + marca(x.f.marca).color, onclick: () => abrirFecha(x.f), title: x.f.titulo + ((x.f.formatos || []).length ? ' · ' + x.f.formatos.join(', ') : '') }, ...dots(cs), (x.f.estado === 'publicado' ? '✓ ' : '') + (x.f.hora ? x.f.hora + ' ' : '') + ((x.f.formatos || []).length ? '[' + x.f.formatos.join(' · ') + '] ' : '') + x.f.titulo + (resps(x.f).length ? ' · ' + nombresResp(x.f) : '')))(cats(x.f.formatos, x.f.tipo === 'Publicación' ? '' : x.f.tipo))
-    : x.pub ? h('button', { class: 'ev k-' + cats([], x.t.tipo)[0], style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Se publica: ' + x.t.titulo }, (x.t.estado === 'publicado' ? '✓ ' : '') + 'Publica · ' + x.t.tipo + ' · ' + x.t.titulo)
-    : h('button', { class: 'ev' + (vencida(x.t) ? ' late' : ''), style: '--bcol:' + marca(x.t.marca).color, onclick: () => abrirTarea(x.t), title: 'Entrega: ' + x.t.titulo }, 'Entrega · ' + nombresResp(x.t) + ' · ' + x.t.titulo);
-  const mover = (k) => { const d = new Date(y, m + k, 1); ui.calMes = d.getFullYear() + '-' + pad(d.getMonth() + 1); guardarUi(); render(); };
-  const grilla = h('div', { class: 'cal-wrap' }, h('div', { class: 'cal' },
-    ...['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'].map((d) => h('div', { class: 'dow' }, d)),
-    ...dias.map((d) => { const s = iso(d); return h('div', { class: 'day' + (d.getMonth() !== m ? ' out' : '') + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá para crear algo este día' : null, onclick: (e) => { if (!e.target.closest('.ev')) abrirDia(s); } }, h('span', { class: 'num' }, d.getDate()), ...enDia(s).map(item)); })));
-  /* En el celu: el mes actual se muestra desde hoy; cualquier otro mes, completo (antes quedaba vacío al mirar meses pasados). */
-  const esMesActual = HOY.slice(0, 7) === y + '-' + pad(m + 1);
-  const proximos = dias.map(iso).filter((s) => (!esMesActual || s >= HOY) && parse(s).getMonth() === m && enDia(s).length);
+  const hoy = () => { ui.calSem = null; ui.calMes = null; guardarUi(); render(); };
+  const vista = (v) => { ui.calVista = v; guardarUi(); render(); };
+  const crear = (s) => (e) => { if (!e.target.closest('.cc')) abrirDia(s); };
+  const DOW = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+  const grilla = semana
+    ? h('div', { class: 'cal-wrap' }, h('div', { class: 'week' }, ...dias.map((d, i) => { const s = iso(d); const it = enDia(s);
+        return h('div', { class: 'wday' + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá un espacio libre para crear algo este día' : null, onclick: crear(s) },
+          h('div', { class: 'wday-h' }, h('span', { class: 'num' }, d.getDate()), h('span', { class: 'dw' }, DOW[i]), h('span', { class: 'cnt' }, it.length || '')),
+          ...it.map(calCard)); })))
+    : h('div', { class: 'cal-wrap' }, h('div', { class: 'cal' },
+        ...DOW.map((d) => h('div', { class: 'dow' }, d)),
+        ...dias.map((d) => { const s = iso(d); return h('div', { class: 'day' + (d.getMonth() !== m ? ' out' : '') + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá un espacio libre para crear algo este día' : null, onclick: crear(s) }, h('span', { class: 'num' }, d.getDate()), ...enDia(s).map(calCard)); })));
+  /* En el celu: lista por día. En el mes actual arranca desde hoy; cualquier otro período se muestra completo. */
+  const esActual = semana ? dias.some((d) => iso(d) === HOY) : HOY.slice(0, 7) === y + '-' + pad(m + 1);
+  const proximos = dias.map(iso).filter((s) => (!esActual || semana || s >= HOY) && (semana || parse(s).getMonth() === m) && enDia(s).length);
   const agenda = h('div', { class: 'agenda' },
     esAdmin() ? h('button', { class: 'btn', style: 'justify-self:start', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null,
-    ...(proximos.length ? proximos.map((s) => h('div', { class: 'group' }, h('h3', {}, s === HOY ? 'Hoy' : fCorta(s)), h('div', { class: 'list' }, ...enDia(s).map(item)))) : [h('div', { class: 'empty' }, esMesActual ? 'Nada en lo que queda del mes.' : 'Nada cargado en este mes.')]));
+    ...(proximos.length ? proximos.map((s) => h('div', { class: 'group' }, h('h3', {}, s === HOY ? 'Hoy' : fCorta(s), h('span', { class: 'n' }, enDia(s).length)), h('div', { class: 'list cc-list' }, ...enDia(s).map(calCard)))) : [h('div', { class: 'empty' }, 'Nada cargado en este período.')]));
   return h('div', { style: 'display:grid;gap:14px' },
-    cabecera(MESES[m].charAt(0).toUpperCase() + MESES[m].slice(1) + ' ' + y, esAdmin() ? 'Tocá un día para crear un pedido o una fecha.' : 'Entregas, publicaciones y fechas de las marcas.',
-      h('button', { class: 'btn small', onclick: () => mover(-1), 'aria-label': 'Mes anterior' }, '←'),
-      h('button', { class: 'btn small', onclick: () => { ui.calMes = null; guardarUi(); render(); } }, 'Hoy'),
-      h('button', { class: 'btn small', onclick: () => mover(1), 'aria-label': 'Mes siguiente' }, '→'),
+    cabecera(titulo, esAdmin() ? 'Tocá un día para crear un pedido o una fecha.' : 'Publicaciones, entregas y fechas de las marcas.',
+      h('span', { class: 'seg', role: 'group', 'aria-label': 'Vista' },
+        h('button', { class: 'chip', 'aria-pressed': String(semana), onclick: () => vista('semana') }, 'Semana'),
+        h('button', { class: 'chip', 'aria-pressed': String(!semana), onclick: () => vista('mes') }, 'Mes')),
+      h('button', { class: 'btn small', onclick: () => mover(-1), 'aria-label': semana ? 'Semana anterior' : 'Mes anterior' }, '←'),
+      h('button', { class: 'btn small', onclick: hoy }, 'Hoy'),
+      h('button', { class: 'btn small', onclick: () => mover(1), 'aria-label': semana ? 'Semana siguiente' : 'Mes siguiente' }, '→'),
       esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirFecha(null) }, '+ Fecha') : null),
-    filtros(true),
-    h('div', { class: 'cal-legend' }, ...[['hist', 'Historia'], ['feed', 'Feed (post, carrusel, reel)'], ['pauta', 'Pauta'], ['reu', 'Reunión / llamada'], ['otro', 'Evento y otros']].map(([k, l]) => h('span', {}, h('i', { style: 'background:var(--c-' + k + ')' }), l)), h('span', {}, h('i', { style: 'background:var(--surface-2);border:1px solid var(--line)' }), 'Entrega de un pedido')),
+    h('div', { class: 'chips', style: 'justify-content:space-between;align-items:center' }, filtros(true),
+      h('button', { class: 'chip', 'aria-pressed': String(verEntregas), title: 'Mostrar también los días de entrega de cada pedido', onclick: () => { ui.calEntregas = !verEntregas; guardarUi(); render(); } }, verEntregas ? 'Entregas: se ven' : 'Entregas: ocultas')),
     grilla, agenda);
 }
 
@@ -1700,6 +1838,188 @@ function vistaResumen() {
     h('div', { class: 'people' }, ...gente.map(tarjetaPersona)));
 }
 
+/* ===== balance de laburo por área y persona + anotaciones de cumplimiento ===== */
+/* Las anotaciones se guardan en la colección "notas". Las que hablan de Mica o Agus son privadas de Manu:
+   ellas no las leen (lo controla la regla de Firestore, no solo la pantalla). */
+const JEFE_ID = 'manu';
+const esJefe = () => !!yo().jefe;
+const AREAS = [
+  { id: 'gestion', nombre: 'Planificación y creatividad' },
+  { id: 'diseno', nombre: 'Diseño' },
+  { id: 'edicion', nombre: 'Edición' },
+  { id: 'pauta', nombre: 'Pauta' },
+  { id: 'otros', nombre: 'Otros freelancers' },
+];
+const AREA_FIJA = { mica: 'gestion', agus: 'gestion', luciano: 'diseno', salva: 'diseno', maxi: 'edicion', santi: 'pauta' };
+const areaDe = (p) => AREA_FIJA[p.id] || (/edici|film|video/i.test(p.especialidad || '') ? 'edicion' : /dise/i.test(p.especialidad || '') ? 'diseno' : 'otros');
+const RESULTADOS = [
+  { id: 'cumplio', nombre: 'Cumplió', cls: 'p-ok' },
+  { id: 'no', nombre: 'No cumplió', cls: 'p-bad' },
+  { id: 'obs', nombre: 'Observación', cls: 'p-muted' },
+];
+const resultado = (id) => RESULTADOS.find((r) => r.id === id) || RESULTADOS[2];
+const notaPrivada = (sobre) => EQUIPO.some((p) => p.id === sobre && p.admin && !p.jefe);
+/* A quién puede anotar cada uno: Manu a todos; Mica y Agus a producción y freelancers. */
+const anotables = () => [...(esJefe() ? EQUIPO.filter((p) => p.admin && !p.jefe) : []), ...EQUIPO.filter((p) => !p.admin), ...S.freelancers];
+
+function periodoBalance() {
+  const p = ui.balPer || 'semana';
+  const d = parse(HOY);
+  const lunes = new Date(d); lunes.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  const mas = (x, n) => { const r = new Date(x); r.setDate(r.getDate() + n); return r; };
+  if (p === 'semana') return { id: p, desde: iso(lunes), hasta: iso(mas(lunes, 6)), nombre: 'esta semana' };
+  if (p === 'semanaPasada') return { id: p, desde: iso(mas(lunes, -7)), hasta: iso(mas(lunes, -1)), nombre: 'la semana pasada' };
+  if (p === 'mes') return { id: p, desde: HOY.slice(0, 8) + '01', hasta: iso(new Date(d.getFullYear(), d.getMonth() + 1, 0)), nombre: 'este mes' };
+  const a = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+  return { id: p, desde: iso(a), hasta: iso(new Date(d.getFullYear(), d.getMonth(), 0)), nombre: 'el mes pasado' };
+}
+const enRango = (s, per) => !!s && s >= per.desde && s <= per.hasta;
+
+function balancePersona(p, per) {
+  const items = trabajos().filter((t) => esDe(t, p.id) && enRango(t.entrega, per) && !(t._fecha && SIN_ENTREGA.includes(t.tipo)));
+  const entregada = (t) => ENTREGADO.includes(t.estado) || hecha(t);
+  const cumplidas = items.filter(entregada);
+  const noCumplidas = items.filter((t) => !entregada(t) && diff(t.entrega) < 0);
+  const pendientes = items.filter((t) => !entregada(t) && diff(t.entrega) >= 0);
+  const conDia = cumplidas.filter((t) => t.entregadaEl);
+  const aTiempo = conDia.filter((t) => t.entregadaEl <= t.entrega).length;
+  const parte = (t, k) => (t[k] || 0) / Math.max(1, resps(t).length);
+  const r1 = (v) => Math.round(v * 10) / 10;
+  const vencidas = cumplidas.length + noCumplidas.length;
+  /* Mica y Agus también responden por pasos de la hoja de ruta y temas con fecha en el período. */
+  let gestion = null;
+  if (p.admin) {
+    const pasos = []; proyectos().forEach((pr) => (pr.pasos || []).forEach((x) => { if (x.resp === p.id && enRango(x.fecha, per)) pasos.push({ pr, p: x }); }));
+    const temas = S.temas.filter((t) => t.tipo !== 'proyecto' && (t.resps || []).includes(p.id) && enRango(t.limite, per));
+    gestion = {
+      pasos: pasos.length, pasosHechos: pasos.filter((x) => x.p.hecho).length, pasosAtrasados: pasos.filter((x) => !x.p.hecho && diff(x.p.fecha) < 0),
+      temas: temas.length, temasDecididos: temas.filter((t) => t.estado === 'decidido').length, temasVencidos: temas.filter(temaVencido),
+    };
+  }
+  const notas = S.notas.filter((n) => n.sobre === p.id && enRango(n.fecha, per));
+  return {
+    p, items, cumplidas, noCumplidas, pendientes,
+    pct: vencidas ? Math.round(cumplidas.length / vencidas * 100) : null,
+    aTiempo, tarde: conDia.length - aTiempo,
+    devol: items.reduce((s, t) => s + (t.devoluciones || []).filter((d) => enRango(d.fecha, per)).length, 0),
+    est: r1(items.reduce((s, t) => s + parte(t, 'horasEst'), 0)), real: r1(items.reduce((s, t) => s + parte(t, 'horasReal'), 0)),
+    gestion, notas,
+    notasSi: notas.filter((n) => n.resultado === 'cumplio').length, notasNo: notas.filter((n) => n.resultado === 'no').length,
+  };
+}
+const clsPct = (v) => v == null ? '' : v >= 85 ? 'ok' : v >= 60 ? 'warn' : 'bad';
+
+function abrirNota(n, base) {
+  const nueva = !n;
+  const x = n || { sobre: '', fecha: HOY, resultado: 'cumplio', texto: '', ref: '', ...(base || {}) };
+  const gente = anotables();
+  const sobre = sel('nt-sobre', [['', 'Elegí a quién'], ...gente.map((p) => [p.id, p.nombre + (p.rol ? ' · ' + p.rol : p.especialidad ? ' · ' + p.especialidad : '')])], x.sobre);
+  const fecha = h('input', { id: 'nt-fecha', type: 'date', value: x.fecha });
+  const res = chipSel('nt-res', RESULTADOS.map((r) => [r.id, r.nombre]), x.resultado);
+  const texto = h('textarea', { id: 'nt-texto', placeholder: 'Qué pasó. Ej. "Entregó los flyers del viernes a tiempo y sin cambios" o "No mandó el reel; avisó el mismo día".' }, x.texto);
+  const ref = x.ref ? trabajos().find((t) => t.id === x.ref) : null;
+  const puedeBorrar = n && (esJefe() || n.autor === ui.yo);
+  const aviso = h('p', { class: 'full', style: 'margin:0;font-size:12px;color:var(--muted)' });
+  const pintarAviso = () => { aviso.textContent = notaPrivada(sobre.value) ? 'Solo la ves vos: Mica y Agus no ven lo que se anota sobre ellas.' : 'La ven Manu, Mica y Agus. ' + (sobre.value ? persona(sobre.value).nombre : 'La persona') + ' no la ve.'; };
+  sobre.addEventListener('change', pintarAviso); pintarAviso();
+  modal(nueva ? 'Nueva anotación' : 'Anotación', h('div', { class: 'form' },
+      campo('Sobre quién', sobre), campo('Día', fecha),
+      h('div', { class: 'field full' }, h('label', {}, 'Resultado'), res),
+      ref ? h('p', { class: 'full', style: 'margin:0;font-size:13px' }, 'Sobre: ', h('b', {}, ref.titulo), ' · entrega ' + fCorta(ref.entrega)) : null,
+      campo('Detalle', texto, true), aviso,
+      n ? h('p', { class: 'full', style: 'margin:0;font-size:12px;color:var(--muted)' }, 'Anotó ' + persona(n.autor).nombre + ' el ' + fCorta(n.creado || n.fecha) + '.') : null),
+    h('div', { class: 'sheet-foot' },
+      puedeBorrar ? botonPeligro('Borrar anotación', () => { S.notas = S.notas.filter((y) => y !== n); guardar(); cerrarModal(); render(); toast('Anotación borrada'); }) : null,
+      h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'), h('button', { class: 'btn primary', onclick: () => {
+        if (!sobre.value) { toast('Elegí sobre quién es la anotación'); return; }
+        if (!texto.value.trim() && res.value === 'obs') { toast('Escribí la observación'); texto.focus(); return; }
+        if (n && !esJefe() && n.autor !== ui.yo) { toast('Solo quien la escribió (o Manu) puede cambiarla'); return; }
+        Object.assign(x, { sobre: sobre.value, fecha: fecha.value || HOY, resultado: res.value, texto: texto.value.trim(), privada: notaPrivada(sobre.value) });
+        if (nueva) Object.assign(x, { id: uid(), autor: ui.yo, autorEmail: yo().email, creado: HOY });
+        if (nueva) S.notas.unshift(x);
+        guardar(); cerrarModal(); render(); toast(nueva ? 'Anotación guardada' : 'Anotación actualizada');
+      } }, nueva ? 'Guardar anotación' : 'Guardar'))));
+}
+
+function filaNota(n) {
+  const r = resultado(n.resultado);
+  const ref = n.ref ? trabajos().find((t) => t.id === n.ref) : null;
+  return h('div', { class: 'nota', role: 'button', tabindex: '0', onclick: () => abrirNota(n), onkeydown: (e) => { if (e.key === 'Enter') abrirNota(n); } },
+    h('span', { class: 'pill ' + r.cls }, r.nombre),
+    h('div', { class: 'nota-t' }, h('b', {}, persona(n.sobre).nombre, ref ? h('span', { class: 'nota-ref' }, ' · ' + ref.titulo) : null), n.texto ? h('span', {}, n.texto) : null),
+    h('small', {}, fCorta(n.fecha) + ' · ' + persona(n.autor).nombre.split(' ')[0]));
+}
+
+function vistaBalance() {
+  const per = periodoBalance();
+  const gente = anotables();
+  const bs = gente.map((p) => balancePersona(p, per));
+  const chipPer = (id, txt) => h('button', { class: 'chip', 'aria-pressed': String(per.id === id), onclick: () => { ui.balPer = id; guardarUi(); render(); } }, txt);
+  const total = (arr, k) => arr.reduce((s, b) => s + b[k].length, 0);
+  const pctDe = (arr) => { const c = total(arr, 'cumplidas'), n = total(arr, 'noCumplidas'); return c + n ? Math.round(c / (c + n) * 100) : null; };
+  const bloqueado = notasBloqueado ? h('div', { class: 'warnbox' }, 'Firebase todavía no deja guardar anotaciones. Hay que agregar la colección "notas" a las reglas de Firestore del proyecto zebra-mkt (pedile a Claude el bloque exacto). El balance funciona igual.') : null;
+
+  const areaCard = (a) => {
+    const arr = bs.filter((b) => areaDe(b.p) === a.id);
+    if (!arr.length) return null;
+    const pc = pctDe(arr);
+    return h('div', { class: 'stat area' },
+      h('span', { class: 'area-n' }, a.nombre),
+      h('b', { class: clsPct(pc) }, pc == null ? '—' : pc + '%'),
+      h('div', { class: 'track' }, h('div', { class: 'real' + (pc != null && pc < 60 ? ' over' : ''), style: 'width:' + (pc || 0) + '%' })),
+      h('span', {}, total(arr, 'cumplidas') + ' cumplidas · ' + total(arr, 'noCumplidas') + ' sin cumplir · ' + total(arr, 'pendientes') + ' por venir'));
+  };
+
+  const listaTrab = (ts, vacio, pid) => ts.length ? h('div', { class: 'bal-list' }, ...ts.sort((a, b) => a.entrega.localeCompare(b.entrega)).map((t) => h('div', { class: 'bal-it' },
+      h('button', { class: 'bal-tt', onclick: () => abrir(t) }, h('i', { class: 'mk', style: 'background:' + marca(t.marca).color }), t.titulo),
+      h('small', {}, tipoTxt(t) + ' · entrega ' + fCorta(t.entrega) + (t.entregadaEl ? ' · entregó ' + fCorta(t.entregadaEl) : '')),
+      estadoPill(t.estado),
+      !notasBloqueado ? h('button', { class: 'btn small', title: 'Anotar sobre este trabajo', onclick: () => abrirNota(null, { sobre: pid, ref: t.id, resultado: ENTREGADO.includes(t.estado) || hecha(t) ? 'cumplio' : 'no', texto: '' }) }, 'Anotar') : null))) : h('div', { class: 'empty', style: 'padding:10px' }, vacio);
+
+  const tarjetaBal = (b) => {
+    const g = b.gestion;
+    const det = h('details', { class: 'bal-det' },
+      h('summary', {}, 'Ver qué se hizo y qué no'),
+      h('div', { class: 'bal-sec' }, h('h4', { class: 'bad' }, 'Sin cumplir (' + b.noCumplidas.length + ')'), listaTrab(b.noCumplidas.slice(), 'Nada sin cumplir en ' + per.nombre + '.', b.p.id)),
+      h('div', { class: 'bal-sec' }, h('h4', {}, 'Por venir (' + b.pendientes.length + ')'), listaTrab(b.pendientes.slice(), 'Nada pendiente.', b.p.id)),
+      h('div', { class: 'bal-sec' }, h('h4', { class: 'ok' }, 'Cumplidas (' + b.cumplidas.length + ')'), listaTrab(b.cumplidas.slice(), 'Todavía nada cumplido en ' + per.nombre + '.', b.p.id)),
+      g && (g.pasosAtrasados.length || g.temasVencidos.length) ? h('div', { class: 'bal-sec' }, h('h4', { class: 'bad' }, 'Gestión atrasada'),
+        h('div', { class: 'bal-list' }, ...g.pasosAtrasados.map((x) => h('div', { class: 'bal-it' }, h('button', { class: 'bal-tt', onclick: () => abrirProyecto(x.pr) }, x.p.texto), h('small', {}, 'Hoja de ruta · ' + x.pr.titulo + ' · ' + fCorta(x.p.fecha)))),
+          ...g.temasVencidos.map((t) => h('div', { class: 'bal-it' }, h('button', { class: 'bal-tt', onclick: () => abrirTema(t) }, t.titulo), h('small', {}, 'Tema · límite ' + fCorta(t.limite)))))) : null,
+      h('div', { class: 'bal-sec' }, h('h4', {}, 'Anotaciones (' + b.notas.length + ')'), b.notas.length ? h('div', { class: 'notas' }, ...b.notas.map(filaNota)) : h('div', { class: 'empty', style: 'padding:10px' }, 'Sin anotaciones en ' + per.nombre + '.')));
+    return h('div', { class: 'card person bal', style: 'display:grid;gap:12px' },
+      h('div', { class: 'person-h' }, av(b.p.id), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, b.p.nombre), h('small', {}, b.p.rol || ((b.p.especialidad || '') + ' · freelance'))),
+        h('b', { class: 'bal-pct ' + clsPct(b.pct), title: 'Cumplidas sobre lo que ya tenía que estar' }, b.pct == null ? '—' : b.pct + '%')),
+      h('div', { class: 'metrics-row' },
+        h('div', {}, h('b', {}, b.items.length), h('span', {}, 'asignadas')),
+        h('div', {}, h('b', { class: b.cumplidas.length ? 'ok' : '' }, b.cumplidas.length), h('span', {}, 'cumplidas')),
+        h('div', {}, h('b', { class: b.noCumplidas.length ? 'bad' : '' }, b.noCumplidas.length), h('span', {}, 'sin cumplir')),
+        h('div', {}, h('b', {}, b.pendientes.length), h('span', {}, 'por venir')),
+        h('div', {}, h('b', { class: b.tarde ? 'warn' : '' }, b.aTiempo + '/' + b.tarde), h('span', {}, 'a tiempo / tarde')),
+        h('div', {}, h('b', { class: b.real > b.est && b.est ? 'bad' : '' }, b.real + '/' + b.est), h('span', {}, 'horas real/est.'))),
+      g ? h('div', { class: 'kv' },
+        h('span', { class: 'pill ' + (g.pasosAtrasados.length ? 'p-bad' : 'p-muted') }, 'Hoja de ruta ' + g.pasosHechos + '/' + g.pasos + ' pasos'),
+        h('span', { class: 'pill ' + (g.temasVencidos.length ? 'p-bad' : 'p-muted') }, 'Temas ' + g.temasDecididos + '/' + g.temas + ' decididos')) : null,
+      h('div', { class: 'person-foot' },
+        h('span', { class: 'kv' }, h('span', { class: 'pill p-ok' }, '✓ ' + b.notasSi), h('span', { class: 'pill p-bad' }, '✗ ' + b.notasNo), b.devol ? h('span', {}, b.devol + (b.devol === 1 ? ' devolución' : ' devoluciones')) : null),
+        !notasBloqueado ? h('button', { class: 'btn small', onclick: () => abrirNota(null, { sobre: b.p.id }) }, '+ Anotar') : null),
+      det);
+  };
+
+  const notasPer = S.notas.filter((n) => enRango(n.fecha, per)).sort((a, b) => b.fecha.localeCompare(a.fecha));
+  return h('div', { style: 'display:grid;gap:18px' },
+    cabecera('Balance del equipo', 'Qué se hizo y qué no en ' + per.nombre + ' (' + fCorta(per.desde) + ' al ' + fCorta(per.hasta) + ').' + (esJefe() ? ' Incluye a Mica y Agus.' : ''),
+      !notasBloqueado ? h('button', { class: 'btn primary', onclick: () => abrirNota(null) }, '+ Anotación') : null),
+    h('div', { class: 'chips' }, chipPer('semana', 'Esta semana'), chipPer('semanaPasada', 'Semana pasada'), chipPer('mes', 'Este mes'), chipPer('mesPasado', 'Mes pasado')),
+    bloqueado,
+    h('div', { class: 'stats' }, ...AREAS.map(areaCard).filter(Boolean)),
+    h('p', { class: 'note', style: 'margin:0;font-size:12px;color:var(--muted)' }, 'Cuenta los pedidos y fechas con responsable cuya entrega cae en el período. "Cumplida" = se mandó a revisión o más. "Sin cumplir" = pasó la entrega y no se entregó. El % es cumplidas sobre lo que ya tenía que estar.'),
+    ...AREAS.map((a) => { const arr = bs.filter((b) => areaDe(b.p) === a.id); return arr.length ? h('div', { style: 'display:grid;gap:10px' }, h('div', { class: 'sub-h' }, h('h2', {}, a.nombre)), h('div', { class: 'people bal-people' }, ...arr.map(tarjetaBal))) : null; }).filter(Boolean),
+    h('div', { class: 'card', style: 'display:grid;gap:10px' },
+      h('div', { class: 'sub-h' }, h('h2', {}, 'Anotaciones de ' + per.nombre), h('span', { style: 'font-size:12px;color:var(--muted)' }, notasPer.length + ' en total')),
+      notasPer.length ? h('div', { class: 'notas' }, ...notasPer.map(filaNota)) : h('div', { class: 'empty' }, notasBloqueado ? 'Las anotaciones se activan cuando se agregue la regla en Firebase.' : 'Todavía no hay anotaciones en este período. Usá "+ Anotar" en la tarjeta de cada persona.')));
+}
+
 /* ===== confirmación en dos pasos ===== */
 function botonPeligro(texto, accion) {
   let armado = false, t;
@@ -1955,7 +2275,8 @@ function abrirTarea(t, base) {
 const FORMATOS = ['Historia', 'Post', 'Carrusel', 'Reel', 'Pauta'];
 function abrirFecha(fe, fechaInicial) {
   const admin = esAdmin();
-  const x = fe || { titulo: '', tipo: 'Publicación', formatos: [], marca: 'zebra', fecha: fechaInicial || dia(1), hora: '', notas: '', resps: [], estado: 'pedido' };
+  const x = fe || { titulo: '', tipo: 'Publicación', formatos: [], marca: 'zebra', fecha: fechaInicial || dia(1), hora: '', notas: '', resps: [], estado: 'pedido', prioridad: 'Normal' };
+  const prioSel = chipSel('fe-prio', PRIORIDADES.map((v) => [v, v]), x.prioridad || 'Normal', !admin);
   let formatos = (x.formatos || []).slice();
   const mia = fe && esDe(fe, ui.yo);
   const respSel = selectorPersonas(resps(x), !admin);
@@ -1980,7 +2301,7 @@ function abrirFecha(fe, fechaInicial) {
     h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, admin || mia ? 'Cancelar' : 'Cerrar'), admin || mia ? h('button', { class: 'btn primary', onclick: () => {
       if (!admin) { x.estado = estadoSel.value; x.horasReal = Number(hReal.value) || 0; guardar(); cerrarModal(); render(); toast('Estado actualizado'); return; }
       const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné un título'); return; }
-      Object.assign(x, { titulo, tipo: f.tipo.value, formatos, marca: f.marca.value, fecha: f.fecha.value || HOY, hora: f.hora.value, notas: f.notas.value, resps: respSel.valor(), estado: estadoSel.value, horasEst: Number(hEst.value) || 0, horasReal: Number(hReal.value) || 0 });
+      Object.assign(x, { titulo, tipo: f.tipo.value, formatos, marca: f.marca.value, fecha: f.fecha.value || HOY, hora: f.hora.value, notas: f.notas.value, resps: respSel.valor(), estado: estadoSel.value, prioridad: prioSel.value, horasEst: Number(hEst.value) || 0, horasReal: Number(hReal.value) || 0 });
       if (!fe) { x.id = uid(); S.fechas.push(x); }
       avisar(x, 'asignada', resps(x).filter((id) => !antesF.includes(id)));
       guardar(); cerrarModal(); render(); toast(fe ? 'Fecha guardada' : 'Fecha agregada');
@@ -1989,7 +2310,7 @@ function abrirFecha(fe, fechaInicial) {
     h('div', { class: 'field full' }, h('label', {}, 'Formato (marcá todos los que van)'), toggles),
     campo('Fecha', f.fecha), campo('Hora', f.hora),
     h('div', { class: 'field full' }, h('label', {}, 'Responsables'), respSel.el),
-    campo('Estado', estadoSel), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', hEst), campo('Horas reales', hReal)), campo('Notas', f.notas, true)), pie);
+    campo('Estado', estadoSel), h('div', { class: 'field full' }, h('label', {}, 'Prioridad'), prioSel), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', hEst), campo('Horas reales', hReal)), campo('Notas', f.notas, true)), pie);
 }
 
 function abrirCampania(c) {
@@ -2041,7 +2362,7 @@ function abrirFreelancer(fr) {
 function render() {
   pintarNav();
   const def = VISTAS.find((x) => x.id === ui.vista);
-  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, carga: vistaCarga, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
+  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, balance: vistaBalance, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, carga: vistaCarga, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
   $('#view').replaceChildren(listo ? v() : h('div', { class: 'empty', style: 'margin-top:40px' }, 'Cargando datos del equipo…'));
 }
 iniciar();
