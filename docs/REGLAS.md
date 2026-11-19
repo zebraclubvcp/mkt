@@ -43,5 +43,31 @@ Pegá este bloque **adentro** de `match /databases/{database}/documents { … }`
 
 **Si se suma alguien al equipo** (o cambia un mail), hay que agregarlo también en la lista de `miId()`.
 
+## Fase 2 — `config/equipo` (topes de tareas)
+
+Mismo lugar que el bloque anterior: adentro de `match /databases/{database}/documents { … }`.
+Todos los del equipo lo leen; solo Manu, Mica y Agustina cambian los topes.
+
+```
+    match /config/{doc} {
+      function miMail() { return request.auth == null ? '' : request.auth.token.email.lower(); }
+      function esEquipo() {
+        return miMail() in ['manucontreras3@gmail.com', 'colanskymica@gmail.com', 'agustinan.contacto@gmail.com',
+          'luchixo34@gmail.com', 'salvacontre.c@gmail.com', 'bishelsalexismaximiliano@gmail.com', 'maxterom@gmail.com'];
+      }
+      function esAdmin() {
+        return miMail() in ['manucontreras3@gmail.com', 'colanskymica@gmail.com', 'agustinan.contacto@gmail.com'];
+      }
+      allow read: if esEquipo();
+      // Solo el documento "equipo" y solo el campo "topes".
+      allow create, update: if esAdmin() && doc == 'equipo'
+        && request.resource.data.keys().hasOnly(['topes'])
+        && request.resource.data.topes is map;
+    }
+```
+
+Sin esta regla la app funciona igual con los topes de siempre (5, y 6 para Mica y Agustina), pero
+en Equipo y carga aparece el aviso de que falta la regla y no se pueden cambiar con − y +.
+
 Cómo probar que quedó bien: entrar a Marcebra, abrir una tarea y mandar un comentario. Si aparece
 "Los comentarios todavía no están activados" o "No tenés permiso para comentar", la regla no se publicó.

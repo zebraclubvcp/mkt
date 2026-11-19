@@ -438,6 +438,36 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .field .cm-op input, .field .cm-op select { width: auto; padding: 6px 8px; }
 .field .cm-op input[type="checkbox"] { width: 18px; height: 18px; padding: 0; margin: 0; }
 .field .cm-h label { font-size: 13px; font-weight: 600; color: var(--fg); }
+/* Equipo y carga */
+.ayuda { font-size: 13px; color: var(--fg); background: var(--surface-2); border: 1px dashed var(--line); border-radius: var(--r-sm); padding: 10px 14px; }
+.s-pedido { background: color-mix(in srgb, var(--muted) 45%, var(--surface)); }
+.s-proceso { background: var(--info); }
+.s-revision { background: var(--warn); }
+.s-libre { background: transparent; border: 1.5px dashed var(--line); box-sizing: border-box; }
+.legend i.s-libre { background: transparent; }
+.cg { display: grid; padding: 4px 16px; }
+.cg-f { display: grid; grid-template-columns: auto 150px minmax(200px, 1fr) auto 210px; gap: 8px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.cg-f:first-child { border-top: 0; }
+.cg-n b { display: block; } .cg-n small { color: var(--muted); font-size: 12px; }
+.slots { display: flex; gap: 4px; }
+.slots i { flex: 1; height: 14px; border-radius: 4px; min-width: 8px; }
+.cg-d { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 10px; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.cg-d b.bad { color: var(--bad); } .cg-d b.warn { color: var(--warn); } .cg-d b.ok { color: var(--ok); }
+.cg-t { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.cg-t b { min-width: 18px; text-align: center; font-size: 15px; color: var(--fg); }
+.cg-t .btn { min-width: 34px; justify-content: center; }
+.cg-s { font-size: 12px; color: var(--muted); }
+.cg-s b { color: var(--fg); }
+@media (max-width: 900px) {
+  .cg-f { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .cg-b { grid-column: 1 / -1; }
+  .cg-s { grid-column: 1 / -1; }
+  .cg-t { grid-column: 3; grid-row: 1; }
+}
+.toggles button .tope-s { margin-left: 6px; font-size: 11px; opacity: .8; }
+.toggles button.al-tope { border-style: dashed; opacity: .6; cursor: not-allowed; }
+.toggles button.al-tope .tope-s { color: var(--bad); opacity: 1; }
+.toggles button.al-tope[aria-pressed="true"] { opacity: 1; background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
 .coment-add { display: flex; gap: 6px; align-items: flex-end; }
 .coment-add textarea { flex: 1; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); resize: vertical; }
 @media (max-width: 900px) {
@@ -633,16 +663,14 @@ const ESTADOS = [
 const PRIORIDADES = ['Baja', 'Normal', 'Alta', 'Urgente'];
 const VISTAS = [
   { id: 'resumen', nombre: 'Resumen', admin: true },
-  { id: 'balance', nombre: 'Balance', admin: true },
   { id: 'ruta', nombre: 'Hoja de ruta', admin: true },
   { id: 'temas', nombre: 'Temas', admin: true },
   { id: 'mis', nombre: 'Mis tareas' },
   { id: 'novedades', nombre: 'Novedades' },
   { id: 'tablero', nombre: 'Tablero' },
   { id: 'calendario', nombre: 'Calendario' },
-  { id: 'carga', nombre: 'Carga del equipo' },
+  { id: 'equipo', nombre: 'Equipo y carga' },
   { id: 'pauta', nombre: 'Pauta' },
-  { id: 'equipo', nombre: 'Equipo' },
 ];
 
 /* ===== fechas ===== */
@@ -684,7 +712,11 @@ const KEY = 'zebra-mkt';
 let ui = { vista: 'mis', yo: '', marca: 'todas', persona: 'todas', carga: 'semana', calMes: null };
 try { Object.assign(ui, JSON.parse(localStorage.getItem(KEY + '-ui')) || {}); } catch (e) {}
 const guardarUi = () => { try { localStorage.setItem(KEY + '-ui', JSON.stringify({ ...ui, yo: '' })); } catch (e) {} };
-if (location.hash && VISTAS.some((v) => v.id === location.hash.slice(1))) ui.vista = location.hash.slice(1);
+/* Carga del equipo y Balance pasaron a ser pestañas de Equipo y carga: los links y vistas guardadas viejas siguen andando. */
+const VIEJAS = { carga: 'horas', balance: 'balance' };
+const alias = (v) => { if (VIEJAS[v]) { ui.eqTab = VIEJAS[v]; return 'equipo'; } return v; };
+ui.vista = alias(ui.vista);
+if (location.hash && (VISTAS.some((v) => v.id === location.hash.slice(1)) || VIEJAS[location.hash.slice(1)])) ui.vista = alias(location.hash.slice(1));
 const limpio = (o) => { const c = JSON.parse(JSON.stringify(o)); delete c.id; return c; };
 
 /* Sube a Firestore lo que cambió en S respecto de lo último que llegó de la base. */
@@ -767,7 +799,7 @@ function cortarEscucha() {
   document.querySelectorAll('.wa-bar').forEach((x) => x.remove());
   S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [] };
   Object.values(ultimo).forEach((m) => m.clear());
-  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false; comentsListo = false; comentsBloqueado = false; porTarea = new Map();
+  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false; comentsListo = false; comentsBloqueado = false; porTarea = new Map(); topesCfg = {}; topesBloqueado = false;
 }
 function escuchar() {
   let pendientes = new Set(COLS);
@@ -793,7 +825,7 @@ function escuchar() {
     const cambios = typeof qs.docChanges === 'function' ? qs.docChanges().length : 1;
     if (!pendientes.size && (!listo || primera || cambios)) { listo = true; pedirRender(); }
   }, (err) => { console.error(err); gate('No tenés permiso para ver estos datos. Pedile a Manu que agregue tu mail.', true); })));
-  escucharComentarios();
+  escucharComentarios(); escucharTopes();
   if (esAdmin()) { escucharTemas(); escucharNotas(); }
 }
 function escucharTemas() {
@@ -851,6 +883,30 @@ function escucharComentarios() {
 const comentsDe = (o) => (o && o.id && porTarea.get(o.id)) || [];
 const pendienteDe = (o) => comentsDe(o).find((c) => c.pendiente && !c.resuelto) || null;
 const trabada = (o) => !!pendienteDe(o);
+/* Tope de tareas por persona. Activas = tareas (no fechas del calendario) sin empezar, en proceso o en revisión.
+   El tope vive en config/equipo { topes: { id: n } }; si falta, 5 para producción y freelancers, 6 para Mica y Agustina.
+   Manu no tiene tope. Al tope no se le puede asignar otra tarea (se valida en la pantalla). */
+const ACTIVOS = ['pedido', 'proceso', 'revision'];
+let topesCfg = {}, topesBloqueado = false;
+function escucharTopes() {
+  desuscribir.push(db.collection('config').doc('equipo').onSnapshot((d) => {
+    topesCfg = (d.exists && d.data().topes) || {}; topesBloqueado = false;
+    if (listo) pedirRender();
+  }, (err) => { console.error(err); topesBloqueado = true; if (listo) pedirRender(); }));
+}
+const conTope = (id) => !!id && !(EQUIPO.find((p) => p.id === id) || {}).jefe;
+const topeDe = (id) => { const v = Number(topesCfg[id]); if (v > 0) return v; return (EQUIPO.find((p) => p.id === id) || {}).admin ? 6 : 5; };
+const activasDe = (id) => S.tareas.filter((t) => esDe(t, id) && ACTIVOS.includes(t.estado));
+const alTope = (id) => conTope(id) && activasDe(id).length >= topeDe(id);
+const msgTope = (id) => nombre1(id) + ' está al tope. Elegí a otra persona o pedile que cierre algo antes.';
+function cambiarTope(id, d) {
+  const n = Math.min(20, Math.max(1, topeDe(id) + d));
+  if (n === topeDe(id)) return;
+  topesCfg = { ...topesCfg, [id]: n };
+  db.collection('config').doc('equipo').set({ topes: { [id]: n } }, { merge: true })
+    .catch((e) => { console.error(e); toast(e && e.code === 'permission-denied' ? 'No tenés permiso para cambiar el tope' : 'No se pudo guardar: revisá la conexión'); });
+  render();
+}
 async function borrarComentarios(id) {
   try { const qs = await db.collection('comentarios').where('tarea', '==', id).get(); qs.forEach((d) => d.ref.delete().catch((e) => console.error(e))); }
   catch (e) { console.error(e); }
@@ -1335,7 +1391,7 @@ function vistaCalendario() {
     grilla, agenda);
 }
 
-function vistaCarga() {
+function vistaCarga(enTab) {
   const dias = ui.carga === 'semana' ? 7 : 30;
   const enPeriodo = (t) => { const n = diff(t.entrega); return n >= -dias && n <= dias; };
   const ts = trabajos().filter(enPeriodo);
@@ -1353,7 +1409,7 @@ function vistaCarga() {
     h('span', { class: 'val' }, real + ' / ' + est + ' h' + (extra || '')));
   const seg = (id, txt) => h('button', { class: 'chip', 'aria-pressed': String(ui.carga === id), onclick: () => { ui.carga = id; guardarUi(); render(); } }, txt);
   return h('div', { style: 'display:grid;gap:14px' },
-    cabecera('Carga del equipo', 'Horas estimadas al crear la tarea contra horas reales cargadas por cada uno. Tareas con entrega ±' + dias + ' días.', seg('semana', 'Semana'), seg('mes', 'Mes')),
+    (enTab ? subCabecera : cabecera)(enTab ? 'Horas del equipo' : 'Carga del equipo', 'Horas estimadas al crear la tarea contra horas reales cargadas por cada uno. Tareas con entrega ±' + dias + ' días.', seg('semana', 'Semana'), seg('mes', 'Mes')),
     h('div', { class: 'legend' }, h('span', {}, h('i', { style: 'background:var(--line)' }), 'Estimadas'), h('span', {}, h('i', { style: 'background:var(--ink)' }), 'Reales'), h('span', {}, h('i', { style: 'background:var(--bad)' }), 'Reales por encima de lo estimado')),
     h('div', { class: 'grid2' },
       h('div', { class: 'card', style: 'display:grid;gap:14px' }, h('div', {}, h('h2', {}, 'Por persona'), h('p', { class: 'note' }, 'Quién está más cargado y quién se pasa de lo estimado.')),
@@ -1478,15 +1534,50 @@ function vistaPauta() {
     ...(cs.length ? cs.map(tarjetaCamp) : [h('div', { class: 'empty' }, 'No hay campañas con este filtro.')]));
 }
 
+/* Equipo y carga: pestañas Carga (tope por persona), Balance (solo admins, sin cambios) y Horas (la vieja "Carga del equipo"). */
 function vistaEquipo() {
+  const tabs = [['carga', 'Carga'], ...(esAdmin() ? [['balance', 'Balance']] : []), ['horas', 'Horas']];
+  if (!tabs.some(([id]) => id === ui.eqTab)) ui.eqTab = 'carga';
+  const tab = ui.eqTab;
+  const seg = h('div', { class: 'seg', style: 'justify-self:start', role: 'tablist', 'aria-label': 'Pestañas' }, ...tabs.map(([id, txt]) => h('button', { role: 'tab', 'aria-selected': String(tab === id), 'aria-pressed': String(tab === id), onclick: () => { ui.eqTab = id; guardarUi(); render(); } }, txt)));
+  const cuerpo = tab === 'balance' ? vistaBalance(true) : tab === 'horas' ? vistaCarga(true) : cargaEquipo();
+  return h('div', { style: 'display:grid;gap:16px' },
+    cabecera('Equipo y carga', 'Quién tiene cuánto, y cuánto más puede recibir.', esAdmin() && tab === 'carga' ? h('button', { class: 'btn primary', onclick: () => abrirFreelancer(null) }, '+ Freelancer') : null),
+    seg, cuerpo);
+}
+/* Cabecera chica para lo que se muestra adentro de una pestaña. */
+const subCabecera = (titulo, sub, ...acciones) => h('div', { class: 'pagehead' }, h('div', {}, h('h2', { style: 'font-size:16px' }, titulo), sub ? h('p', {}, sub) : null), h('div', { class: 'chips' }, ...acciones));
+function cargaEquipo() {
   const delMes = (id) => trabajos().filter((t) => esDe(t, id) && diff(t.entrega) >= -30 && diff(t.entrega) <= 30);
-  return h('div', { style: 'display:grid;gap:18px' },
-    cabecera('Equipo', 'Equipo fijo y freelancers con los que trabajan.', esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirFreelancer(null) }, '+ Freelancer') : null),
-    h('div', { class: 'people' }, ...EQUIPO.map((p) => {
-      const ts = delMes(p.id);
-      return h('div', { class: 'card person' }, h('div', { class: 'person-h' }, av(p.id), h('div', {}, h('b', {}, p.nombre), h('small', {}, p.rol))),
-        h('div', { class: 'kv' }, h('span', { class: 'pill p-muted' }, ts.filter((t) => !hecha(t)).length + ' activas'), ts.filter(vencida).length ? h('span', { class: 'pill p-bad' }, ts.filter(vencida).length + ' vencidas') : null, h('span', { class: 'pill p-muted' }, ts.reduce((s, t) => s + (t.horasReal || 0), 0) + ' h este mes'), p.admin ? h('span', { class: 'pill p-ok' }, 'Asigna tareas') : null));
-    })),
+  const admin = esAdmin();
+  const per = (() => { const d = parse(HOY); const l = new Date(d); l.setDate(d.getDate() - ((d.getDay() + 6) % 7)); const f = new Date(l); f.setDate(l.getDate() + 6); return { desde: iso(l), hasta: iso(f) }; })();
+  const gente = [...EQUIPO.filter((p) => !p.admin), ...S.freelancers, ...EQUIPO.filter((p) => p.admin && conTope(p.id))];
+  const filaP = (p) => {
+    const act = activasDe(p.id), tope = topeDe(p.id), n = act.length;
+    const cuenta = (e) => act.filter((t) => t.estado === e).length;
+    const c = { pedido: cuenta('pedido'), proceso: cuenta('proceso'), revision: cuenta('revision') };
+    const slots = [...['pedido', 'proceso', 'revision'].flatMap((e) => Array.from({ length: c[e] }, () => h('i', { class: 's-' + e }))), ...Array.from({ length: Math.max(0, tope - n) }, () => h('i', { class: 's-libre' }))];
+    const libres = tope - n;
+    const est = libres < 0 ? ['bad', 'Pasado del tope (' + n + '/' + tope + ')'] : libres === 0 ? ['bad', 'Al tope (' + n + '/' + tope + ')'] : libres === 1 ? ['warn', 'Le queda 1 lugar'] : ['ok', 'Le quedan ' + libres];
+    const sem = trabajos().filter((t) => esDe(t, p.id) && t.entregadaEl && t.entregadaEl >= per.desde && t.entregadaEl <= per.hasta);
+    const aTiempo = sem.filter((t) => t.entregadaEl <= t.entrega).length;
+    return h('div', { class: 'cg-f' },
+      av(p.id),
+      h('div', { class: 'cg-n' }, h('b', {}, p.nombre), h('small', {}, p.rol || ((p.especialidad || '') + ' · freelance'))),
+      h('div', { class: 'cg-b' },
+        h('div', { class: 'slots', role: 'img', 'aria-label': n + ' activas de ' + tope }, ...slots),
+        h('div', { class: 'cg-d' }, h('span', {}, c.pedido + ' sin empezar · ' + c.proceso + ' en proceso · ' + c.revision + ' en revisión'), h('b', { class: est[0] }, est[1]))),
+      h('div', { class: 'cg-t' }, h('span', {}, 'Tope'),
+        admin && !topesBloqueado ? h('button', { class: 'btn small', 'aria-label': 'Bajar tope de ' + p.nombre, disabled: tope <= 1 || null, onclick: () => cambiarTope(p.id, -1) }, '−') : null,
+        h('b', {}, tope),
+        admin && !topesBloqueado ? h('button', { class: 'btn small', 'aria-label': 'Subir tope de ' + p.nombre, disabled: tope >= 20 || null, onclick: () => cambiarTope(p.id, 1) }, '+') : null),
+      h('div', { class: 'cg-s' }, 'Esta semana: ', h('b', {}, sem.length), sem.length === 1 ? ' entregada' : ' entregadas', sem.length ? ' · ' + Math.round(aTiempo / sem.length * 100) + '% a tiempo' : ''));
+  };
+  return h('div', { style: 'display:grid;gap:16px' },
+    h('div', { class: 'ayuda' }, 'Cada persona tiene un ', h('b', {}, 'tope de tareas activas'), ' (sin empezar + en proceso + en revisión). Al llegar al tope ', h('b', {}, 'no se le puede asignar nada más'), ' hasta que entregue algo.' + (admin ? ' Ajustá el tope con − y +.' : '')),
+    topesBloqueado && admin ? h('p', { class: 'warnbox', style: 'margin:0' }, 'Los topes todavía no se pueden cambiar: falta la regla de Firebase. Mientras, rige el tope de siempre (5, y 6 para Mica y Agustina).') : null,
+    h('div', { class: 'legend' }, h('span', {}, h('i', { class: 's-pedido' }), 'Sin empezar'), h('span', {}, h('i', { class: 's-proceso' }), 'En proceso'), h('span', {}, h('i', { class: 's-revision' }), 'En revisión'), h('span', {}, h('i', { class: 's-libre' }), 'Libre')),
+    h('div', { class: 'card cg' }, ...gente.map(filaP)),
     h('div', { class: 'card', style: 'display:grid;gap:10px' },
       h('div', {}, h('h2', {}, 'Freelancers'), h('p', { class: 'note' }, 'No entran al panel: Mica y Agus les asignan trabajos y siguen el avance. El costo estimado sale de la tarifa por cada trabajo del mes.')),
       S.freelancers.length ? h('div', { class: 'table-wrap' }, h('table', { class: 'tbl' },
@@ -1994,7 +2085,7 @@ function filaNota(n) {
     h('small', {}, fCorta(n.fecha) + ' · ' + persona(n.autor).nombre.split(' ')[0]));
 }
 
-function vistaBalance() {
+function vistaBalance(enTab) {
   const per = periodoBalance();
   const gente = anotables();
   const bs = gente.map((p) => balancePersona(p, per));
@@ -2052,7 +2143,7 @@ function vistaBalance() {
 
   const notasPer = S.notas.filter((n) => enRango(n.fecha, per)).sort((a, b) => b.fecha.localeCompare(a.fecha));
   return h('div', { style: 'display:grid;gap:18px' },
-    cabecera('Balance del equipo', 'Qué se hizo y qué no en ' + per.nombre + ' (' + fCorta(per.desde) + ' al ' + fCorta(per.hasta) + ').' + (esJefe() ? ' Incluye a Mica y Agus.' : ''),
+    (enTab ? subCabecera : cabecera)('Balance del equipo', 'Qué se hizo y qué no en ' + per.nombre + ' (' + fCorta(per.desde) + ' al ' + fCorta(per.hasta) + ').' + (esJefe() ? ' Incluye a Mica y Agus.' : ''),
       !notasBloqueado ? h('button', { class: 'btn primary', onclick: () => abrirNota(null) }, '+ Anotación') : null),
     h('div', { class: 'chips' }, chipPer('semana', 'Esta semana'), chipPer('semanaPasada', 'Semana pasada'), chipPer('mes', 'Este mes'), chipPer('mesPasado', 'Mes pasado')),
     bloqueado,
@@ -2161,14 +2252,24 @@ function abrirDia(s) {
     h('div', { class: 'sheet-foot' }, h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'))));
 }
 
-function selectorPersonas(inicial, soloLectura) {
+function selectorPersonas(inicial, soloLectura, opts = {}) {
   let elegidos = inicial.slice();
+  /* Con opts.tope: quien está al tope no se puede sumar. Los que ya estaban asignados a esta tarea (opts.fijos) no se bloquean. */
+  const fijos = opts.fijos || [];
+  const bloq = (id) => !!opts.tope && !fijos.includes(id) && alTope(id);
   const el = h('div', { class: 'toggles', role: 'group', 'aria-label': 'Responsables' });
-  const pintar = () => el.replaceChildren(...[...EQUIPO, ...S.freelancers].map((p) => h('button', { type: 'button', 'aria-pressed': String(elegidos.includes(p.id)), disabled: soloLectura || null,
-    title: p.rol || p.especialidad || '', onclick: () => { elegidos = elegidos.includes(p.id) ? elegidos.filter((y) => y !== p.id) : [...elegidos, p.id]; pintar(); } },
-    p.nombre + (S.freelancers.includes(p) ? ' · free' : ''))));
+  const pintar = () => el.replaceChildren(...[...EQUIPO, ...S.freelancers].map((p) => {
+    const b = bloq(p.id), on = elegidos.includes(p.id);
+    const n = activasDe(p.id).length, tope = topeDe(p.id);
+    const nota = opts.tope && !soloLectura && conTope(p.id) ? (b ? 'Al tope (' + n + '/' + tope + ')' : (tope - n) + (tope - n === 1 ? ' libre' : ' libres')) : '';
+    return h('button', { type: 'button', class: b ? 'al-tope' : null, 'aria-pressed': String(on), 'aria-disabled': b && !on ? 'true' : null, disabled: soloLectura || null,
+      title: b ? msgTope(p.id) : (p.rol || p.especialidad || ''), onclick: () => {
+        if (b && !on) { toast(msgTope(p.id)); return; }
+        elegidos = on ? elegidos.filter((y) => y !== p.id) : [...elegidos, p.id]; pintar(); } },
+      p.nombre + (S.freelancers.includes(p) ? ' · free' : ''), nota ? h('span', { class: 'tope-s' }, nota) : null);
+  }));
   pintar();
-  return { el, valor: () => elegidos.slice() };
+  return { el, valor: () => elegidos.slice(), bloqueados: () => elegidos.filter(bloq) };
 }
 
 /* Conversación de una tarea o fecha: devoluciones (resaltadas), comentarios viejos guardados dentro de la tarea
@@ -2256,7 +2357,7 @@ function abrirTarea(t, base) {
   const x = t || { titulo: '', marca: ui.marca !== 'todas' ? ui.marca : 'zebra', tipo: 'Post', resp: '', estado: 'pedido', entrega: dia(3), prioridad: 'Normal', horasEst: 2, horasReal: 0, pedidoPor: ui.yo, brief: '', contenido: '', referencias: '', imagenes: [], devoluciones: [], link: '', publica: '', ...(base || {}) };
   let imagenes = (x.imagenes || []).slice();
   const soloLectura = !admin;
-  const respSel = selectorPersonas(resps(x), soloLectura);
+  const respSel = selectorPersonas(resps(x), soloLectura, { tope: true, fijos: nueva ? [] : resps(x) });
   const puedeEntregar = admin || propia;
   const estadosPermitidos = admin ? ESTADOS : ESTADOS.filter((e) => ['pedido', 'proceso', 'revision'].includes(e.id) || e.id === x.estado);
   const f = {
@@ -2344,6 +2445,7 @@ function abrirTarea(t, base) {
     if (admin) {
       const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné qué hay que hacer'); f.titulo.focus(); return; }
       if (!respSel.valor().length) { toast('Elegí al menos un responsable'); return; }
+      { const malos = respSel.bloqueados(); if (malos.length) { toast(msgTope(malos[0])); return; } }
       if (f.estado.value === 'revision' && x.estado !== 'revision' && !f.link.value.trim()) { toast('Pegá el link del Drive para mandarla a revisión'); f.link.focus(); return; }
       Object.assign(x, { titulo, marca: f.marca.value, tipo: f.tipo.value, resps: respSel.valor(), resp: respSel.valor()[0], entrega: f.entrega.value || dia(3), publica: f.publica.value || '', prioridad: f.prioridad.value, horasEst: Number(f.horasEst.value) || 0,
         contenido: f.contenido.value, referencias: f.referencias.value.trim(), brief: f.brief.value, imagenes });
@@ -2471,7 +2573,7 @@ function abrirFreelancer(fr) {
 function render() {
   pintarNav();
   const def = VISTAS.find((x) => x.id === ui.vista);
-  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, balance: vistaBalance, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, carga: vistaCarga, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
+  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
   $('#view').replaceChildren(listo ? v() : h('div', { class: 'empty', style: 'margin-top:40px' }, 'Cargando datos del equipo…'));
 }
 iniciar();
