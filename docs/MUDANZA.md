@@ -136,13 +136,13 @@ dos tablas.
 - **Equipo y carga:** pestaña Carga (casilleros por persona con − y + del tope), Balance (por período: cumplidas,
   sin cumplir, a tiempo, devoluciones recibidas, horas reales vs. estimadas, anotaciones) y Horas.
 - **Calendario:** tarjeta con título, responsable, estado, formato y si es urgente; arrastrar para mover.
-- **Pauta**, **Hoja de ruta** y **Reuniones** como se describe arriba. **Novedades** es la campanita de arriba.
+- **Pauta**, **Hoja de ruta** y **Reuniones** como se describe arriba. **Novedades** es un botón fijo arriba con el número de sin leer en rojo; si hay sin leer, Inicio y Lo mío muestran una franja "Tenés N novedades sin leer · Ver".
 - **Tablero** quedó igual que antes.
 
 ## Avisos (novedades)
 
 No hay colección de avisos: cada tarea, fecha, campaña o tema guarda sus últimos 30 en `log`
-(`{ ts, autor, tipo, para: [ids], txt?, que? }`). La campanita junta los dirigidos a cada uno; lo leído se
+(`{ ts, autor, tipo, para: [ids], txt?, que? }`). El botón Novedades junta los dirigidos a cada uno; lo leído se
 recuerda en el dispositivo. Después de cada acción se ofrece mandar el aviso por WhatsApp con el texto armado.
 Tipos: `asignada`, `revision`, `devuelta`, `aprobada`, `publicada`, `paso`, `proyecto`, `dato`, y los nuevos
 `comentario`, `pendiente`, `resuelto`, `movida`. En el super admin esto pide una tabla de notificaciones propia

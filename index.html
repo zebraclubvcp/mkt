@@ -635,13 +635,19 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .nota-t .nota-ref { color: var(--muted); font-weight: 500; }
 .nota small { font-size: 11px; color: var(--muted); white-space: nowrap; }
 @media (max-width: 600px) { .nota { grid-template-columns: minmax(0, 1fr); } }
-/* campanita (Novedades), siempre arriba */
-.brand .campana { margin-left: auto; }
-.campana { position: relative; width: 36px; height: 36px; flex: none; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0; }
-.campana:hover { border-color: var(--muted); }
-.campana[aria-current="page"] { background: var(--ink); color: var(--ink-fg); border-color: var(--ink); }
-.campana .count { position: absolute; top: -5px; right: -6px; font-size: 10px; font-weight: 700; min-width: 18px; padding: 1px 5px; border-radius: 999px; background: var(--bad); color: #fff; line-height: 1.4; }
-.campana .count:empty { display: none; }
+/* botón Novedades, siempre arriba (menú en compu, barra de arriba en celu) */
+.nov-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-weight: 600; flex: none; }
+.nov-btn:hover { border-color: var(--muted); }
+.nov-btn.hay { border-color: var(--bad); }
+.nov-btn[aria-current="page"] { background: var(--ink); color: var(--ink-fg); border-color: var(--ink); }
+.nov-btn .count { font-size: 11px; font-weight: 700; min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--bad); color: #fff; line-height: 1.4; text-align: center; }
+.nov-btn .count:empty { display: none; }
+.side .nov-btn { justify-content: flex-start; border-radius: var(--r-sm); width: 100%; }
+.side .nov-btn .count { margin-left: auto; }
+/* franja de novedades sin leer en Inicio y Lo mío */
+.franja-nov { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--bad-bg); color: var(--bad); border: 1px solid color-mix(in srgb, var(--bad) 30%, transparent); font-size: 14px; }
+.franja-nov b { font-weight: 700; }
+.franja-nov .btn { margin-left: auto; }
 /* Inicio y Lo mío */
 .kicker { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .pagehead .kicker { margin: 0 0 2px; }
@@ -751,8 +757,8 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 </div>
 <div class="app">
   <aside class="side" aria-label="Menú">
-    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b><small>Zebra Club · Kosmos · Before · Zebra Beach</small></div>
-      <button class="campana" type="button" aria-label="Novedades" onclick="ir('novedades')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="count"></span></button></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b><small>Zebra Club · Kosmos · Before · Zebra Beach</small></div></div>
+    <button class="nov-btn" type="button" onclick="ir('novedades')">Novedades<span class="count"></span></button>
     <nav class="nav" id="nav"></nav>
     <div class="me"><div><b id="me-name">—</b><small id="me-mail"></small></div><span class="sync" id="sync"><i></i>Sincronizado</span><button class="btn small" id="logout">Salir</button></div>
   </aside>
@@ -762,7 +768,7 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
         <div class="topbar-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b></div></div>
           <span style="display:flex;gap:8px;align-items:center">
-            <button class="campana" type="button" aria-label="Novedades" onclick="ir('novedades')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="count"></span></button>
+            <button class="nov-btn" type="button" onclick="ir('novedades')">Novedades<span class="count"></span></button>
             <button class="btn small" id="logout-m">Salir</button>
           </span>
         </div>
@@ -1179,7 +1185,7 @@ function toastAccion(msg, etiqueta, fn, ms = 7000) {
 
 /* ===== avisos =====
    Cada tarea, fecha o campaña guarda sus últimos avisos en el campo "log" (no hace falta una colección nueva en Firebase).
-   La campanita (vista Novedades) junta los avisos dirigidos a cada uno; lo leído se recuerda en el dispositivo.
+   El botón Novedades junta los avisos dirigidos a cada uno; lo leído se recuerda en el dispositivo.
    Además, después de cada acción se ofrece mandar el aviso por WhatsApp con el mensaje ya escrito. */
 const APP_URL = 'https://zebraclubvcp.github.io/mkt/';
 const TXT_AVISO = {
@@ -1343,6 +1349,7 @@ function vistaInicio() {
       h('small', {}, 'Próximo paso: ' + x.prox.texto + (x.prox.fecha ? ' · ' + fCorta(x.prox.fecha) : '')));
   }
   return h('div', { style: 'display:grid;gap:18px' },
+    franjaNovedades(),
     h('div', { class: 'pagehead' }, h('div', {}, h('p', { class: 'kicker' }, fechaLarga()), h('h1', {}, 'Hola, ' + yo().nombre), h('p', {}, 'Arriba está lo que frena al equipo si no lo resolvés. Abajo, lo que sale esta semana.')),
       h('div', { class: 'chips' }, h('button', { class: 'btn', onclick: () => ir('lista') }, 'Lista de tareas'), h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido'))),
     filtrosEl,
@@ -1385,6 +1392,7 @@ function vistaLoMio() {
   const avisos = misAvisos().slice(0, 5);
   const l = leidoHasta();
   return h('div', { style: 'display:grid;gap:18px' },
+    franjaNovedades(),
     h('div', { class: 'pagehead' }, h('div', {}, h('p', { class: 'kicker' }, fechaLarga()), h('h1', {}, 'Lo tuyo, ' + yo().nombre), h('p', {}, 'Ordenado por fecha de entrega. Cada tarea te dice cuál es el próximo paso.'))),
     carga, pend,
     h('div', { class: 'card lst' }, h('div', { class: 'lst-h' }, h('h2', {}, 'Para hacer'), h('small', {}, ts.length ? ts.length + (ts.length === 1 ? ' tarea' : ' tareas') : '')),
@@ -1418,14 +1426,22 @@ function pintarNav() {
   const vis = VISTAS.filter((v) => !v.oculta && puedeVer(v));
   $('#nav').replaceChildren(...vis.map(mk));
   $('#tabs').replaceChildren(...vis.map(mk));
-  /* La campanita: siempre a mano, arriba de todo. Lleva a Novedades. */
+  /* Botón Novedades: siempre a mano, arriba de todo, con el número de sin leer en rojo. */
   const nuevas = ui.vista === 'novedades' ? 0 : sinLeer();
-  document.querySelectorAll('.campana').forEach((b) => {
+  document.querySelectorAll('.nov-btn').forEach((b) => {
     b.setAttribute('aria-current', ui.vista === 'novedades' ? 'page' : 'false');
     b.setAttribute('aria-label', nuevas ? 'Novedades: ' + nuevas + ' sin leer' : 'Novedades');
-    b.title = nuevas ? nuevas + (nuevas === 1 ? ' novedad sin leer' : ' novedades sin leer') : 'Novedades';
+    b.title = nuevas ? textoSinLeer(nuevas) : 'Novedades';
+    b.classList.toggle('hay', !!nuevas);
     b.querySelector('.count').textContent = nuevas || '';
   });
+}
+const textoSinLeer = (n) => n + (n === 1 ? ' novedad sin leer' : ' novedades sin leer');
+/* Franja arriba de Inicio y Lo mío cuando hay novedades sin leer. */
+function franjaNovedades() {
+  const n = sinLeer();
+  if (!n) return null;
+  return h('div', { class: 'franja-nov', role: 'status' }, h('span', {}, 'Tenés ', h('b', {}, textoSinLeer(n))), h('button', { class: 'btn small', onclick: () => ir('novedades') }, 'Ver'));
 }
 function ir(v) { ui.vista = v; guardarUi(); try { history.replaceState(null, '', '#' + v); } catch (e) {} render(); window.scrollTo(0, 0); }
 
