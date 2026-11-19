@@ -206,6 +206,40 @@ select.chip { padding-right: 8px; }
 .decision { display: grid; gap: 2px; padding: 8px 10px; border-radius: 8px; background: var(--ok-bg); font-size: 13px; }
 .decision b { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ok); }
 .decision span { white-space: pre-wrap; }
+/* reuniones */
+.reu-grid { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 900px) { .reu-grid { grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); } }
+.reu-col { display: grid; gap: 10px; min-width: 0; }
+.reu-buscar { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.reu-lista { padding: 0; overflow: hidden; }
+.reu-it { display: grid; gap: 4px; width: 100%; text-align: left; padding: 11px 14px; border: 0; border-top: 1px solid var(--line); background: var(--surface); min-height: 44px; }
+.reu-it:first-child { border-top: 0; }
+.reu-it[aria-current="true"] { background: var(--info-bg); }
+.reu-it .t { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.reu-it small { color: var(--muted); font-size: 12px; }
+.reu-it .frag { font-size: 12px; color: var(--fg); }
+.reu-it mark { background: var(--warn-bg); color: var(--warn); border-radius: 3px; padding: 0 2px; }
+.reu-det { display: grid; gap: 16px; }
+.reu-det h2 { font-size: 18px; }
+.reu-asis { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+.reu-k { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 6px; }
+.reu-notas { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+.reu-prev { display: grid; gap: 6px; padding: 10px 12px; border-radius: var(--r-sm); background: var(--warn-bg); }
+.reu-prev > b { font-size: 12px; color: var(--warn); }
+.acs { display: grid; gap: 6px; }
+.ac { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); min-height: 44px; }
+.ac .tick { width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; font-weight: 700; flex: none; padding: 0; }
+.ac .tick[aria-checked="true"] { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.ac .tx { flex: 1 1 180px; min-width: 0; font-size: 14px; }
+.ac.hecho .tx { color: var(--muted); text-decoration: line-through; }
+.ac .der { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.prox { display: grid; gap: 6px; }
+.prox-it { display: grid; gap: 2px; width: 100%; text-align: left; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); }
+.prox-it .t { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 600; }
+.ac-ed { display: grid; gap: 6px; grid-template-columns: minmax(0, 1fr) auto; padding: 8px; border: 1px solid var(--line); border-radius: var(--r-sm); }
+.ac-ed .tx { grid-column: 1 / -1; }
+.ac-ed .fila { display: flex; gap: 6px; flex-wrap: wrap; }
+.ac-ed input, .ac-ed select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0; }
 .tema-detalle { font-size: 13px; color: var(--muted); white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .person .metrics-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .person .metrics-row div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
@@ -686,6 +720,7 @@ const VISTAS = [
   { id: 'calendario', nombre: 'Calendario' },
   { id: 'equipo', nombre: 'Equipo y carga' },
   { id: 'pauta', nombre: 'Pauta' },
+  { id: 'reuniones', nombre: 'Reuniones', admin: true },
 ];
 
 /* ===== fechas ===== */
@@ -717,10 +752,11 @@ const FIREBASE_CONFIG = {
 const COLS = ['tareas', 'fechas', 'campanias', 'freelancers'];
 
 /* ===== estado ===== */
-let S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [] };
+let S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [], reuniones: [] };
 let temasBloqueado = false, temasListo = false;
 let notasBloqueado = false, notasListo = false;
-const ultimo = { tareas: new Map(), fechas: new Map(), campanias: new Map(), freelancers: new Map(), temas: new Map(), notas: new Map() };
+let reusBloqueado = false, reusListo = false;
+const ultimo = { tareas: new Map(), fechas: new Map(), campanias: new Map(), freelancers: new Map(), temas: new Map(), notas: new Map(), reuniones: new Map() };
 const imgCache = new Map();
 let db = null, listo = false;
 const KEY = 'zebra-mkt';
@@ -756,7 +792,7 @@ function marcarEntregas() {
     setPrev(o);
   });
 }
-const colsActivas = () => [...COLS, ...(esAdmin() && temasListo && !temasBloqueado ? ['temas'] : []), ...(esAdmin() && notasListo && !notasBloqueado ? ['notas'] : [])];
+const colsActivas = () => [...COLS, ...(esAdmin() && temasListo && !temasBloqueado ? ['temas'] : []), ...(esAdmin() && notasListo && !notasBloqueado ? ['notas'] : []), ...(esAdmin() && reusListo && !reusBloqueado ? ['reuniones'] : [])];
 async function guardar() {
   if (!db) return;
   marcarEntregas();
@@ -812,9 +848,9 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function cortarEscucha() {
   desuscribir.forEach((f) => { try { f(); } catch (e) {} }); desuscribir = [];
   document.querySelectorAll('.wa-bar').forEach((x) => x.remove());
-  S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [] };
+  S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [], reuniones: [] };
   Object.values(ultimo).forEach((m) => m.clear());
-  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false; comentsListo = false; comentsBloqueado = false; porTarea = new Map(); topesCfg = {}; topesBloqueado = false;
+  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false; reusListo = false; reusBloqueado = false; comentsListo = false; comentsBloqueado = false; porTarea = new Map(); topesCfg = {}; topesBloqueado = false;
 }
 function escuchar() {
   let pendientes = new Set(COLS);
@@ -841,7 +877,7 @@ function escuchar() {
     if (!pendientes.size && (!listo || primera || cambios)) { listo = true; pedirRender(); }
   }, (err) => { console.error(err); gate('No tenés permiso para ver estos datos. Pedile a Manu que agregue tu mail.', true); })));
   escucharComentarios(); escucharTopes();
-  if (esAdmin()) { escucharTemas(); escucharNotas(); }
+  if (esAdmin()) { escucharTemas(); escucharNotas(); escucharReuniones(); }
 }
 function escucharTemas() {
   desuscribir.push(db.collection('temas').onSnapshot((qs) => {
@@ -879,6 +915,26 @@ function escucharNotas() {
     notasListo = true; notasBloqueado = false;
     if (listo) pedirRender();
   }, (err) => { console.error(err); notasBloqueado = true; notasListo = true; if (listo) pedirRender(); }));
+}
+/* Reuniones del equipo de marketing: solo Manu, Mica y Agus. Se guardan con guardar() (documento entero):
+   si dos editan la misma reunión a la vez gana la última, y está bien porque casi siempre la edita una sola persona. */
+function escucharReuniones() {
+  desuscribir.push(db.collection('reuniones').onSnapshot((qs) => {
+    const viejos = new Map(S.reuniones.map((o) => [o.id, o]));
+    const nuevos = [];
+    ultimo.reuniones.clear();
+    qs.forEach((d) => {
+      const data = d.data(); ultimo.reuniones.set(d.id, JSON.stringify(data));
+      const o = viejos.get(d.id) || {};
+      Object.keys(o).forEach((k) => { if (k !== 'id' && !(k in data)) delete o[k]; });
+      Object.assign(o, data, { id: d.id });
+      o.asistentes = o.asistentes || []; o.acuerdos = o.acuerdos || []; o.notas = o.notas || ''; o.titulo = o.titulo || 'Reunión'; o.fecha = o.fecha || HOY;
+      nuevos.push(o);
+    });
+    S.reuniones = nuevos;
+    reusListo = true; reusBloqueado = false;
+    if (listo) pedirRender();
+  }, (err) => { console.error(err); reusBloqueado = true; reusListo = true; if (listo) pedirRender(); }));
 }
 /* Comentarios: colección propia, un documento por comentario (no pasa por guardar(), así dos personas pueden escribir a la vez).
    "tarea" es el id de la tarea o de la fecha del calendario. Se escucha completa y se agrupa por tarea. */
@@ -1106,8 +1162,8 @@ function vistaNovedades() {
 function contarVencidasMias() { return trabajos().filter((t) => esDe(t, ui.yo) && vencida(t)).length; }
 function pintarNav() {
   const mk = (v) => {
-    const n = v.id === 'mis' ? contarVencidasMias() : v.id === 'novedades' ? (ui.vista === 'novedades' ? 0 : sinLeer()) : v.id === 'ruta' ? pasosPendientes(ui.yo).filter((x) => x.p.fecha && diff(x.p.fecha) <= 0).length : v.id === 'temas' ? S.temas.filter((t) => t.estado !== 'decidido' && t.tipo === 'urgente' && t.resps.includes(ui.yo)).length : v.id === 'pauta' && puedePauta() ? S.campanias.filter((c) => estadoCamp(c) === 'falta').length : 0;
-    return h('button', { 'aria-current': ui.vista === v.id ? 'page' : null, onclick: () => ir(v.id) }, v.nombre, n ? h('span', { class: 'count', title: v.id === 'temas' ? 'Temas urgentes tuyos' : v.id === 'pauta' ? 'Campañas sin conclusión' : v.id === 'ruta' ? 'Pasos para hoy o atrasados' : v.id === 'novedades' ? 'Sin leer' : 'Vencidas' }, n) : null);
+    const n = v.id === 'mis' ? contarVencidasMias() : v.id === 'novedades' ? (ui.vista === 'novedades' ? 0 : sinLeer()) : v.id === 'ruta' ? pasosPendientes(ui.yo).filter((x) => x.p.fecha && diff(x.p.fecha) <= 0).length : v.id === 'temas' ? S.temas.filter((t) => t.estado !== 'decidido' && t.tipo === 'urgente' && t.resps.includes(ui.yo)).length : v.id === 'reuniones' ? acuerdosVencidos().filter((x) => x.a.resp === ui.yo).length : v.id === 'pauta' && puedePauta() ? S.campanias.filter((c) => estadoCamp(c) === 'falta').length : 0;
+    return h('button', { 'aria-current': ui.vista === v.id ? 'page' : null, onclick: () => ir(v.id) }, v.nombre, n ? h('span', { class: 'count', title: v.id === 'temas' ? 'Temas urgentes tuyos' : v.id === 'reuniones' ? 'Acuerdos tuyos vencidos' : v.id === 'pauta' ? 'Campañas sin conclusión' : v.id === 'ruta' ? 'Pasos para hoy o atrasados' : v.id === 'novedades' ? 'Sin leer' : 'Vencidas' }, n) : null);
   };
   const vis = VISTAS.filter((v) => !v.admin || esAdmin());
   $('#nav').replaceChildren(...vis.map(mk));
@@ -1753,6 +1809,163 @@ function cargaEquipo() {
         h('thead', {}, h('tr', {}, h('th', {}, 'Nombre'), h('th', {}, 'Especialidad'), h('th', { class: 'n' }, 'Tarifa'), h('th', { class: 'n' }, 'Trabajos del mes'), h('th', { class: 'n' }, 'Costo estimado'), h('th', {}, ''))),
         h('tbody', {}, ...S.freelancers.map((f) => { const ts = delMes(f.id); return h('tr', {}, h('td', {}, f.nombre), h('td', {}, f.especialidad), h('td', { class: 'n' }, ars(f.tarifa) + ' ' + (f.unidad || '')), h('td', { class: 'n' }, ts.length), h('td', { class: 'n' }, ars(ts.length * (f.tarifa || 0))), h('td', { class: 'n' }, esAdmin() ? h('button', { class: 'btn small', onclick: () => abrirFreelancer(f) }, 'Editar') : null)); })))) : h('div', { class: 'empty' }, 'Todavía no cargaron freelancers.')),
     null);
+}
+
+/* ===== reuniones del equipo de marketing (solo Manu, Mica y Agus) ===== */
+const sinTilde = (x) => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const ordenReus = () => S.reuniones.slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '') || (b.creado || 0) - (a.creado || 0));
+const acuerdoPorId = (rid, aid) => { const r = S.reuniones.find((x) => x.id === rid); return r ? r.acuerdos.find((a) => a.id === aid) : null; };
+const acuerdoVencido = (a) => !a.hecho && !!a.fecha && diff(a.fecha) < 0;
+const acuerdosVencidos = () => S.reuniones.flatMap((r) => r.acuerdos.filter(acuerdoVencido).map((a) => ({ r, a })));
+let reuQ = '';
+/* Busca sin distinguir tildes ni mayúsculas y devuelve el pedacito de texto que coincide: [antes, coincidencia, después]. */
+function fragmento(txt, q) {
+  let norm = ''; const idx = [];
+  for (let k = 0; k < txt.length; k++) for (const ch of sinTilde(txt[k])) { norm += ch; idx.push(k); }
+  const i = norm.indexOf(q); if (i < 0) return null;
+  const ini = idx[i], fin = idx[i + q.length - 1] + 1;
+  const desde = Math.max(0, ini - 35), hasta = Math.min(txt.length, fin + 45);
+  return [(desde > 0 ? '…' : '') + txt.slice(desde, ini), txt.slice(ini, fin), txt.slice(fin, hasta) + (hasta < txt.length ? '…' : '')];
+}
+function buscarEnReunion(r, q) {
+  const textos = [r.titulo, ...r.notas.split('\n'), ...r.acuerdos.map((a) => a.texto)];
+  for (const t of textos) { const f = t && fragmento(t, q); if (f) return f; }
+  return null;
+}
+function tildarAcuerdo(a) {
+  a.hecho = !a.hecho;
+  if (a.hecho) a.hechoTs = Date.now(); else delete a.hechoTs;
+  guardar(); render(); toast(a.hecho ? '¡Bien! Acuerdo cumplido' : 'El acuerdo volvió a pendiente');
+}
+function acuerdoATarea(r, a) {
+  abrirTarea(null, { titulo: a.texto, contenido: 'Acuerdo de la reunión "' + r.titulo + '" del ' + fCorta(r.fecha) + '.', entrega: a.fecha && diff(a.fecha) >= 0 ? a.fecha : dia(3),
+    resps: a.resp && persona(a.resp).id ? [a.resp] : [], resp: a.resp || '', reunionId: r.id, acuerdoId: a.id });
+  toast('Completá la tarea y creala');
+}
+function filaAcuerdo(r, a) {
+  const venc = acuerdoVencido(a);
+  const est = a.hecho ? ['p-ok', 'Cumplido'] : venc ? ['p-bad', 'Vencido · ' + fCorta(a.fecha)] : a.fecha ? ['p-muted', 'Para el ' + fCorta(a.fecha)] : ['p-muted', 'Sin fecha'];
+  const t = a.tarea && S.tareas.find((y) => y.id === a.tarea);
+  return h('div', { class: 'ac' + (a.hecho ? ' hecho' : '') },
+    h('button', { class: 'tick', role: 'checkbox', 'aria-checked': String(!!a.hecho), 'aria-label': (a.hecho ? 'Desmarcar: ' : 'Marcar cumplido: ') + a.texto, onclick: () => tildarAcuerdo(a) }, a.hecho ? '✓' : ''),
+    h('span', { class: 'tx' }, a.texto),
+    h('span', { class: 'der' },
+      a.resp ? h('span', { class: 'reu-asis' }, av(a.resp), nombre1(a.resp)) : null,
+      h('span', { class: 'pill ' + est[0] }, est[1]),
+      t ? h('button', { class: 'btn small', onclick: () => abrir(t) }, 'Ver tarea')
+        : !a.hecho ? h('button', { class: 'btn small', title: 'Crea una tarea con este acuerdo', onclick: () => acuerdoATarea(r, a) }, 'Pasar a tarea') : null));
+}
+function temasProxima() {
+  const ts = S.temas.filter((t) => t.tipo !== 'proyecto' && t.estado !== 'decidido').sort(ordenTemas);
+  return h('div', { class: 'card', style: 'display:grid;gap:10px' },
+    h('div', { class: 'pagehead', style: 'align-items:center' }, h('div', {}, h('h2', {}, 'Temas para la próxima'), h('p', { class: 'note' }, 'Lo que queda por charlar o decidir. Tocá un tema para verlo y decidirlo.')),
+      temasBloqueado ? null : h('button', { class: 'btn small', onclick: () => abrirTema(null) }, '+ Tema')),
+    temasBloqueado ? h('div', { class: 'warnbox' }, 'Firebase todavía no deja ver los temas.')
+      : !temasListo ? h('div', { class: 'empty' }, 'Cargando temas…')
+      : ts.length ? h('div', { class: 'prox' }, ...ts.map((t) => h('button', { class: 'prox-it', onclick: () => abrirTema(t) },
+          h('span', { class: 't' }, h('span', {}, t.titulo), h('span', { class: 'pill ' + estadoTema(t.estado).cls }, estadoTema(t.estado).nombre)),
+          t.detalle ? h('span', { class: 'tema-detalle' }, t.detalle) : null,
+          h('small', { style: 'font-size:12px;color:' + (temaVencido(t) ? 'var(--bad)' : 'var(--muted)') }, nombresResp(t) + (t.limite ? ' · ' + (temaVencido(t) ? 'vencido ' : 'para ') + cuando(t.limite) : '')))))
+      : h('div', { class: 'empty' }, 'No hay temas abiertos. Sumá lo que quieras charlar en la próxima reunión.'));
+}
+function detalleReunion(r) {
+  const lista = ordenReus(); const prev = lista[lista.indexOf(r) + 1];
+  const pend = prev ? prev.acuerdos.filter((a) => !a.hecho) : [];
+  const notas = r.notas.split('\n').map((l) => l.trim().replace(/^[-•*]\s*/, '')).filter(Boolean);
+  const hechos = r.acuerdos.filter((a) => a.hecho).length;
+  return h('div', { class: 'card reu-det', id: 'reu-det' },
+    h('div', { style: 'display:grid;gap:6px' },
+      h('div', { style: 'display:flex;justify-content:space-between;gap:8px;align-items:center' }, h('small', { style: 'color:var(--muted);font-size:12px' }, fCorta(r.fecha) + (r.creadoPor ? ' · la cargó ' + nombre1(r.creadoPor) : '')),
+        h('button', { class: 'btn small', onclick: () => abrirReunion(r) }, 'Editar')),
+      h('h2', {}, r.titulo),
+      r.asistentes.length ? h('div', { class: 'reu-asis' }, ...r.asistentes.map(av), r.asistentes.map(nombre1).join(', ')) : null),
+    pend.length ? h('div', { class: 'reu-prev' }, h('b', {}, 'Quedó pendiente de la reunión anterior (' + fCorta(prev.fecha) + ')'), h('div', { class: 'acs' }, ...pend.map((a) => filaAcuerdo(prev, a)))) : null,
+    h('div', {}, h('p', { class: 'reu-k' }, 'Qué se habló'),
+      notas.length ? h('ul', { class: 'reu-notas' }, ...notas.map((n) => h('li', {}, n))) : h('p', { class: 'note', style: 'margin:0;color:var(--muted);font-size:13px' }, 'Todavía no hay notas. Tocá Editar para cargarlas.')),
+    h('div', {}, h('p', { class: 'reu-k' }, 'Acuerdos' + (r.acuerdos.length ? ' · ' + hechos + ' de ' + r.acuerdos.length + ' cumplidos' : '')),
+      r.acuerdos.length ? h('div', { class: 'acs' }, ...r.acuerdos.map((a) => filaAcuerdo(r, a))) : h('p', { class: 'note', style: 'margin:0;color:var(--muted);font-size:13px' }, 'Sin acuerdos. Un acuerdo es algo concreto: qué, quién y para cuándo.')));
+}
+function vistaReuniones() {
+  const cab = cabecera('Reuniones', 'Lo que se habló en las reuniones de marketing, lo que se acordó y si se cumplió. Las ven Manu, Mica y Agus.', reusBloqueado ? null : h('button', { class: 'btn primary', onclick: () => abrirReunion(null) }, '+ Reunión'));
+  if (reusBloqueado) return h('div', { style: 'display:grid;gap:14px' }, cab, h('div', { class: 'warnbox' }, 'Firebase todavía no deja guardar reuniones: falta pegar la regla de "reuniones" en la consola de Firebase.'));
+  if (!reusListo) return h('div', { style: 'display:grid;gap:14px' }, cab, h('div', { class: 'empty' }, 'Cargando reuniones…'));
+  const todas = ordenReus();
+  const acs = todas.flatMap((r) => r.acuerdos);
+  const cumplidos = acs.filter((a) => a.hecho).length, vencidos = acs.filter(acuerdoVencido).length;
+  const delMes = todas.filter((r) => (r.fecha || '').slice(0, 7) === HOY.slice(0, 7)).length;
+  const stat = (v, txt, cls) => h('div', { class: 'stat' + (cls ? ' ' + cls : '') }, h('b', {}, v), h('span', {}, txt));
+  let sel = todas.find((r) => r.id === ui.reuSel) || todas[0];
+  const cont = h('div', { class: 'card reu-lista' });
+  const pintarLista = () => {
+    const q = sinTilde(reuQ.trim());
+    const items = todas.map((r) => ({ r, f: q ? buscarEnReunion(r, q) : null })).filter((x) => !q || x.f);
+    cont.replaceChildren(...(items.length ? items.map(({ r, f }) => {
+      const hechos = r.acuerdos.filter((a) => a.hecho).length;
+      return h('button', { class: 'reu-it', 'aria-current': String(r === sel), onclick: () => {
+        ui.reuSel = r.id; guardarUi(); render();
+        if (matchMedia('(max-width: 899px)').matches) { const d = $('#reu-det'); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); } } },
+        h('span', { class: 't' }, h('b', {}, r.titulo), h('small', {}, fCorta(r.fecha))),
+        h('small', {}, r.asistentes.map(nombre1).join(', ') + (r.acuerdos.length ? ' · acuerdos ' + hechos + '/' + r.acuerdos.length : '')),
+        f ? h('span', { class: 'frag' }, f[0], h('mark', {}, f[1]), f[2]) : null);
+    }) : [h('p', { style: 'margin:0;padding:14px;color:var(--muted);font-size:13px' }, todas.length ? 'No hay reuniones con eso. Probá con otra palabra.' : 'Todavía no hay reuniones. Cargá la primera con + Reunión.')]));
+  };
+  pintarLista();
+  const buscar = h('input', { class: 'reu-buscar', type: 'search', id: 'reu-q', value: reuQ, placeholder: 'Buscar en las reuniones (ej. set time, Halloween)', 'aria-label': 'Buscar en las reuniones',
+    oninput: (e) => { reuQ = e.target.value; pintarLista(); } });
+  return h('div', { style: 'display:grid;gap:14px' },
+    cab,
+    h('div', { class: 'stats' },
+      stat(cumplidos + ' de ' + acs.length, 'acuerdos cumplidos'),
+      stat(acs.length - cumplidos, 'acuerdos pendientes'),
+      stat(vencidos, 'vencidos: pasó la fecha y no se cumplieron', vencidos ? 'bad' : ''),
+      stat(delMes, delMes === 1 ? 'reunión este mes' : 'reuniones este mes')),
+    h('div', { class: 'reu-grid' },
+      h('div', { class: 'reu-col' }, buscar, cont),
+      h('div', { class: 'reu-col' }, sel ? detalleReunion(sel) : h('div', { class: 'empty' }, 'Elegí una reunión para ver lo que se habló y los acuerdos.'), temasProxima())));
+}
+function abrirReunion(r) {
+  const nueva = !r;
+  const x = r || { fecha: HOY, titulo: 'Semanal de marketing', asistentes: admins().map((p) => p.id), notas: '', acuerdos: [], creadoPor: ui.yo };
+  let asis = x.asistentes.slice();
+  let acs = x.acuerdos.map((a) => ({ ...a }));
+  const f = {
+    fecha: h('input', { id: 'ru-fecha', type: 'date', value: x.fecha }),
+    titulo: h('input', { id: 'ru-titulo', value: x.titulo, placeholder: 'Ej. Semanal de marketing' }),
+    notas: h('textarea', { id: 'ru-notas', style: 'min-height:120px', placeholder: 'Una idea por renglón. Ej. Halloween: en Kosmos funcionó mejor el video que el flyer.' }, x.notas),
+  };
+  const tg = h('div', { class: 'toggles', role: 'group', 'aria-label': 'Asistentes' });
+  const pintarAsis = () => tg.replaceChildren(...EQUIPO.map((p) => h('button', { type: 'button', 'aria-pressed': String(asis.includes(p.id)),
+    onclick: () => { asis = asis.includes(p.id) ? asis.filter((y) => y !== p.id) : [...asis, p.id]; pintarAsis(); } }, p.nombre)));
+  pintarAsis();
+  const lista = h('div', { class: 'acs' });
+  const pintarAcs = (foco) => {
+    lista.replaceChildren(...acs.map((a, i) => {
+      const tx = h('input', { class: 'tx', value: a.texto, placeholder: 'Qué se acordó', 'aria-label': 'Acuerdo ' + (i + 1), oninput: (e) => { a.texto = e.target.value; } });
+      const resp = sel('ru-resp-' + i, [['', 'Sin responsable'], ...EQUIPO.map((p) => [p.id, p.nombre])], a.resp || '');
+      resp.setAttribute('aria-label', 'Quién'); resp.onchange = () => { a.resp = resp.value; };
+      const fe = h('input', { type: 'date', value: a.fecha || '', 'aria-label': 'Para cuándo', onchange: (e) => { a.fecha = e.target.value; } });
+      return h('div', { class: 'ac-ed' }, tx, h('div', { class: 'fila' }, resp, fe),
+        h('button', { type: 'button', class: 'btn small', 'aria-label': 'Quitar acuerdo', onclick: () => { acs = acs.filter((y) => y !== a); pintarAcs(); } }, '×'));
+    }), h('button', { type: 'button', class: 'btn small', style: 'justify-self:start', onclick: () => { acs.push({ id: uid(), texto: '', resp: '', fecha: '', hecho: false }); pintarAcs(true); } }, '+ Acuerdo'));
+    if (foco) { const ins = lista.querySelectorAll('input.tx'); if (ins.length) ins[ins.length - 1].focus(); }
+  };
+  pintarAcs();
+  const guardarReu = () => {
+    const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné un título'); f.titulo.focus(); return; }
+    const acuerdos = acs.map((a) => ({ ...a, texto: (a.texto || '').trim() })).filter((a) => a.texto);
+    Object.assign(x, { fecha: f.fecha.value || HOY, titulo, asistentes: asis, notas: f.notas.value.trim(), acuerdos });
+    if (nueva) { x.id = uid(); x.creado = Date.now(); S.reuniones.push(x); }
+    ui.reuSel = x.id; guardarUi();
+    guardar(); cerrarModal(); render(); toast(nueva ? 'Reunión guardada' : 'Cambios guardados');
+  };
+  const pie = h('div', { class: 'sheet-foot' },
+    !nueva ? botonPeligro('Eliminar reunión', () => { S.reuniones = S.reuniones.filter((y) => y !== r); guardar(); cerrarModal(); render(); toast('Reunión eliminada'); }) : null,
+    h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'), h('button', { class: 'btn primary', onclick: guardarReu }, nueva ? 'Guardar reunión' : 'Guardar')));
+  modal(nueva ? 'Nueva reunión' : 'Editar reunión', h('div', { class: 'form' },
+    campo('Fecha', f.fecha), campo('Título', f.titulo),
+    h('div', { class: 'field full' }, h('label', {}, 'Quiénes estuvieron'), tg),
+    campo('Qué se habló', f.notas, true),
+    h('div', { class: 'field full' }, h('label', {}, 'Acuerdos (qué, quién y para cuándo)'), lista)), pie, { panel: true });
 }
 
 /* ===== temas: puntos a ver y decidir (solo Manu, Mica y Agus) ===== */
@@ -2406,7 +2619,7 @@ async function duplicar(t) {
   try { imgs = await Promise.all((t.imagenes || []).map((ref) => ref.startsWith('data:') ? ref : cargarImagen(ref))); } catch (e) { imgs = []; }
   const copia = JSON.parse(JSON.stringify(t));
   /* La copia arranca de cero: sin entrega registrada, comentarios ni vínculo al tema de la original. */
-  ['id', 'creado', 'link', 'devoluciones', 'horasReal', 'entregadaEl', 'comentarios', 'temaId', 'log'].forEach((k) => delete copia[k]);
+  ['id', 'creado', 'link', 'devoluciones', 'horasReal', 'entregadaEl', 'comentarios', 'temaId', 'reunionId', 'acuerdoId', 'log'].forEach((k) => delete copia[k]);
   Object.assign(copia, { titulo: t.titulo + ' (copia)', estado: 'pedido', horasReal: 0, devoluciones: [], link: '', imagenes: imgs.filter(Boolean), pedidoPor: ui.yo });
   cerrarModal(); abrirTarea(null, copia); toast('Copia lista: cambiá lo que necesites y creala');
 }
@@ -2628,6 +2841,8 @@ function abrirTarea(t, base, op) {
       x.id = uid(); x.creado = HOY; S.tareas.push(x);
       const tm = x.temaId && S.temas.find((y) => y.id === x.temaId);
       if (tm) tm.pedidos = [...(tm.pedidos || []), x.id];
+      const ac = x.acuerdoId && acuerdoPorId(x.reunionId, x.acuerdoId);
+      if (ac) ac.tarea = x.id;
     }
     /* Avisos: a quienes se suman como responsables, y por cambio de estado hecho desde el formulario. */
     const nuevos = resps(x).filter((id) => !antesResps.includes(id));
@@ -2743,7 +2958,7 @@ function abrirFreelancer(fr) {
 function render() {
   pintarNav();
   const def = VISTAS.find((x) => x.id === ui.vista);
-  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, pauta: vistaPauta, equipo: vistaEquipo }[ui.vista] || vistaMis);
+  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, pauta: vistaPauta, equipo: vistaEquipo, reuniones: vistaReuniones }[ui.vista] || vistaMis);
   $('#view').replaceChildren(listo ? v() : h('div', { class: 'empty', style: 'margin-top:40px' }, 'Cargando datos del equipo…'));
 }
 iniciar();

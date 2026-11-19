@@ -71,3 +71,29 @@ en Equipo y carga aparece el aviso de que falta la regla y no se pueden cambiar 
 
 Cómo probar que quedó bien: entrar a Marcebra, abrir una tarea y mandar un comentario. Si aparece
 "Los comentarios todavía no están activados" o "No tenés permiso para comentar", la regla no se publicó.
+
+## Fase 5 — Pauta
+
+No hace falta regla nueva: la conclusión se guarda adentro de cada campaña (`campanias`), que ya
+tiene su regla.
+
+## Fase 7 — `reuniones`
+
+Mismo lugar que los bloques anteriores: adentro de `match /databases/{database}/documents { … }`.
+Solo Manu, Mica y Agustina leen, crean, editan y borran reuniones. Producción no las ve.
+
+```
+    match /reuniones/{id} {
+      function esAdmin() {
+        return request.auth != null && request.auth.token.email.lower() in
+          ['manucontreras3@gmail.com', 'colanskymica@gmail.com', 'agustinan.contacto@gmail.com'];
+      }
+      allow read, write: if esAdmin();
+    }
+```
+
+Sin esta regla, la sección Reuniones muestra el aviso "Firebase todavía no deja guardar reuniones"
+y no deja cargar nada. El resto de la app sigue igual.
+
+Cómo probar que quedó bien: entrar como Manu, Mica o Agustina, ir a **Reuniones**, tocar
+**+ Reunión** y guardarla. Si aparece "No tenés permiso para guardar esto", la regla no se publicó.
