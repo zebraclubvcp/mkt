@@ -621,6 +621,10 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .bal-it .pill { grid-column: 2; grid-row: 1; justify-self: end; }
 .bal-it .btn { grid-column: 2; grid-row: 2; justify-self: end; padding: 2px 8px; font-size: 11px; }
 .bal { align-self: start; align-content: start; }
+.bal-horas { display: grid; gap: 6px; }
+.bal-horas .track { height: 10px; }
+.bal-horas-n { margin: 0; font-size: 12px; color: var(--muted); }
+.sec.decididos .prox-it .decision { text-align: left; }
 .bal-people { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); align-items: start; }
 .cc.cc-prio.cc-alta { border-color: var(--warn); box-shadow: inset 3px 0 0 var(--warn); }
 .notas { display: grid; gap: 6px; }
@@ -2097,6 +2101,18 @@ function temasProxima() {
           h('small', { style: 'font-size:12px;color:' + (temaVencido(t) ? 'var(--bad)' : 'var(--muted)') }, nombresResp(t) + (t.limite ? ' · ' + (temaVencido(t) ? 'vencido ' : 'para ') + cuando(t.limite) : '')))))
       : h('div', { class: 'empty' }, 'No hay temas abiertos. Sumá lo que quieras charlar en la próxima reunión.'));
 }
+/* Temas ya decididos, con su decisión: cerrado por defecto para no sumar ruido. Tocar uno lo abre como siempre. */
+function temasDecididos() {
+  if (temasBloqueado || !temasListo) return null;
+  const ts = S.temas.filter((t) => t.tipo !== 'proyecto' && t.estado === 'decidido').sort((a, b) => (b.decididoEl || '').localeCompare(a.decididoEl || ''));
+  return h('details', { class: 'sec decididos' },
+    h('summary', { class: 'sec-h' }, h('span', {}, 'Temas decididos'), h('small', {}, 'Lo que ya se resolvió y qué se decidió'), h('span', { class: 'n' }, ts.length)),
+    ts.length ? h('div', { class: 'prox', style: 'padding:10px' }, ...ts.map((t) => h('button', { class: 'prox-it', onclick: () => abrirTema(t) },
+        h('span', { class: 't' }, h('span', {}, t.titulo), t.decididoEl ? h('small', { style: 'font-size:12px;font-weight:400;color:var(--muted);white-space:nowrap' }, fCorta(t.decididoEl)) : null),
+        h('span', { class: 'decision' }, h('b', {}, 'Decisión'), h('span', {}, t.decision || 'Sin texto de decisión.')),
+        h('small', { style: 'font-size:12px;color:var(--muted)' }, nombresResp(t)))))
+      : h('p', { style: 'margin:0;padding:12px 14px;font-size:13px;color:var(--muted)' }, 'Todavía no hay temas decididos. Cuando decidan uno, queda acá con lo que se resolvió.'));
+}
 function detalleReunion(r) {
   const lista = ordenReus(); const prev = lista[lista.indexOf(r) + 1];
   const pend = prev ? prev.acuerdos.filter((a) => !a.hecho) : [];
@@ -2150,7 +2166,7 @@ function vistaReuniones() {
       stat(delMes, delMes === 1 ? 'reunión este mes' : 'reuniones este mes')),
     h('div', { class: 'reu-grid' },
       h('div', { class: 'reu-col' }, buscar, cont),
-      h('div', { class: 'reu-col' }, sel ? detalleReunion(sel) : h('div', { class: 'empty' }, 'Elegí una reunión para ver lo que se habló y los acuerdos.'), temasProxima())));
+      h('div', { class: 'reu-col' }, sel ? detalleReunion(sel) : h('div', { class: 'empty' }, 'Elegí una reunión para ver lo que se habló y los acuerdos.'), temasProxima(), temasDecididos())));
 }
 function abrirReunion(r) {
   const nueva = !r;
@@ -2590,17 +2606,31 @@ function balancePersona(p, per) {
     };
   }
   const notas = S.notas.filter((n) => n.sobre === p.id && enRango(n.fecha, per));
+  /* Devoluciones recibidas en el período, en cualquier trabajo suyo (aunque la entrega caiga en otro período). */
+  const devols = trabajos().filter((t) => esDe(t, p.id)).flatMap((t) => (t.devoluciones || []).filter((d) => enRango(d.fecha, per)).map((d) => ({ t, d })))
+    .sort((a, b) => (b.d.fecha || '').localeCompare(a.d.fecha || ''));
   return {
     p, items, cumplidas, noCumplidas, pendientes,
     pct: vencidas ? Math.round(cumplidas.length / vencidas * 100) : null,
     aTiempo, tarde: conDia.length - aTiempo,
-    devol: items.reduce((s, t) => s + (t.devoluciones || []).filter((d) => enRango(d.fecha, per)).length, 0),
+    devols, devol: devols.length,
     est: r1(items.reduce((s, t) => s + parte(t, 'horasEst'), 0)), real: r1(items.reduce((s, t) => s + parte(t, 'horasReal'), 0)),
     gestion, notas,
     notasSi: notas.filter((n) => n.resultado === 'cumplio').length, notasNo: notas.filter((n) => n.resultado === 'no').length,
   };
 }
 const clsPct = (v) => v == null ? '' : v >= 85 ? 'ok' : v >= 60 ? 'warn' : 'bad';
+/* Horas reales contra estimadas del período (lo que mostraba Resumen): gris = estimadas, negro = reales, rojo si se pasó. */
+function horasBal(b) {
+  if (!b.est && !b.real) return h('p', { class: 'bal-horas-n' }, 'Horas: sin horas cargadas en el período.');
+  const max = Math.max(b.est, b.real, 1);
+  const desvio = b.est ? Math.round((b.real / b.est - 1) * 100) : null;
+  return h('div', { class: 'bal-horas' },
+    h('div', { class: 'carga-l' }, h('span', {}, 'Horas reales vs. estimadas'),
+      h('b', { class: b.real > b.est ? 'bad' : '' }, b.real + ' de ' + b.est + ' h' + (desvio && b.real > b.est ? ' (+' + desvio + '%)' : ''))),
+    h('div', { class: 'track', title: 'Estimadas ' + b.est + ' h · reales ' + b.real + ' h' },
+      h('span', { class: 'est', style: 'width:' + (b.est / max * 100) + '%' }), h('span', { class: 'real' + (b.real > b.est ? ' over' : ''), style: 'width:' + (b.real / max * 100) + '%' })));
+}
 
 function abrirNota(n, base) {
   const nueva = !n;
@@ -2676,6 +2706,10 @@ function vistaBalance(enTab) {
       h('div', { class: 'bal-sec' }, h('h4', { class: 'bad' }, 'Sin cumplir (' + b.noCumplidas.length + ')'), listaTrab(b.noCumplidas.slice(), 'Nada sin cumplir en ' + per.nombre + '.', b.p.id)),
       h('div', { class: 'bal-sec' }, h('h4', {}, 'Por venir (' + b.pendientes.length + ')'), listaTrab(b.pendientes.slice(), 'Nada pendiente.', b.p.id)),
       h('div', { class: 'bal-sec' }, h('h4', { class: 'ok' }, 'Cumplidas (' + b.cumplidas.length + ')'), listaTrab(b.cumplidas.slice(), 'Todavía nada cumplido en ' + per.nombre + '.', b.p.id)),
+      b.devols.length ? h('div', { class: 'bal-sec' }, h('h4', {}, 'Devoluciones recibidas (' + b.devols.length + ')'),
+        h('div', { class: 'bal-list' }, ...b.devols.map(({ t, d }) => h('div', { class: 'bal-it' },
+          h('button', { class: 'bal-tt', onclick: () => abrir(t) }, h('i', { class: 'mk', style: 'background:' + marca(t.marca).color }), t.titulo),
+          h('small', { style: 'white-space:pre-wrap' }, nombre1(d.autor) + ' · ' + fCorta(d.fecha) + ' · ' + d.texto))))) : null,
       g && (g.pasosAtrasados.length || g.temasVencidos.length) ? h('div', { class: 'bal-sec' }, h('h4', { class: 'bad' }, 'Gestión atrasada'),
         h('div', { class: 'bal-list' }, ...g.pasosAtrasados.map((x) => h('div', { class: 'bal-it' }, h('button', { class: 'bal-tt', onclick: () => abrirProyecto(x.pr) }, x.p.texto), h('small', {}, 'Hoja de ruta · ' + x.pr.titulo + ' · ' + fCorta(x.p.fecha)))),
           ...g.temasVencidos.map((t) => h('div', { class: 'bal-it' }, h('button', { class: 'bal-tt', onclick: () => abrirTema(t) }, t.titulo), h('small', {}, 'Tema · límite ' + fCorta(t.limite)))))) : null,
@@ -2689,12 +2723,13 @@ function vistaBalance(enTab) {
         h('div', {}, h('b', { class: b.noCumplidas.length ? 'bad' : '' }, b.noCumplidas.length), h('span', {}, 'sin cumplir')),
         h('div', {}, h('b', {}, b.pendientes.length), h('span', {}, 'por venir')),
         h('div', {}, h('b', { class: b.tarde ? 'warn' : '' }, b.aTiempo + '/' + b.tarde), h('span', {}, 'a tiempo / tarde')),
-        h('div', {}, h('b', { class: b.real > b.est && b.est ? 'bad' : '' }, b.real + '/' + b.est), h('span', {}, 'horas real/est.'))),
+        h('div', { title: 'Cambios que le pidieron en ' + per.nombre }, h('b', { class: b.devol >= 3 ? 'warn' : '' }, b.devol), h('span', {}, b.devol === 1 ? 'devolución' : 'devoluciones'))),
+      horasBal(b),
       g ? h('div', { class: 'kv' },
         h('span', { class: 'pill ' + (g.pasosAtrasados.length ? 'p-bad' : 'p-muted') }, 'Hoja de ruta ' + g.pasosHechos + '/' + g.pasos + ' pasos'),
         h('span', { class: 'pill ' + (g.temasVencidos.length ? 'p-bad' : 'p-muted') }, 'Temas ' + g.temasDecididos + '/' + g.temas + ' decididos')) : null,
       h('div', { class: 'person-foot' },
-        h('span', { class: 'kv' }, h('span', { class: 'pill p-ok' }, '✓ ' + b.notasSi), h('span', { class: 'pill p-bad' }, '✗ ' + b.notasNo), b.devol ? h('span', {}, b.devol + (b.devol === 1 ? ' devolución' : ' devoluciones')) : null),
+        h('span', { class: 'kv' }, h('span', { class: 'pill p-ok' }, '✓ ' + b.notasSi), h('span', { class: 'pill p-bad' }, '✗ ' + b.notasNo)),
         !notasBloqueado ? h('button', { class: 'btn small', onclick: () => abrirNota(null, { sobre: b.p.id }) }, '+ Anotar') : null),
       det);
   };
