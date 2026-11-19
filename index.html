@@ -604,6 +604,7 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .cc-avs .av + .av { margin-left: -6px; }
 .cc-mas { font-size: 11px; color: var(--muted); font-weight: 600; margin-left: 3px; }
 .cc-sin { font-size: 11px; color: var(--muted); }
+.cc-quien { font-size: 11.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal .day .cc { padding: 6px 7px; gap: 4px; }
 .cal .day .cc-t { font-size: 12px; }
 .cal { min-width: 980px; grid-template-columns: repeat(7, minmax(140px, 1fr)); }
@@ -646,6 +647,59 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .nota-t .nota-ref { color: var(--muted); font-weight: 500; }
 .nota small { font-size: 11px; color: var(--muted); white-space: nowrap; }
 @media (max-width: 600px) { .nota { grid-template-columns: minmax(0, 1fr); } }
+/* campanita (Novedades), siempre arriba */
+.brand .campana { margin-left: auto; }
+.campana { position: relative; width: 36px; height: 36px; flex: none; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0; }
+.campana:hover { border-color: var(--muted); }
+.campana[aria-current="page"] { background: var(--ink); color: var(--ink-fg); border-color: var(--ink); }
+.campana .count { position: absolute; top: -5px; right: -6px; font-size: 10px; font-weight: 700; min-width: 18px; padding: 1px 5px; border-radius: 999px; background: var(--bad); color: #fff; line-height: 1.4; }
+.campana .count:empty { display: none; }
+/* Inicio y Lo mío */
+.kicker { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.pagehead .kicker { margin: 0 0 2px; }
+.filtros-ini { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtros-ini button { display: flex; align-items: baseline; gap: 8px; padding: 10px 14px; min-height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
+.filtros-ini button:hover { border-color: var(--muted); }
+.filtros-ini button b { font-size: 20px; line-height: 1; }
+.filtros-ini button span { font-size: 13px; }
+.filtros-ini button[aria-pressed="true"] { background: var(--ink); color: var(--ink-fg); border-color: var(--ink); }
+.ini-grid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 1100px) { .ini-grid { grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); } }
+.ini-col { display: grid; gap: 18px; min-width: 0; align-content: start; }
+.lst { padding: 0; overflow: hidden; }
+.lst-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px 8px; }
+.card .lst-h h2 { font-size: 16px; }
+.lst-h small { font-size: 12px; color: var(--muted); }
+.lst-bad { border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
+.it { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 11px 16px; border-top: 1px solid var(--line); }
+.it-t { flex: 1 1 220px; min-width: 0; display: grid; gap: 3px; }
+.it-t .l1 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.it-t b { font-weight: 600; }
+.it-t small, .it-t .muted { font-size: 12px; color: var(--muted); }
+.it-t small.apurada { color: var(--bad); font-weight: 600; }
+.it-t .devol-nota { color: var(--warn); }
+.it .btn { flex: none; margin-left: auto; }
+.it .espera { flex: 0 1 220px; font-size: 12px; color: var(--muted); }
+.it-vacio { margin: 0; padding: 12px 16px 16px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); }
+.link { border: 0; background: none; padding: 0; color: var(--info); font-size: 12px; font-weight: 500; }
+.link:hover { text-decoration: underline; }
+.dia-sale { display: grid; gap: 6px; }
+.sale { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; width: 100%; text-align: left; padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid transparent; background: var(--surface-2); }
+.sale:hover { border-color: var(--line); }
+.sale b { flex: 1 1 160px; min-width: 0; font-weight: 600; }
+.carga-l { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+.carga-l b.bad, .mio-carga p.bad { color: var(--bad); }
+.mini-bar { height: 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.mini-bar i { display: block; height: 100%; border-radius: 999px; background: var(--ok); }
+.mini-bar i.warn { background: var(--warn); } .mini-bar i.bad { background: var(--bad); }
+.atajo { display: grid; gap: 6px; text-align: left; width: 100%; }
+.atajo:hover { border-color: var(--muted); }
+.atajo > b { font-size: 15px; }
+.atajo small { font-size: 12px; color: var(--muted); }
+.mio-carga { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+.mio-carga .carga-l { font-size: 14px; }
+.mio-carga .mini-bar { height: 10px; }
+.mio-carga p { margin: 0; flex: 2 1 260px; font-size: 13px; }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -664,7 +718,8 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 </div>
 <div class="app">
   <aside class="side" aria-label="Menú">
-    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b><small>Zebra Club · Kosmos · Before · Zebra Beach</small></div></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b><small>Zebra Club · Kosmos · Before · Zebra Beach</small></div>
+      <button class="campana" type="button" aria-label="Novedades" onclick="ir('novedades')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="count"></span></button></div>
     <nav class="nav" id="nav"></nav>
     <div class="me"><div><b id="me-name">—</b><small id="me-mail"></small></div><span class="sync" id="sync"><i></i>Sincronizado</span><button class="btn small" id="logout">Salir</button></div>
   </aside>
@@ -673,7 +728,10 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
       <div class="topbar">
         <div class="topbar-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><b>Marcebra</b></div></div>
-          <button class="btn small" id="logout-m">Salir</button>
+          <span style="display:flex;gap:8px;align-items:center">
+            <button class="campana" type="button" aria-label="Novedades" onclick="ir('novedades')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="count"></span></button>
+            <button class="btn small" id="logout-m">Salir</button>
+          </span>
         </div>
         <div class="tabs" id="tabs"></div>
       </div>
@@ -710,17 +768,18 @@ const ESTADOS = [
   { id: 'publicado', nombre: 'Publicada' },
 ];
 const PRIORIDADES = ['Baja', 'Normal', 'Alta', 'Urgente'];
+/* admin: solo Manu, Mica y Agus · prod: solo producción · pauta: quien puede ver Pauta · oculta: no va en el menú (se llega desde otra pantalla). */
 const VISTAS = [
-  { id: 'resumen', nombre: 'Resumen', admin: true },
-  { id: 'ruta', nombre: 'Hoja de ruta', admin: true },
-  { id: 'temas', nombre: 'Temas', admin: true },
-  { id: 'mis', nombre: 'Mis tareas' },
-  { id: 'novedades', nombre: 'Novedades' },
-  { id: 'tablero', nombre: 'Tablero' },
+  { id: 'inicio', nombre: 'Inicio', admin: true },
+  { id: 'lomio', nombre: 'Lo mío', prod: true },
   { id: 'calendario', nombre: 'Calendario' },
-  { id: 'equipo', nombre: 'Equipo y carga' },
-  { id: 'pauta', nombre: 'Pauta' },
+  { id: 'tablero', nombre: 'Tablero', admin: true },
+  { id: 'equipo', nombre: 'Equipo y carga', admin: true },
+  { id: 'pauta', nombre: 'Pauta', pauta: true },
+  { id: 'ruta', nombre: 'Hoja de ruta', admin: true },
   { id: 'reuniones', nombre: 'Reuniones', admin: true },
+  { id: 'novedades', nombre: 'Novedades', oculta: true },
+  { id: 'lista', nombre: 'Lista de tareas', admin: true, oculta: true },
 ];
 
 /* ===== fechas ===== */
@@ -766,8 +825,11 @@ const guardarUi = () => { try { localStorage.setItem(KEY + '-ui', JSON.stringify
 /* Carga del equipo y Balance pasaron a ser pestañas de Equipo y carga: los links y vistas guardadas viejas siguen andando. */
 const VIEJAS = { carga: 'horas', balance: 'balance' };
 const alias = (v) => { if (VIEJAS[v]) { ui.eqTab = VIEJAS[v]; return 'equipo'; } return v; };
+/* Vistas que ya no están en el menú: los links viejos (ej. el #mis de los WhatsApp) llevan a la que las reemplaza.
+   Depende de quién entra, por eso se resuelve después del login (vistaValida). */
+const VIEJAS_ROL = { mis: () => (esAdmin() ? 'inicio' : 'lomio'), resumen: () => 'inicio', temas: () => 'reuniones' };
 ui.vista = alias(ui.vista);
-if (location.hash && (VISTAS.some((v) => v.id === location.hash.slice(1)) || VIEJAS[location.hash.slice(1)])) ui.vista = alias(location.hash.slice(1));
+if (location.hash && (VISTAS.some((v) => v.id === location.hash.slice(1)) || VIEJAS[location.hash.slice(1)] || VIEJAS_ROL[location.hash.slice(1)])) ui.vista = alias(location.hash.slice(1));
 const limpio = (o) => { const c = JSON.parse(JSON.stringify(o)); delete c.id; return c; };
 
 /* Sube a Firestore lo que cambió en S respecto de lo último que llegó de la base. */
@@ -1010,8 +1072,7 @@ function iniciar() {
     const p = EQUIPO.find((x) => x.email && x.email.toLowerCase() === (u.email || '').toLowerCase());
     if (!p) { cortarEscucha(); db = null; gate('La cuenta ' + u.email + ' no tiene acceso. Pedile a Manu que la agregue.', true); return; }
     ui.yo = p.id;
-    if (p.jefe && !location.hash) ui.vista = 'resumen';
-    if (!p.admin && (VISTAS.find((v) => v.id === ui.vista) || {}).admin) ui.vista = 'mis';
+    ui.vista = vistaValida(ui.vista);
     $('#me-name').textContent = p.nombre; $('#me-mail').textContent = u.email;
     $('#gate').hidden = true;
     if (!db) { db = firebase.firestore(); escuchar(); }
@@ -1148,9 +1209,9 @@ function vistaNovedades() {
   /* Al abrir Novedades queda todo marcado como leído (lo nuevo se ve resaltado esta vez). */
   try { localStorage.setItem(LEIDO_KEY(), String(Date.now())); } catch (e) {}
   setTimeout(pintarNav, 0);
-  const abrirO = (o) => (S.campanias.includes(o) ? ir('pauta') : o.tipo === 'proyecto' ? abrirProyecto(o) : abrir(o));
+  const abrirO = abrirAviso;
   return h('div', { style: 'display:grid;gap:16px' },
-    cabecera('Novedades', 'Lo que te asignaron, devolvieron, comentaron o pidieron.'),
+    cabecera('Novedades', 'Lo que te asignaron, devolvieron, comentaron o pidieron.', h('button', { class: 'btn', onclick: () => ir(vistaInicial()) }, '← ' + (esAdmin() ? 'Inicio' : 'Lo mío'))),
     items.length ? h('div', { class: 'sec' }, ...items.map(({ o, ev }) => h('div', { class: 'row aviso' + (ev.ts > l ? ' nuevo' : ''), tabindex: '0', role: 'button', onclick: () => abrirO(o), onkeydown: (e) => { if (e.key === 'Enter') abrirO(o); } },
       av(ev.autor),
       h('div', { class: 'tt' }, h('b', {}, h('span', { class: 't' }, textoAviso(o, ev))), h('small', {}, h('span', {}, haceCuanto(ev.ts)), o.estado ? estadoPill(o.estado) : null)),
@@ -1158,16 +1219,180 @@ function vistaNovedades() {
       : h('div', { class: 'empty' }, 'Todavía no tenés novedades. Acá van a aparecer las tareas que te asignen, las devoluciones y los comentarios.'));
 }
 
+const abrirAviso = (o) => (S.campanias.includes(o) ? ir('pauta') : o.tipo === 'proyecto' ? abrirProyecto(o) : abrir(o));
+
+/* ===== Inicio (Manu, Mica y Agus) y Lo mío (producción) ===== */
+const fechaLarga = () => { const d = parse(HOY); return ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()]; };
+/* Tarea o fecha del calendario a la que pertenece un comentario. */
+const trabajoPorId = (id) => S.tareas.find((t) => t.id === id) || S.fechas.find((f) => f.id === id) || null;
+/* Pendientes de la conversación sin resolver (los de tareas borradas no cuentan). */
+const pendientesAbiertos = () => S.comentarios.filter((c) => c.pendiente && !c.resuelto && trabajoPorId(c.tarea));
+const gentesConTope = () => [...EQUIPO.filter((p) => !p.admin), ...S.freelancers, ...EQUIPO.filter((p) => p.admin && conTope(p.id))];
+const estadoCorto = (t) => trabada(t) ? h('span', { class: 'pill p-bad' }, 'Trabada') : vencida(t) ? h('span', { class: 'pill p-bad' }, 'Vencida') : estadoPill(t.estado);
+const formatoChip = (t) => { const fm = formatoDe(t._fecha ? { f: t } : { t })[0] || ''; return fm ? h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm) : null; };
+const barraCarga = (n, tope) => h('div', { class: 'mini-bar', role: 'img', 'aria-label': n + ' de ' + tope }, h('i', { class: n >= tope ? 'bad' : n / tope >= 0.8 ? 'warn' : '', style: 'width:' + Math.min(100, Math.round(n / tope * 100)) + '%' }));
+/* "Necesita tu atención": lo que frena al equipo si Manu, Mica o Agus no lo resuelven. */
+function atencion() {
+  if (!esAdmin()) return [];
+  const out = [];
+  trabajos().filter((t) => t.estado === 'revision' && !esDe(t, ui.yo)).sort((a, b) => a.entrega.localeCompare(b.entrega)).forEach((t) => {
+    const ev = (t.log || []).filter((e) => e.tipo === 'revision').pop();
+    out.push({ tipo: 'revision', quien: resps(t)[0], etiqueta: ['p-warn', 'Para revisar'], titulo: t.titulo,
+      sub: nombresResp(t) + ' lo mandó' + (ev ? ' ' + haceCuanto(ev.ts) : '') + ' · ' + marca(t.marca).nombre, accion: 'Revisar', ir: () => abrir(t) });
+  });
+  pendientesAbiertos().filter((c) => c.para === ui.yo).sort((a, b) => (a.ts || 0) - (b.ts || 0)).forEach((c) => {
+    const t = trabajoPorId(c.tarea);
+    out.push({ tipo: 'pide', quien: c.de, etiqueta: ['p-bad', 'Te piden'], titulo: '“' + c.texto + '”',
+      sub: nombre1(c.de) + ' · en ' + t.titulo + ' · ' + haceCuanto(c.ts || Date.now()) + ' · la tarea está trabada', accion: 'Responder', ir: () => abrir(t) });
+  });
+  trabajos().filter(vencida).sort((a, b) => a.entrega.localeCompare(b.entrega)).forEach((t) => {
+    out.push({ tipo: 'vencida', quien: resps(t)[0], etiqueta: ['p-bad', 'Vencida'], titulo: t.titulo,
+      sub: nombresResp(t) + ' · venció ' + cuando(t.entrega) + ' y sigue ' + (ESTADOS.find((e) => e.id === t.estado) || ESTADOS[0]).nombre.toLowerCase(), accion: 'Ver', ir: () => abrir(t) });
+  });
+  gentesConTope().filter((p) => alTope(p.id)).forEach((p) => {
+    out.push({ tipo: 'tope', quien: p.id, etiqueta: ['p-warn', 'Al tope'], titulo: p.nombre + ' tiene ' + activasDe(p.id).length + ' de ' + topeDe(p.id) + ' tareas activas',
+      sub: 'No se le puede asignar más hasta que entregue algo', accion: 'Ver carga', ir: () => { ui.eqTab = 'carga'; ir('equipo'); } });
+  });
+  return out;
+}
+function vistaInicio() {
+  const items = atencion();
+  const FILTROS = [['todo', 'Todo'], ['revision', 'Para revisar'], ['pide', 'Te piden'], ['vencida', 'Vencidas'], ['tope', 'Gente al tope']];
+  if (!FILTROS.some(([id]) => id === ui.iniFiltro)) ui.iniFiltro = 'todo';
+  const fil = ui.iniFiltro;
+  const vis = items.filter((i) => fil === 'todo' || i.tipo === fil);
+  const VACIO = { todo: 'Nada te espera. Cuando alguien mande algo a revisión, te pida algo o se venza una tarea, aparece acá.', revision: 'No hay piezas esperando revisión.', pide: 'Nadie te está esperando.', vencida: 'No hay tareas vencidas. ¡Bien!', tope: 'Nadie está al tope: todos pueden recibir tareas.' };
+  const filtrosEl = h('div', { class: 'filtros-ini', role: 'group', 'aria-label': 'Filtrar' }, ...FILTROS.map(([id, txt]) => h('button', { type: 'button', 'aria-pressed': String(fil === id), onclick: () => { ui.iniFiltro = id; guardarUi(); render(); } },
+    h('b', {}, id === 'todo' ? items.length : items.filter((i) => i.tipo === id).length), h('span', {}, txt))));
+  const atn = h('div', { class: 'card lst' },
+    h('div', { class: 'lst-h' }, h('h2', {}, 'Necesita tu atención'), h('small', {}, vis.length + (vis.length === 1 ? ' cosa' : ' cosas'))),
+    ...(vis.length ? vis.map((i) => h('div', { class: 'it' }, av(i.quien),
+      h('div', { class: 'it-t' }, h('span', { class: 'l1' }, h('span', { class: 'pill ' + i.etiqueta[0] }, i.etiqueta[1]), h('b', {}, i.titulo)), h('small', {}, i.sub)),
+      h('button', { class: 'btn small', onclick: i.ir }, i.accion)))
+      : [h('p', { class: 'it-vacio' }, VACIO[fil])]));
+  /* Sale esta semana: hoy y los 6 días que siguen, por la fecha en que sale (o la entrega si no tiene). */
+  const fechaSale = (t) => t.publica || t.entrega;
+  const sale = trabajos().filter((t) => t.estado !== 'publicado' && !(t._fecha && SIN_ENTREGA.includes(t.tipo)) && diff(fechaSale(t)) >= 0 && diff(fechaSale(t)) <= 6);
+  const dias = [...new Set(sale.map(fechaSale))].sort();
+  const nomDia = (s) => { const n = diff(s); return (n === 0 ? 'Hoy · ' : n === 1 ? 'Mañana · ' : '') + fCorta(s); };
+  const semana = h('div', { class: 'card', style: 'display:grid;gap:14px' },
+    h('div', { class: 'lst-h', style: 'padding:0' }, h('h2', {}, 'Sale esta semana'), h('button', { class: 'link', onclick: () => ir('calendario') }, 'Ver calendario')),
+    ...(dias.length ? dias.map((s) => h('div', { class: 'dia-sale' }, h('p', { class: 'kicker' }, nomDia(s)),
+      ...sale.filter((t) => fechaSale(t) === s).map((t) => h('button', { class: 'sale', onclick: () => abrir(t) },
+        h('i', { class: 'dot', style: 'background:' + marca(t.marca).color, title: marca(t.marca).nombre }), h('b', {}, t.titulo), formatoChip(t),
+        h('span', { class: 'cc-avs' }, ...resps(t).slice(0, 2).map(av)), estadoCorto(t)))))
+      : [h('p', { class: 'note', style: 'margin:0' }, 'No sale nada en los próximos 7 días. Lo que cargues con fecha de publicación aparece acá.')]));
+  /* Al costado: carga del equipo, próxima reunión y una idea de la hoja de ruta. */
+  const carga = h('div', { class: 'card', style: 'display:grid;gap:12px' },
+    h('div', { class: 'lst-h', style: 'padding:0' }, h('h2', {}, 'Carga del equipo'), h('button', { class: 'link', onclick: () => { ui.eqTab = 'carga'; ir('equipo'); } }, 'Ver todo')),
+    ...gentesConTope().map((p) => { const n = activasDe(p.id).length, tope = topeDe(p.id);
+      return h('div', { style: 'display:grid;gap:4px' }, h('div', { class: 'carga-l' }, h('span', {}, p.nombre), h('b', { class: n >= tope ? 'bad' : '' }, n + ' de ' + tope)), barraCarga(n, tope)); }));
+  let reunion = null;
+  if (reusListo && !reusBloqueado) {
+    const prox = S.reuniones.filter((r) => r.fecha >= HOY).sort((a, b) => a.fecha.localeCompare(b.fecha))[0];
+    const ult = ordenReus().find((r) => r.fecha < HOY || (!prox && r));
+    const temas = temasListo && !temasBloqueado ? S.temas.filter((t) => t.tipo !== 'proyecto' && t.estado !== 'decidido').length : 0;
+    const sinCumplir = ult ? ult.acuerdos.filter((a) => !a.hecho).length : 0;
+    reunion = h('button', { class: 'card atajo', onclick: () => { if (prox) ui.reuSel = prox.id; ir('reuniones'); } },
+      h('p', { class: 'kicker' }, 'Próxima reunión'),
+      h('b', {}, prox ? fCorta(prox.fecha).replace(/^./, (c) => c.toUpperCase()) + ' · ' + prox.titulo : 'Sin fecha cargada'),
+      h('small', {}, [temas + (temas === 1 ? ' tema anotado' : ' temas anotados'), ult ? sinCumplir + (sinCumplir === 1 ? ' acuerdo' : ' acuerdos') + ' de la anterior sin cumplir' : ''].filter(Boolean).join(' · ')));
+  }
+  let idea = null;
+  if (temasListo && !temasBloqueado) {
+    const conPaso = proyectos().filter((pr) => pr.estado !== 'terminado' && pr.estado !== 'pausado').map((pr) => ({ pr, a: avance(pr), prox: proximoPaso(pr) })).filter((x) => x.prox)
+      .sort((a, b) => (a.prox.fecha || '9999').localeCompare(b.prox.fecha || '9999'));
+    const x = conPaso[0];
+    if (x) idea = h('button', { class: 'card atajo', onclick: () => ir('ruta') },
+      h('p', { class: 'kicker' }, 'Hoja de ruta'),
+      h('span', { class: 'carga-l' }, h('b', {}, x.pr.titulo), h('b', {}, x.a.d + ' de ' + x.a.n)),
+      h('div', { class: 'mini-bar' }, h('i', { style: 'width:' + Math.round(x.a.pct * 100) + '%' })),
+      h('small', {}, 'Próximo paso: ' + x.prox.texto + (x.prox.fecha ? ' · ' + fCorta(x.prox.fecha) : '')));
+  }
+  return h('div', { style: 'display:grid;gap:18px' },
+    h('div', { class: 'pagehead' }, h('div', {}, h('p', { class: 'kicker' }, fechaLarga()), h('h1', {}, 'Hola, ' + yo().nombre), h('p', {}, 'Arriba está lo que frena al equipo si no lo resolvés. Abajo, lo que sale esta semana.')),
+      h('div', { class: 'chips' }, h('button', { class: 'btn', onclick: () => ir('lista') }, 'Lista de tareas'), h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido'))),
+    filtrosEl,
+    h('div', { class: 'ini-grid' }, h('div', { class: 'ini-col' }, atn, semana), h('div', { class: 'ini-col' }, carga, reunion, idea)));
+}
+/* Lo mío: lo que tiene que hacer cada persona de producción, con un solo botón de próximo paso por tarea. */
+function vistaLoMio() {
+  const n = activasDe(ui.yo).length, tope = topeDe(ui.yo), conT = conTope(ui.yo);
+  const lleno = conT && n >= tope;
+  const carga = conT ? h('div', { class: 'card mio-carga' },
+    h('div', { style: 'display:grid;gap:6px;flex:1 1 260px' }, h('div', { class: 'carga-l' }, h('b', {}, 'Tu carga'), h('b', { class: lleno ? 'bad' : '' }, n + ' de ' + tope + ' tareas activas')), barraCarga(n, tope)),
+    h('p', { class: lleno ? 'bad' : '' }, lleno ? 'Estás al tope: nadie te puede asignar más hasta que entregues algo. Empezá por lo que vence primero.' : 'Te ' + (tope - n === 1 ? 'queda 1 lugar libre.' : 'quedan ' + (tope - n) + ' lugares libres.'))) : null;
+  const abiertos = pendientesAbiertos();
+  const espero = abiertos.filter((c) => c.de === ui.yo), meEsperan = abiertos.filter((c) => c.para === ui.yo);
+  const filaPend = (c, yoPido) => { const t = trabajoPorId(c.tarea);
+    return h('div', { class: 'it' }, h('span', { class: 'pill p-bad' }, yoPido ? 'Trabada' : 'Te piden'),
+      h('div', { class: 'it-t' }, h('span', {}, h('b', {}, t.titulo), h('span', { class: 'muted' }, ' · ' + (yoPido ? 'le pediste a ' + nombre1(c.para) : nombre1(c.de) + ' te pidió') + ': “' + c.texto + '” · ' + haceCuanto(c.ts || Date.now())))),
+      h('button', { class: 'btn small', onclick: () => abrir(t) }, yoPido ? 'Ver' : 'Responder')); };
+  const pend = espero.length || meEsperan.length ? h('div', { class: 'card lst lst-bad' },
+    h('div', { class: 'lst-h' }, h('h2', {}, meEsperan.length && !espero.length ? 'Te están esperando' : 'Esperando a otros')),
+    ...meEsperan.map((c) => filaPend(c, false)), ...espero.map((c) => filaPend(c, true))) : null;
+  const ts = trabajos().filter((t) => esDe(t, ui.yo) && ACTIVOS.includes(t.estado) && !hecha(t)).sort((a, b) => a.entrega.localeCompare(b.entrega) || (PRIORIDADES.indexOf(b.prioridad) - PRIORIDADES.indexOf(a.prioridad)));
+  const filaT = (t) => {
+    const p = pendienteDe(t), dv = ultimaDevol(t);
+    const apurada = !ENTREGADO.includes(t.estado) && diff(t.entrega) <= 1;
+    let accion = null, espera = '';
+    if (p && p.para !== ui.yo) espera = 'Trabada: esperás a ' + nombre1(p.para) + '.';
+    else if (p) accion = h('button', { class: 'btn primary', onclick: () => abrir(t) }, 'Responder');
+    else if (t.estado === 'pedido') accion = h('button', { class: 'btn primary', onclick: () => mover(t, 'proceso') }, 'Empezar');
+    else if (t.estado === 'proceso') accion = h('button', { class: 'btn primary', onclick: () => mandarRevision(t) }, 'Mandar a revisión');
+    else if (t.estado === 'revision') espera = 'Lo está revisando ' + (t.pedidoPor ? nombre1(t.pedidoPor) : 'Mica o Agustina') + '. Te avisa si hay cambios.';
+    return h('div', { class: 'it mio' },
+      h('div', { class: 'it-t', role: 'button', tabindex: '0', style: 'cursor:pointer', onclick: () => abrir(t), onkeydown: (e) => { if (e.key === 'Enter') abrir(t); } },
+        h('span', { class: 'l1' }, h('b', { style: 'font-size:15px' }, t.titulo), formatoChip(t), t.prioridad === 'Urgente' ? h('span', { class: 'prio Urgente' }, 'Urgente') : null),
+        h('span', { class: 'l1' }, p ? h('span', { class: 'pill p-bad' }, 'Trabada') : estadoPill(t.estado),
+          h('small', { class: vencida(t) || apurada ? 'apurada' : '' }, vencida(t) ? 'Venció ' + cuando(t.entrega) : 'Entrega ' + cuando(t.entrega)), h('small', {}, '· ' + marca(t.marca).nombre)),
+        dv ? h('small', { class: 'devol-nota' }, 'Tiene cambios de ' + nombre1(dv.autor) + ': ' + dv.texto) : null),
+      accion, espera ? h('small', { class: 'espera' }, espera) : null);
+  };
+  const avisos = misAvisos().slice(0, 5);
+  const l = leidoHasta();
+  return h('div', { style: 'display:grid;gap:18px' },
+    h('div', { class: 'pagehead' }, h('div', {}, h('p', { class: 'kicker' }, fechaLarga()), h('h1', {}, 'Lo tuyo, ' + yo().nombre), h('p', {}, 'Ordenado por fecha de entrega. Cada tarea te dice cuál es el próximo paso.'))),
+    carga, pend,
+    h('div', { class: 'card lst' }, h('div', { class: 'lst-h' }, h('h2', {}, 'Para hacer'), h('small', {}, ts.length ? ts.length + (ts.length === 1 ? ' tarea' : ' tareas') : '')),
+      ...(ts.length ? ts.map(filaT) : [h('p', { class: 'it-vacio' }, 'No tenés nada para hacer. Cuando te asignen una tarea, aparece acá con su fecha de entrega.')])),
+    h('div', { class: 'card lst' }, h('div', { class: 'lst-h' }, h('h2', {}, 'Novedades'), avisos.length ? h('button', { class: 'link', onclick: () => ir('novedades') }, 'Ver todas') : null),
+      ...(avisos.length ? avisos.map(({ o, ev }) => h('div', { class: 'it', role: 'button', tabindex: '0', style: 'cursor:pointer', onclick: () => abrirAviso(o), onkeydown: (e) => { if (e.key === 'Enter') abrirAviso(o); } }, av(ev.autor),
+        h('div', { class: 'it-t' }, h('span', {}, textoAviso(o, ev)), h('small', {}, haceCuanto(ev.ts))), ev.ts > l ? h('span', { class: 'pill p-bad' }, 'Nuevo') : null))
+        : [h('p', { class: 'it-vacio' }, 'Acá vas a ver lo que te asignen, las devoluciones y los comentarios.')])));
+}
+
 /* ===== navegación ===== */
 function contarVencidasMias() { return trabajos().filter((t) => esDe(t, ui.yo) && vencida(t)).length; }
+const puedeVer = (v) => !!v && !(v.admin && !esAdmin()) && !(v.prod && esAdmin()) && !(v.pauta && !puedePauta());
+const vistaInicial = () => (esAdmin() ? 'inicio' : 'lomio');
+function vistaValida(v) {
+  if (VIEJAS_ROL[v]) v = VIEJAS_ROL[v]();
+  return puedeVer(VISTAS.find((x) => x.id === v)) ? v : vistaInicial();
+}
 function pintarNav() {
-  const mk = (v) => {
-    const n = v.id === 'mis' ? contarVencidasMias() : v.id === 'novedades' ? (ui.vista === 'novedades' ? 0 : sinLeer()) : v.id === 'ruta' ? pasosPendientes(ui.yo).filter((x) => x.p.fecha && diff(x.p.fecha) <= 0).length : v.id === 'temas' ? S.temas.filter((t) => t.estado !== 'decidido' && t.tipo === 'urgente' && t.resps.includes(ui.yo)).length : v.id === 'reuniones' ? acuerdosVencidos().filter((x) => x.a.resp === ui.yo).length : v.id === 'pauta' && puedePauta() ? S.campanias.filter((c) => estadoCamp(c) === 'falta').length : 0;
-    return h('button', { 'aria-current': ui.vista === v.id ? 'page' : null, onclick: () => ir(v.id) }, v.nombre, n ? h('span', { class: 'count', title: v.id === 'temas' ? 'Temas urgentes tuyos' : v.id === 'reuniones' ? 'Acuerdos tuyos vencidos' : v.id === 'pauta' ? 'Campañas sin conclusión' : v.id === 'ruta' ? 'Pasos para hoy o atrasados' : v.id === 'novedades' ? 'Sin leer' : 'Vencidas' }, n) : null);
+  const CUENTA = {
+    inicio: [() => atencion().length, 'Cosas que necesitan tu atención'],
+    lomio: [contarVencidasMias, 'Vencidas'],
+    ruta: [() => pasosPendientes(ui.yo).filter((x) => x.p.fecha && diff(x.p.fecha) <= 0).length, 'Pasos para hoy o atrasados'],
+    reuniones: [() => acuerdosVencidos().filter((x) => x.a.resp === ui.yo).length, 'Acuerdos tuyos vencidos'],
+    pauta: [() => S.campanias.filter((c) => estadoCamp(c) === 'falta').length, 'Campañas sin conclusión'],
   };
-  const vis = VISTAS.filter((v) => !v.admin || esAdmin());
+  const mk = (v) => {
+    const c = CUENTA[v.id], n = c ? c[0]() : 0;
+    return h('button', { 'aria-current': ui.vista === v.id ? 'page' : null, onclick: () => ir(v.id) }, v.nombre, n ? h('span', { class: 'count', title: c[1] }, n) : null);
+  };
+  const vis = VISTAS.filter((v) => !v.oculta && puedeVer(v));
   $('#nav').replaceChildren(...vis.map(mk));
   $('#tabs').replaceChildren(...vis.map(mk));
+  /* La campanita: siempre a mano, arriba de todo. Lleva a Novedades. */
+  const nuevas = ui.vista === 'novedades' ? 0 : sinLeer();
+  document.querySelectorAll('.campana').forEach((b) => {
+    b.setAttribute('aria-current', ui.vista === 'novedades' ? 'page' : 'false');
+    b.setAttribute('aria-label', nuevas ? 'Novedades: ' + nuevas + ' sin leer' : 'Novedades');
+    b.title = nuevas ? nuevas + (nuevas === 1 ? ' novedad sin leer' : ' novedades sin leer') : 'Novedades';
+    b.querySelector('.count').textContent = nuevas || '';
+  });
 }
 function ir(v) { ui.vista = v; guardarUi(); try { history.replaceState(null, '', '#' + v); } catch (e) {} render(); window.scrollTo(0, 0); }
 
@@ -1335,7 +1560,8 @@ function vistaMis() {
   const buscador = h('label', { class: 'search' }, lupa(), h('input', { type: 'search', placeholder: 'Buscar tarea, marca o persona…', value: ui.q || '', 'aria-label': 'Buscar', oninput: (e) => { ui.q = e.target.value; pintarLista(); } }));
   const fechaHoy = (() => { const d = parse(HOY); return ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()]; })();
   return h('div', { style: 'display:grid;gap:16px' },
-    cabecera('Hola, ' + yo().nombre, fechaHoy + ' · ' + (guia === 'publica' ? 'ordenado por fecha en que sale.' : 'ordenado por fecha de entrega.'), esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null),
+    cabecera('Lista de tareas', fechaHoy + ' · ' + (guia === 'publica' ? 'ordenado por fecha en que sale.' : 'ordenado por fecha de entrega.') + ' Buscá, filtrá y mové tareas de a una.',
+      h('button', { class: 'btn', onclick: () => ir('inicio') }, '← Inicio'), esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null),
     h('div', { class: 'kpis' },
       kpi('bad', 'Atrasadas', atrasadas.length, atrasadas.length ? 'Pasó la fecha' : 'Nada atrasado', 'late'),
       kpi('hoy', verbo + ' hoy', hoy.length, hoy.length ? hoy.slice(0, 2).map((t) => t.titulo).join(' · ') : 'Nada para hoy', 'hoy'),
@@ -1349,36 +1575,11 @@ function vistaMis() {
     lista);
 }
 
-function vistaMisVieja() {
-  const mias = trabajos().filter((t) => esDe(t, ui.yo));
-  const activas = mias.filter((t) => !hecha(t)).sort((a, b) => a.entrega.localeCompare(b.entrega));
-  const grupos = [
-    { id: 'late', nombre: 'Vencidas', ts: activas.filter((t) => diff(t.entrega) < 0) },
-    { id: 'hoy', nombre: 'Hoy y mañana', ts: activas.filter((t) => diff(t.entrega) >= 0 && diff(t.entrega) <= 1) },
-    { id: 'sem', nombre: 'Esta semana', ts: activas.filter((t) => diff(t.entrega) > 1 && diff(t.entrega) <= 7) },
-    { id: 'mas', nombre: 'Más adelante', ts: activas.filter((t) => diff(t.entrega) > 7) },
-  ];
-  const listas = mias.filter((t) => hecha(t) && diff(t.entrega) >= -14).sort((a, b) => b.entrega.localeCompare(a.entrega));
-  const horasSem = mias.filter((t) => !hecha(t) && diff(t.entrega) <= 7).reduce((s, t) => s + Math.max(0, (t.horasEst || 0) - (t.horasReal || 0)), 0);
-  const pedidasPorMi = esAdmin() ? trabajos().filter((t) => t.estado === 'revision' && !esDe(t, ui.yo)) : [];
-  return h('div', { style: 'display:grid;gap:18px' },
-    cabecera('Hola, ' + yo().nombre, 'Lo que tenés asignado, ordenado por fecha de entrega.', esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null),
-    h('div', { class: 'stats' },
-      h('div', { class: 'stat' + (grupos[0].ts.length ? ' bad' : '') }, h('b', {}, grupos[0].ts.length), h('span', {}, 'vencidas')),
-      h('div', { class: 'stat' }, h('b', {}, grupos[1].ts.length), h('span', {}, 'para hoy y mañana')),
-      h('div', { class: 'stat' }, h('b', {}, activas.length), h('span', {}, 'activas en total')),
-      h('div', { class: 'stat' }, h('b', {}, num(horasSem) + ' h'), h('span', {}, 'de trabajo pendiente esta semana'))),
-    pedidasPorMi.length ? h('div', { class: 'group' }, h('h3', {}, 'Para revisar', h('span', { class: 'n' }, pedidasPorMi.length)), h('div', { class: 'list' }, ...pedidasPorMi.map((t) => tarjeta(t)))) : null,
-    ...grupos.filter((g) => g.ts.length).map((g) => h('div', { class: 'group' + (g.id === 'late' ? ' late' : '') }, h('h3', {}, g.nombre, h('span', { class: 'n' }, g.ts.length)), h('div', { class: 'list' }, ...g.ts.map((t) => tarjeta(t, { sinResp: true }))))),
-    activas.length ? null : h('div', { class: 'empty' }, 'No tenés tareas pendientes.'),
-    listas.length ? h('div', { class: 'group' }, h('h3', {}, 'Terminadas (últimas 2 semanas)', h('span', { class: 'n' }, listas.length)), h('div', { class: 'list' }, ...listas.map((t) => tarjeta(t, { sinResp: true })))) : null);
-}
-
 function vistaTablero() {
   const ts = filtrar(trabajos(), true);
   const vencidas = ts.filter(vencida).length;
   return h('div', { style: 'display:grid;gap:14px' },
-    cabecera('Tablero', vencidas ? vencidas + ' tareas vencidas con este filtro.' : 'Todo al día con este filtro.', esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null),
+    cabecera('Tablero', 'Cada columna es un estado. Tocá una tarea para abrirla. ' + (vencidas ? vencidas + ' vencidas con este filtro.' : 'Todo al día con este filtro.'), esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null),
     filtros(true),
     h('div', { class: 'board' }, ...ESTADOS.map((e) => {
       const col = ts.filter((t) => t.estado === e.id).sort((a, b) => a.entrega.localeCompare(b.entrega));
@@ -1460,7 +1661,8 @@ function calCard(x) {
   const cual = x.f ? 'fecha' : x.pub ? 'publica' : 'entrega';
   const arrastrable = puedeCorrer(o) && !pantallaTactil();
   const ver = (e) => { e.stopPropagation(); abrir(o, { cual }); };
-  const prio = o.prioridad === 'Urgente' || o.prioridad === 'Alta' ? o.prioridad : '';
+  /* En la tarjeta solo lo que ayuda a decidir: título, responsable, estado, formato y si es urgente. */
+  const prio = o.prioridad === 'Urgente' ? o.prioridad : '';
   const late = esEntrega ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
   const top = [
     x.f && o.hora ? h('span', { class: 'cc-hora' }, o.hora) : null,
@@ -1478,10 +1680,8 @@ function calCard(x) {
       ondragend: arrastrable ? (e) => { arrastre = null; e.currentTarget.classList.remove('arrastrando'); document.querySelectorAll('.drop').forEach((d) => d.classList.remove('drop')); } : null },
     top.length ? h('span', { class: 'cc-top' }, ...top) : null,
     h('span', { class: 'cc-t' }, h('i', { class: 'mk', style: 'background:' + marca(o.marca).color, title: marca(o.marca).nombre }), o.titulo),
-    h('span', { class: 'cc-row' }, estadoPill(o.estado || 'pedido')),
-    h('span', { class: 'cc-row cc-foot' },
-      h('span', { class: 'cc-fmts' }, ...formatoDe(x).map((fm) => h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm))),
-      h('span', { class: 'cc-avs', title: nombresResp(o) }, ...(rs.length ? rs.slice(0, 2).map(av) : [h('span', { class: 'cc-sin' }, 'Sin asignar')]), rs.length > 2 ? h('span', { class: 'cc-mas' }, '+' + (rs.length - 2)) : null)));
+    h('span', { class: 'cc-row', title: nombresResp(o) }, rs.length ? h('span', { class: 'cc-avs' }, ...rs.slice(0, 2).map(av)) : null, h('span', { class: rs.length ? 'cc-quien' : 'cc-sin' }, rs.length ? nombresResp(o) : 'Sin asignar')),
+    h('span', { class: 'cc-row cc-fmts' }, estadoPill(o.estado || 'pedido'), ...formatoDe(x).map((fm) => h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm))));
 }
 
 function vistaCalendario() {
@@ -1776,7 +1976,7 @@ function cargaEquipo() {
   const delMes = (id) => trabajos().filter((t) => esDe(t, id) && diff(t.entrega) >= -30 && diff(t.entrega) <= 30);
   const admin = esAdmin();
   const per = (() => { const d = parse(HOY); const l = new Date(d); l.setDate(d.getDate() - ((d.getDay() + 6) % 7)); const f = new Date(l); f.setDate(l.getDate() + 6); return { desde: iso(l), hasta: iso(f) }; })();
-  const gente = [...EQUIPO.filter((p) => !p.admin), ...S.freelancers, ...EQUIPO.filter((p) => p.admin && conTope(p.id))];
+  const gente = gentesConTope();
   const filaP = (p) => {
     const act = activasDe(p.id), tope = topeDe(p.id), n = act.length;
     const cuenta = (e) => act.filter((t) => t.estado === e).length;
@@ -1979,44 +2179,6 @@ const admins = () => EQUIPO.filter((p) => p.admin);
 const temaVencido = (t) => t.estado !== 'decidido' && t.limite && diff(t.limite) < 0;
 const ordenTemas = (a, b) => (a.limite || '9999').localeCompare(b.limite || '9999') || (a.creado || '').localeCompare(b.creado || '');
 
-function tarjetaTema(t) {
-  const est = estadoTema(t.estado);
-  const lim = t.limite ? h('span', { class: temaVencido(t) ? 'late' : (t.estado !== 'decidido' && diff(t.limite) <= 1 ? 'soon' : '') }, (temaVencido(t) ? 'Vencido · ' : 'Para ') + cuando(t.limite)) : null;
-  const sig = t.estado === 'abierto' ? 'charla' : t.estado === 'charla' ? 'decidido' : null;
-  return h('div', { class: 'task', style: '--bcol:' + (t.tipo === 'urgente' ? 'var(--bad)' : 'var(--info)') },
-    h('div', { class: 'task-top' }, h('span', { class: 'task-title' }, t.titulo), h('span', { class: 'pill ' + est.cls }, est.nombre)),
-    h('div', { class: 'task-meta' },
-      h('span', { class: 'pill p-bad' }, 'Urgente'),
-      h('span', { style: 'display:inline-flex;gap:6px;align-items:center' }, ...t.resps.map(av), nombresResp(t)),
-      lim,
-      t.opiniones.length ? h('span', {}, t.opiniones.length + (t.opiniones.length === 1 ? ' opinión' : ' opiniones')) : null,
-      t.pedidos.length ? h('span', {}, t.pedidos.length + (t.pedidos.length === 1 ? ' pedido' : ' pedidos')) : null),
-    t.decision ? h('div', { class: 'decision' }, h('b', {}, 'Decisión'), h('span', {}, t.decision)) : (t.detalle ? h('div', { class: 'tema-detalle' }, t.detalle) : null),
-    h('div', { class: 'task-actions' },
-      sig ? h('button', { class: 'btn small primary', onclick: (e) => { e.stopPropagation(); if (sig === 'decidido') abrirTema(t, true); else { t.estado = sig; guardar(); render(); toast('"' + t.titulo + '" pasó a en charla'); } } }, sig === 'charla' ? 'Empezar a charlarlo' : 'Marcar decidido') : null,
-      h('button', { class: 'btn small', onclick: (e) => { e.stopPropagation(); abrirTema(t); } }, 'Abrir')));
-}
-
-function vistaTemas() {
-  const filtro = ui.temasFiltro || 'abiertos';
-  const quien = ui.temasQuien || 'todos';
-  const chip = (k, v, txt) => h('button', { class: 'chip', 'aria-pressed': String((ui[k] || (k === 'temasFiltro' ? 'abiertos' : 'todos')) === v), onclick: () => { ui[k] = v; guardarUi(); render(); } }, txt);
-  const base = S.temas.filter((t) => t.tipo !== 'proyecto' && (quien === 'todos' || t.resps.includes(ui.yo)));
-  const abiertos = base.filter((t) => t.estado !== 'decidido').sort(ordenTemas);
-  const decididos = base.filter((t) => t.estado === 'decidido').sort((a, b) => (b.decididoEl || '').localeCompare(a.decididoEl || ''));
-  const grupo = (titulo, ts, cls) => ts.length ? h('div', { class: 'group' + (cls ? ' ' + cls : '') }, h('h3', {}, titulo, h('span', { class: 'n' }, ts.length)), h('div', { class: 'list' }, ...ts.map(tarjetaTema))) : null;
-  const cuerpo = temasBloqueado
-    ? h('div', { class: 'warnbox' }, 'Firebase todavía no deja guardar temas. Hay que agregar la colección "temas" en las reglas de Firestore del proyecto zebra-mkt (pedile a Claude la línea exacta).')
-    : !temasListo ? h('div', { class: 'empty' }, 'Cargando temas…')
-    : filtro === 'abiertos'
-      ? (abiertos.length ? grupo('Urgentes', abiertos, 'late') : h('div', { class: 'empty' }, 'No hay temas abiertos.'))
-      : (decididos.length ? grupo('Decididos', decididos) : h('div', { class: 'empty' }, 'Todavía no hay temas decididos.'));
-  return h('div', { style: 'display:grid;gap:18px' },
-    cabecera('Temas', 'Urgencias y decisiones entre Manu, Mica y Agus. Las ideas grandes van en Hoja de ruta.', h('button', { class: 'btn primary', onclick: () => abrirTema(null) }, '+ Tema')),
-    h('div', { class: 'chips' }, chip('temasFiltro', 'abiertos', 'Abiertos'), chip('temasFiltro', 'decididos', 'Decididos'), h('span', { style: 'width:8px' }), chip('temasQuien', 'todos', 'De todas'), chip('temasQuien', 'mios', 'Míos')),
-    cuerpo);
-}
-
 function abrirTema(t, decidir) {
   const nuevo = !t;
   const x = t || { titulo: '', tipo: 'urgente', resps: [], limite: '', estado: 'abierto', detalle: '', decision: '', opiniones: [], pedidos: [], creadoPor: ui.yo };
@@ -2111,6 +2273,7 @@ const proyectos = () => S.temas.filter((t) => t.tipo === 'proyecto');
 const estadoProy = (id) => ESTADOS_PROY.find((e) => e.id === id) || ESTADOS_PROY[0];
 const tipoProy = (id) => TIPOS_PROY.find((e) => e.id === id) || { nombre: 'Sin tipo' };
 const avance = (pr) => { const n = (pr.pasos || []).length, d = (pr.pasos || []).filter((p) => p.hecho).length; return { n, d, pct: n ? d / n : 0 }; };
+const proximoPaso = (pr) => (pr.pasos || []).filter((p) => !p.hecho).sort((x, y) => (x.fecha || '9999').localeCompare(y.fecha || '9999'))[0];
 const mesTxt = (m) => { if (!m) return ''; const [y, mm] = m.split('-').map(Number); return MESES[mm - 1] + (y !== Number(HOY.slice(0, 4)) ? ' ' + y : ''); };
 function pasosPendientes(quien) {
   const out = [];
@@ -2152,7 +2315,7 @@ function filaPaso(pr, p, conProyecto) {
 }
 function tarjetaProyecto(pr) {
   const a = avance(pr), est = estadoProy(pr.estado);
-  const prox = (pr.pasos || []).filter((p) => !p.hecho).sort((x, y) => (x.fecha || '9999').localeCompare(y.fecha || '9999'))[0];
+  const prox = proximoPaso(pr);
   const atras = (pr.pasos || []).filter((p) => !p.hecho && p.fecha && diff(p.fecha) < 0).length;
   return h('button', { class: 'proy', style: '--bcol:' + marca(pr.marca).color, onclick: () => abrirProyecto(pr) },
     h('div', { class: 'proy-top' }, h('b', {}, pr.titulo), h('span', { class: 'pill ' + est.cls }, est.nombre)),
@@ -2288,71 +2451,6 @@ function abrirProyecto(pr) {
     pr ? botonPeligro('Eliminar proyecto', () => { S.temas = S.temas.filter((y) => y !== pr); guardar(); cerrarModal(); render(); toast('Proyecto eliminado'); }) : null,
     h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cerrar'), h('button', { class: 'btn primary', onclick: guardarProy }, nuevo ? 'Crear proyecto' : 'Guardar')));
   modal(nuevo ? 'Nuevo proyecto' : x.titulo, cuerpo, pie, { panel: true, cabeza: nuevo ? null : h('span', { class: 'pill ' + estadoProy(x.estado).cls }, estadoProy(x.estado).nombre) });
-}
-
-/* ===== resumen del equipo ===== */
-function metricasPersona(id) {
-  const ts = trabajos().filter((t) => esDe(t, id));
-  const activas = ts.filter((t) => !hecha(t));
-  const entregadas = ts.filter((t) => t.entregadaEl && diff(t.entregadaEl) >= -30);
-  const aTiempo = entregadas.filter((t) => t.entregadaEl <= t.entrega).length;
-  const devol = ts.reduce((s, t) => s + (t.devoluciones || []).filter((d) => d.fecha && diff(d.fecha) >= -30).length, 0);
-  const mes = ts.filter((t) => diff(t.entrega) >= -30 && diff(t.entrega) <= 30);
-  const parte = (t, k) => (t[k] || 0) / Math.max(1, resps(t).length);
-  const r1 = (v) => Math.round(v * 10) / 10;
-  return {
-    activas: activas.length, vencidas: activas.filter(vencida).length, revision: ts.filter((t) => t.estado === 'revision').length,
-    entregadas: entregadas.length, pct: entregadas.length ? Math.round(aTiempo / entregadas.length * 100) : null, devol,
-    est: r1(mes.reduce((s, t) => s + parte(t, 'horasEst'), 0)), real: r1(mes.reduce((s, t) => s + parte(t, 'horasReal'), 0)),
-    temas: S.temas.filter((t) => t.tipo !== 'proyecto' && t.estado !== 'decidido' && t.resps.includes(id)).length,
-    proxima: activas.filter((t) => !vencida(t) && !ENTREGADO.includes(t.estado)).sort((a, b) => a.entrega.localeCompare(b.entrega))[0],
-  };
-}
-
-function vistaResumen() {
-  const jefe = !!yo().jefe;
-  const gente = [...(jefe ? EQUIPO.filter((p) => p.admin && !p.jefe) : []), ...EQUIPO.filter((p) => !p.admin), ...S.freelancers];
-  const ids = new Set(gente.map((p) => p.id));
-  const delEquipo = trabajos().filter((t) => resps(t).some((id) => ids.has(id)));
-  const vencidas = delEquipo.filter(vencida).sort((a, b) => a.entrega.localeCompare(b.entrega));
-  const enRevision = delEquipo.filter((t) => t.estado === 'revision');
-  const semana = delEquipo.filter((t) => t.entregadaEl && diff(t.entregadaEl) >= -7).length;
-  const temasUrg = S.temas.filter((t) => t.estado !== 'decidido' && t.tipo === 'urgente').sort(ordenTemas);
-  const campRojas = S.campanias.filter((c) => diff(c.fin) >= 0 && semaforo(c).cls === 'p-bad');
-  const stat = (n, txt, mal, accion) => h('button', { class: 'stat' + (mal && n ? ' bad' : ''), style: 'text-align:left' + (accion ? '' : ';cursor:default'), onclick: accion || null }, h('b', {}, n), h('span', {}, txt));
-  const verTablero = (pid) => { ui.persona = pid || 'todas'; ui.marca = 'todas'; guardarUi(); ir('tablero'); };
-
-  const tarjetaPersona = (p) => {
-    const m = metricasPersona(p.id);
-    const pctCls = m.pct == null ? '' : m.pct >= 85 ? 'ok' : m.pct >= 60 ? 'warn' : 'bad';
-    return h('div', { class: 'card person', style: 'display:grid;gap:12px' },
-      h('div', { class: 'person-h' }, av(p.id), h('div', {}, h('b', {}, p.nombre), h('small', {}, p.rol || ((p.especialidad || '') + ' · freelance')))),
-      h('div', { class: 'metrics-row' },
-        h('div', {}, h('b', {}, m.activas), h('span', {}, 'activas')),
-        h('div', {}, h('b', { class: m.vencidas ? 'bad' : '' }, m.vencidas), h('span', {}, 'vencidas')),
-        h('div', {}, h('b', {}, m.revision), h('span', {}, 'en revisión')),
-        h('div', {}, h('b', { class: pctCls }, m.pct == null ? '—' : m.pct + '%'), h('span', {}, 'a tiempo')),
-        h('div', {}, h('b', { class: m.devol >= 3 ? 'warn' : '' }, m.devol), h('span', {}, 'devoluciones')),
-        h('div', {}, h('b', { class: m.real > m.est && m.est ? 'bad' : '' }, m.real + '/' + m.est), h('span', {}, 'horas real/est.'))),
-      h('div', { class: 'person-foot' },
-        h('span', {}, p.admin ? (m.temas + (m.temas === 1 ? ' tema abierto' : ' temas abiertos')) : (m.proxima ? 'Próxima: ' + m.proxima.titulo + ' · ' + cuando(m.proxima.entrega) : 'Sin entregas próximas')),
-        h('button', { class: 'btn small', onclick: () => verTablero(p.id) }, 'Ver sus tareas')));
-  };
-
-  return h('div', { style: 'display:grid;gap:18px' },
-    cabecera('Resumen del equipo', jefe ? 'Todo el equipo, incluidas Mica y Agus.' : 'Diseño, edición, pauta y freelancers.'),
-    h('div', { class: 'stats' },
-      stat(vencidas.length, 'tareas vencidas', true, () => verTablero()),
-      stat(enRevision.length, 'esperando revisión', false, () => verTablero()),
-      stat(semana, 'entregadas en 7 días'),
-      stat(temasUrg.length, 'temas urgentes sin decidir', true, () => ir('temas')),
-      stat(campRojas.length, 'campañas en rojo', true, () => ir('pauta'))),
-    vencidas.length ? h('div', { style: 'display:grid;gap:8px' }, seccion2('late', 'Vencidas', 'Pasó la fecha de entrega y no se entregaron', vencidas.slice(0, 8), 'entrega'),
-      vencidas.length > 8 ? h('button', { class: 'btn small', style: 'justify-self:start', onclick: () => verTablero() }, 'Ver las ' + vencidas.length + ' en el tablero') : null) : null,
-    temasUrg.length ? h('div', { class: 'group' }, h('h3', {}, 'Temas urgentes sin decidir', h('span', { class: 'n' }, temasUrg.length)), h('div', { class: 'list' }, ...temasUrg.slice(0, 5).map(tarjetaTema)),
-      temasUrg.length > 5 ? h('button', { class: 'btn small', style: 'justify-self:start', onclick: () => ir('temas') }, 'Ver todos en Temas') : null) : null,
-    h('div', { class: 'sub-h' }, h('h2', {}, 'Por persona'), h('span', { class: 'note', style: 'font-size:12px;color:var(--muted)' }, 'A tiempo y devoluciones: últimos 30 días. "A tiempo" cuenta desde el 22/10, cuando la app empezó a registrar el día de entrega.')),
-    h('div', { class: 'people' }, ...gente.map(tarjetaPersona)));
 }
 
 /* ===== balance de laburo por área y persona + anotaciones de cumplimiento ===== */
@@ -2956,9 +3054,9 @@ function abrirFreelancer(fr) {
 
 /* ===== render ===== */
 function render() {
+  ui.vista = vistaValida(ui.vista);
   pintarNav();
-  const def = VISTAS.find((x) => x.id === ui.vista);
-  const v = (def && def.admin && !esAdmin()) ? vistaMis : ({ resumen: vistaResumen, ruta: vistaRuta, temas: vistaTemas, novedades: vistaNovedades, mis: vistaMis, tablero: vistaTablero, calendario: vistaCalendario, pauta: vistaPauta, equipo: vistaEquipo, reuniones: vistaReuniones }[ui.vista] || vistaMis);
+  const v = { inicio: vistaInicio, lomio: vistaLoMio, lista: vistaMis, ruta: vistaRuta, novedades: vistaNovedades, tablero: vistaTablero, calendario: vistaCalendario, pauta: vistaPauta, equipo: vistaEquipo, reuniones: vistaReuniones }[ui.vista];
   $('#view').replaceChildren(listo ? v() : h('div', { class: 'empty', style: 'margin-top:40px' }, 'Cargando datos del equipo…'));
 }
 iniciar();
