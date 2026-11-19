@@ -868,6 +868,11 @@ const alias = (v) => { if (VIEJAS[v]) { ui.eqTab = VIEJAS[v]; return 'equipo'; }
    Depende de quién entra, por eso se resuelve después del login (vistaValida). */
 const VIEJAS_ROL = { mis: () => (esAdmin() ? 'inicio' : 'lomio'), resumen: () => 'inicio', temas: () => 'reuniones' };
 ui.vista = alias(ui.vista);
+/* Link directo a una tarea o fecha (#tarea=ID, el que va en los WhatsApp): se abre en cuanto llegan los datos (ver render). */
+let tareaLink = '';
+const leerLinkTarea = () => { const m = location.hash.match(/^#tarea=(.+)$/); if (m) { try { tareaLink = decodeURIComponent(m[1]); } catch (e) { tareaLink = m[1]; } } return !!m; };
+leerLinkTarea();
+window.addEventListener('hashchange', () => { if (leerLinkTarea() && listo && ui.yo) render(); });
 if (location.hash && (VISTAS.some((v) => v.id === location.hash.slice(1)) || VIEJAS[location.hash.slice(1)] || VIEJAS_ROL[location.hash.slice(1)])) ui.vista = alias(location.hash.slice(1));
 const limpio = (o) => { const c = JSON.parse(JSON.stringify(o)); delete c.id; return c; };
 
@@ -1214,22 +1219,28 @@ function registrarAviso(o, tipo, para, txt) {
   return { o, ev };
 }
 const telDe = (id) => { const p = EQUIPO.find((x) => x.id === id) || S.freelancers.find((x) => x.id === id) || {}; const d = String(p.tel || p.contacto || '').replace(/\D/g, ''); return d.length >= 10 ? d : ''; };
+/* Link directo: las tareas y fechas del calendario se abren solas con #tarea=ID; lo demás va al inicio de cada uno. */
+const linkApp = (o) => APP_URL + (o && o.id && trabajoPorId(o.id) === o ? '#tarea=' + encodeURIComponent(o.id) : '#mis');
+/* Sin teléfono cargado, wa.me/?text= abre WhatsApp para elegir el chat. */
 function linkWa(id, o, ev) {
-  const msg = 'Hola ' + persona(id).nombre.split(' ')[0] + '! ' + textoAviso(o, ev) + '. Miralo en Marcebra: ' + APP_URL + '#mis';
+  const msg = 'Hola ' + persona(id).nombre.split(' ')[0] + '! ' + textoAviso(o, ev) + '. Miralo en Marcebra: ' + linkApp(o);
   return 'https://wa.me/' + telDe(id) + '?text=' + encodeURIComponent(msg);
 }
 /* Barra con un botón de WhatsApp por persona. Queda unos segundos; no tapa el aviso de "guardado". */
 let waT;
-function ofrecerWa(r) {
+function ofrecerWa(r, ms = 12000) {
   document.querySelectorAll('.wa-bar').forEach((x) => x.remove());
-  if (!r) return;
+  if (!r || !r.ev.para.length) return;
   const cerrar = () => { clearTimeout(waT); bar.remove(); };
+  const uno = r.ev.para.length === 1;
+  const boton = (id) => h('a', { class: 'btn small wa', href: linkWa(id, r.o, r.ev), target: '_blank', rel: 'noopener', onclick: () => setTimeout(cerrar, 300) },
+    (uno ? 'Avisar por WhatsApp a ' : '') + persona(id).nombre.split(' ')[0]);
   const bar = h('div', { class: 'wa-bar', role: 'status' },
-    h('span', {}, 'Avisar por WhatsApp:'),
-    ...r.ev.para.map((id) => h('a', { class: 'btn small wa', href: linkWa(id, r.o, r.ev), target: '_blank', rel: 'noopener', onclick: () => setTimeout(cerrar, 300) }, persona(id).nombre.split(' ')[0])),
+    uno ? null : h('span', {}, 'Avisar por WhatsApp a:'),
+    ...r.ev.para.map(boton),
     h('button', { class: 'wa-x', 'aria-label': 'Cerrar', onclick: cerrar }, '×'));
   document.body.append(bar);
-  clearTimeout(waT); waT = setTimeout(cerrar, 12000);
+  clearTimeout(waT); waT = setTimeout(cerrar, ms);
 }
 const avisar = (o, tipo, para, txt) => { const r = registrarAviso(o, tipo, para, txt); setTimeout(() => ofrecerWa(r), 0); return r; };
 
@@ -2939,12 +2950,17 @@ function conversacion(x) {
     const pend = chk.checked, aQuien = pend ? para.value : '';
     db.collection('comentarios').doc().set({ tarea: x.id, de: ui.yo, texto: txt, ts: Date.now(), pendiente: pend, para: aQuien, resuelto: false })
       .catch((e) => { console.error(e); toast(e && e.code === 'permission-denied' ? 'No tenés permiso para comentar' : 'No se pudo enviar: revisá la conexión'); });
+    const otros = [...resps(x), ...(x.pedidoPor ? [x.pedidoPor] : [])].filter((id) => id !== aQuien);
     if (puedeAvisar()) {
-      const otros = [...resps(x), ...(x.pedidoPor ? [x.pedidoPor] : [])].filter((id) => id !== aQuien);
-      if (pend) { registrarAviso(x, 'comentario', otros, txt); avisar(x, 'pendiente', [aQuien], txt); }
-      else avisar(x, 'comentario', otros, txt);
+      if (pend) registrarAviso(x, 'comentario', otros, txt);
+      registrarAviso(x, pend ? 'pendiente' : 'comentario', pend ? [aQuien] : otros, txt);
       guardar();
     }
+    /* WhatsApp siempre se ofrece (aunque el aviso no quede guardado en la tarea), con el comentario entero y el link a la tarea.
+       Pendiente: a quien se le pidió. Comentario: responsables y quien pidió; si no hay nadie, a Mica y Agustina. */
+    let waPara = [...new Set(pend ? [aQuien] : otros)].filter((id) => id && id !== ui.yo);
+    if (!waPara.length && !pend) waPara = quienPidio(x);
+    if (waPara.length) setTimeout(() => ofrecerWa({ o: x, ev: { ts: Date.now(), autor: ui.yo, tipo: pend ? 'pendiente' : 'comentario', para: waPara, txt } }, 20000), 0);
     ta.value = ''; chk.checked = false; paraWrap.hidden = true;
     render(); toast(pend ? 'Listo: quedó pendiente para ' + nombre1(aQuien) : 'Comentario enviado');
   } }, 'Enviar');
@@ -3187,6 +3203,12 @@ function render() {
   pintarNav();
   const v = { inicio: vistaInicio, lomio: vistaLoMio, lista: vistaMis, ruta: vistaRuta, novedades: vistaNovedades, tablero: vistaTablero, calendario: vistaCalendario, pauta: vistaPauta, equipo: vistaEquipo, reuniones: vistaReuniones }[ui.vista];
   $('#view').replaceChildren(listo ? v() : h('div', { class: 'empty', style: 'margin-top:40px' }, 'Cargando datos del equipo…'));
+  if (listo && tareaLink) {
+    const id = tareaLink; tareaLink = '';
+    try { history.replaceState(null, '', '#' + ui.vista); } catch (e) {}
+    const t = trabajoPorId(id);
+    if (t) abrir(t); else toast('No encontramos esa tarea. Puede que la hayan borrado.');
+  }
 }
 iniciar();
 </script>

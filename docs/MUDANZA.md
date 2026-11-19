@@ -143,7 +143,7 @@ dos tablas.
 
 No hay colección de avisos: cada tarea, fecha, campaña o tema guarda sus últimos 30 en `log`
 (`{ ts, autor, tipo, para: [ids], txt?, que? }`). El botón Novedades junta los dirigidos a cada uno; lo leído se
-recuerda en el dispositivo. Después de cada acción se ofrece mandar el aviso por WhatsApp con el texto armado.
+recuerda en el dispositivo. Después de cada acción se ofrece mandar el aviso por WhatsApp con el texto armado y un link directo a la tarea (`#tarea=ID`, abre la tarea o fecha al entrar). Al comentar o dejar un pendiente siempre se ofrece el botón "Avisar por WhatsApp a [nombre]" (al destinatario del pendiente, o a responsables y quien pidió), aunque quien comenta no pueda registrar el aviso; sin teléfono cargado abre WhatsApp para elegir el chat.
 Tipos: `asignada`, `revision`, `devuelta`, `aprobada`, `publicada`, `paso`, `proyecto`, `dato`, y los nuevos
 `comentario`, `pendiente`, `resuelto`, `movida`. En el super admin esto pide una tabla de notificaciones propia
 (con leído por usuario, no por dispositivo).
