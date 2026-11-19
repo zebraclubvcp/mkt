@@ -12,3 +12,12 @@ Cosas donde la maqueta chocaba con cómo se usa hoy. Se eligió lo más simple; 
 - **Inicio → Vencidas** muestra las de todo el equipo, también las de Mica y Agus.
 - **Lo mío:** las tareas "Para publicar" ya no aparecen (para quien diseña ya están terminadas). Si alguien le pide algo a esa persona, aparece arriba como "Te piden" con botón Responder.
 - **Calendario:** la tarjeta ahora muestra el nombre del responsable y solo marca la prioridad **Urgente** (Alta ya no se resalta). Se mantienen la hora de los eventos y la etiqueta "Entrega".
+
+## Fase 6 — Hoja de ruta visual
+
+- **La vista "Hoy" sigue, como pestaña "Pasos por día".** Ahora la hoja de ruta abre en **Ideas** (las tarjetas con el anillo); la lista de pasos por fecha con "Lo mío / Los tres" quedó en la segunda pestaña, sin cambios.
+- **"Avance del mes"** cuenta los pasos que tienen fecha en el mes (hechos / total). Los pasos sin fecha no entran. Las ideas pausadas no cuentan.
+- **"Esta semana"** cuenta los pasos tildados desde el lunes. Para los pasos viejos se usa el día en que se tildaron, que ya se guardaba; desde ahora se guarda también la hora exacta (`hechoTs`).
+- **Tocar una tarjeta abre sus pasos debajo de su grupo (Ahora, Próximo…)** para tildarlos. Para cambiar el nombre, los pasos o el estado, botón **Editar** (el panel de siempre).
+- **Al tildar el último paso la idea no pasa sola a Terminadas**: el mensaje avisa y se marca desde Editar. Así nadie la cierra sin querer.
+- El botón sigue diciendo **"+ Proyecto"** (la maqueta dice "Nueva idea"), para que coincida con el panel de edición.
