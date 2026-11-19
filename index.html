@@ -535,7 +535,8 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .cc { all: unset; box-sizing: border-box; display: grid; gap: 6px; width: 100%; min-width: 0; padding: 8px 9px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); cursor: pointer; text-align: left; font-size: 12px; line-height: 1.3; }
 .cc:hover { border-color: var(--muted); }
 .cc:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
-.cc[draggable="true"] { cursor: grab; }
+/* all: unset de .cc pisa el -webkit-user-drag que Chrome les pone a los draggable: sin esto no se puede arrastrar. */
+.cc[draggable="true"] { -webkit-user-drag: element; -webkit-user-select: none; user-select: none; cursor: grab; }
 .cc.arrastrando { opacity: .45; }
 .wday.drop, .cal .day.drop { outline: 2px dashed var(--info); outline-offset: -2px; background: var(--info-bg); }
 .cc.cc-prio { border-color: var(--bad); box-shadow: inset 3px 0 0 var(--bad); }
@@ -1326,11 +1327,11 @@ function vistaTablero() {
 const formatoDe = (x) => x.f ? ((x.f.formatos || []).length ? x.f.formatos : [x.f.tipo === 'Publicación' ? 'Publicación' : x.f.tipo]) : [x.t.tipo];
 const claseFormato = (fm) => /histori/i.test(fm) ? 'hist' : /pauta/i.test(fm) ? 'pauta' : /reuni|llamad/i.test(fm) ? 'reu' : /^(post|carrusel|reel|flyer|video|fotos|diseño)$/i.test(fm) ? 'feed' : 'otro';
 /* ===== mover de día =====
-   En compu se arrastra la tarjeta a otro día; en el celu, desde el detalle con "Mover a…".
+   En compu se arrastra la tarjeta a otro día; en el celu (y como alternativa en la compu), desde el detalle con "Mover a…".
    Solo Manu, Mica y Agustina (igual que en el detalle de la tarea). Cada tarjeta mueve su fecha:
    la de entrega cambia "entrega", la de publicación cambia "publica", la de una fecha del calendario cambia "fecha". */
 const puedeCorrer = (o) => esAdmin() && o.estado !== 'publicado';
-const pantallaTactil = () => matchMedia('(max-width: 900px), (pointer: coarse)').matches;
+const pantallaTactil = () => matchMedia('(pointer: coarse)').matches;
 let arrastre = null;
 function correrFecha(o, cual, nueva) {
   const esFecha = !!o._fecha;
@@ -1360,7 +1361,7 @@ function correrFecha(o, cual, nueva) {
     guardar(); render(); toast('Listo, quedó como estaba');
   });
 }
-/* Ventanita "Mover a…" (celu): elegir el día y, si la tarea tiene entrega y publicación en días distintos, cuál se mueve. */
+/* Ventanita "Mover a…": elegir el día y, si la tarea tiene entrega y publicación en días distintos, cuál se mueve. */
 function moverA(o, cual) {
   const esFecha = !!o._fecha;
   const dos = !esFecha && !!o.publica && o.publica !== o.entrega;
@@ -1385,7 +1386,8 @@ function moverA(o, cual) {
     campo('Nuevo día', elDia, true), nota),
     h('div', { class: 'sheet-foot' }, h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'), h('button', { class: 'btn primary', onclick: ok }, 'Mover'))));
 }
-const botonMoverA = (o, cual) => puedeCorrer(o) && pantallaTactil() ? h('button', { class: 'btn', onclick: () => { cerrarModal(); moverA(o, cual); } }, 'Mover a…') : null;
+/* Está siempre (celu y compu): en la compu es la alternativa a arrastrar. */
+const botonMoverA = (o, cual) => puedeCorrer(o) ? h('button', { class: 'btn', onclick: () => { cerrarModal(); moverA(o, cual); } }, 'Mover a…') : null;
 
 function calCard(x) {
   const o = x.f || x.t;
