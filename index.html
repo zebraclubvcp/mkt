@@ -294,6 +294,8 @@ select.chip { padding-right: 8px; }
 .row.aviso.nuevo { background: var(--info-bg); }
 @media (max-width: 900px) { .row.aviso { grid-template-columns: auto minmax(0, 1fr) auto; } .row.aviso .tt { grid-column: 2; grid-row: 1; } }
 .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--ink-fg); padding: 10px 16px; border-radius: 999px; font-weight: 500; z-index: 60; box-shadow: var(--shadow); }
+.toast.toast-acc { display: flex; align-items: center; gap: 12px; padding: 6px 6px 6px 16px; max-width: calc(100% - 32px); }
+.toast-acc button { border: 1px solid currentColor; background: transparent; color: inherit; font: inherit; font-weight: 700; padding: 5px 12px; border-radius: 999px; cursor: pointer; flex: none; }
 
 
 /* ===== rediseño estilo Cockpit: filas compactas, contadores, filtros y panel lateral ===== */
@@ -533,6 +535,9 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .cc { all: unset; box-sizing: border-box; display: grid; gap: 6px; width: 100%; min-width: 0; padding: 8px 9px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); cursor: pointer; text-align: left; font-size: 12px; line-height: 1.3; }
 .cc:hover { border-color: var(--muted); }
 .cc:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+.cc[draggable="true"] { cursor: grab; }
+.cc.arrastrando { opacity: .45; }
+.wday.drop, .cal .day.drop { outline: 2px dashed var(--info); outline-offset: -2px; background: var(--info-bg); }
 .cc.cc-prio { border-color: var(--bad); box-shadow: inset 3px 0 0 var(--bad); }
 .cc.cc-pub { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, var(--line)); }
 .cc.cc-ent { border-style: dashed; }
@@ -987,7 +992,8 @@ function trabajos() {
   return [...S.tareas, ...S.fechas.filter((f) => resps(f).length)];
 }
 const tipoTxt = (t) => t._fecha ? (t.tipo + ((t.formatos || []).length ? ' · ' + t.formatos.join(', ') : '')) : t.tipo;
-const abrir = (t) => (t._fecha ? abrirFecha(t) : abrirTarea(t));
+/* op.cual: desde qué tarjeta del calendario se abrió ('entrega' o 'publica'), para que "Mover a…" arranque en esa fecha. */
+const abrir = (t, op) => (t._fecha ? abrirFecha(t) : abrirTarea(t, null, op));
 /* Reuniones y eventos del calendario no se "entregan": una vez que pasó el día, ya no quedan como pendientes ni atrasadas. */
 const SIN_ENTREGA = ['Reunión', 'Evento'];
 const hecha = (t) => t.estado === 'aprobado' || t.estado === 'publicado' || (!!t._fecha && SIN_ENTREGA.includes(t.tipo) && diff(t.fecha) < 0);
@@ -1001,6 +1007,14 @@ function toast(msg) {
   document.querySelectorAll('.toast').forEach((x) => x.remove());
   const t = h('div', { class: 'toast', role: 'status' }, msg); document.body.append(t);
   clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2200);
+}
+/* Toast con un botón (ej. Deshacer). Queda unos segundos más que el común. */
+function toastAccion(msg, etiqueta, fn, ms = 7000) {
+  document.querySelectorAll('.toast').forEach((x) => x.remove());
+  const t = h('div', { class: 'toast toast-acc', role: 'status' }, h('span', {}, msg),
+    h('button', { type: 'button', onclick: () => { clearTimeout(toastT); t.remove(); fn(); } }, etiqueta));
+  document.body.append(t);
+  clearTimeout(toastT); toastT = setTimeout(() => t.remove(), ms);
 }
 
 /* ===== avisos =====
@@ -1019,6 +1033,7 @@ const TXT_AVISO = {
   comentario: (o, a, ev) => a + ' comentó en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
   pendiente: (o, a, ev) => a + ' te pidió algo en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
   resuelto: (o, a, ev) => a + ' resolvió el pendiente de "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
+  movida: (o, a, ev) => a + ' movió ' + (ev.que === 'entrega' ? 'la entrega de ' : ev.que === 'publica' ? 'la publicación de ' : '') + '"' + o.titulo + '"' + (ev.txt ? ' al ' + ev.txt : ''),
   dato: (o, a, ev) => a + ' te pidió un dato en la campaña "' + (o.nombre || o.titulo) + '"' + (ev.txt ? ': ' + ev.txt : ''),
 };
 const textoAviso = (o, ev) => (TXT_AVISO[ev.tipo] || TXT_AVISO.comentario)(o, persona(ev.autor).nombre.split(' ')[0] || 'Alguien', ev);
@@ -1310,9 +1325,74 @@ function vistaTablero() {
    Vista Semana (por defecto, columnas por día) o Mes (grilla). En el celu se ve como lista por día. */
 const formatoDe = (x) => x.f ? ((x.f.formatos || []).length ? x.f.formatos : [x.f.tipo === 'Publicación' ? 'Publicación' : x.f.tipo]) : [x.t.tipo];
 const claseFormato = (fm) => /histori/i.test(fm) ? 'hist' : /pauta/i.test(fm) ? 'pauta' : /reuni|llamad/i.test(fm) ? 'reu' : /^(post|carrusel|reel|flyer|video|fotos|diseño)$/i.test(fm) ? 'feed' : 'otro';
+/* ===== mover de día =====
+   En compu se arrastra la tarjeta a otro día; en el celu, desde el detalle con "Mover a…".
+   Solo Manu, Mica y Agustina (igual que en el detalle de la tarea). Cada tarjeta mueve su fecha:
+   la de entrega cambia "entrega", la de publicación cambia "publica", la de una fecha del calendario cambia "fecha". */
+const puedeCorrer = (o) => esAdmin() && o.estado !== 'publicado';
+const pantallaTactil = () => matchMedia('(max-width: 900px), (pointer: coarse)').matches;
+let arrastre = null;
+function correrFecha(o, cual, nueva) {
+  const esFecha = !!o._fecha;
+  const antes = {}; (esFecha ? ['fecha'] : ['entrega', 'publica']).forEach((k) => { antes[k] = o[k]; });
+  let que = '';
+  if (esFecha) o.fecha = nueva;
+  else if (cual === 'publica' && o.publica) {
+    /* Si entrega y publicación eran el mismo día se mueven juntas; la entrega nunca queda después de la publicación. */
+    if (o.entrega === o.publica || o.entrega > nueva) o.entrega = nueva;
+    o.publica = nueva; que = 'publica';
+  } else {
+    o.entrega = nueva; que = 'entrega';
+    if (o.publica && o.publica < nueva) o.publica = nueva;
+  }
+  const r = registrarAviso(o, 'movida', resps(o), fCorta(nueva));
+  if (r && que) r.ev.que = que;
+  guardar(); render();
+  setTimeout(() => ofrecerWa(r), 0);
+  const ambas = !esFecha && antes.entrega !== o.entrega && !!antes.publica && antes.publica !== o.publica;
+  const msg = (ambas ? 'Entrega y publicación movidas' : que === 'entrega' ? 'Entrega movida' : que === 'publica' ? 'Publicación movida' : 'Movida') + ' al ' + fCorta(nueva);
+  toastAccion(msg, 'Deshacer', () => {
+    const y = (esFecha ? S.fechas : S.tareas).find((z) => z.id === o.id);
+    if (!y) return;
+    Object.entries(antes).forEach(([k, v]) => { if (v === undefined) delete y[k]; else y[k] = v; });
+    if (r) y.log = (y.log || []).filter((e) => !(e.ts === r.ev.ts && e.autor === r.ev.autor && e.tipo === 'movida'));
+    document.querySelectorAll('.wa-bar').forEach((x) => x.remove());
+    guardar(); render(); toast('Listo, quedó como estaba');
+  });
+}
+/* Ventanita "Mover a…" (celu): elegir el día y, si la tarea tiene entrega y publicación en días distintos, cuál se mueve. */
+function moverA(o, cual) {
+  const esFecha = !!o._fecha;
+  const dos = !esFecha && !!o.publica && o.publica !== o.entrega;
+  let que = esFecha ? 'fecha' : (cual === 'publica' && o.publica ? 'publica' : 'entrega');
+  const valorDe = (q) => q === 'fecha' ? o.fecha : q === 'publica' ? o.publica : o.entrega;
+  const elDia = h('input', { id: 'mv-dia', type: 'date', value: valorDe(que), 'data-nofoco': '' });
+  const nota = h('p', { class: 'full', style: 'margin:0;font-size:12px;color:var(--muted)' });
+  const pintarNota = () => { nota.textContent = esFecha ? 'Hoy está el ' + fCorta(o.fecha) + '.'
+    : que === 'publica' ? 'Cambia la publicación' + (o.entrega === o.publica ? ' y la entrega' : '') + '. Hoy sale el ' + fCorta(o.publica) + '.'
+    : 'Cambia la entrega. Hoy se entrega el ' + fCorta(o.entrega) + '.'; };
+  pintarNota();
+  const queSel = dos ? chipSel('mv-que', [['entrega', 'Entrega'], ['publica', 'Publicación']], que, false, (v) => { que = v; elDia.value = valorDe(v); pintarNota(); }) : null;
+  const ok = () => {
+    const s = elDia.value;
+    if (!s) { toast('Elegí el día'); return; }
+    cerrarModal();
+    if (s !== valorDe(que)) correrFecha(o, que, s);
+  };
+  modal('Mover a…', h('div', { class: 'form' },
+    h('p', { class: 'full', style: 'margin:0;font-weight:600' }, o.titulo),
+    queSel ? h('div', { class: 'field full' }, h('label', {}, 'Qué fecha'), queSel) : null,
+    campo('Nuevo día', elDia, true), nota),
+    h('div', { class: 'sheet-foot' }, h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'), h('button', { class: 'btn primary', onclick: ok }, 'Mover'))));
+}
+const botonMoverA = (o, cual) => puedeCorrer(o) && pantallaTactil() ? h('button', { class: 'btn', onclick: () => { cerrarModal(); moverA(o, cual); } }, 'Mover a…') : null;
+
 function calCard(x) {
   const o = x.f || x.t;
   const esEntrega = !x.f && !x.pub;
+  const cual = x.f ? 'fecha' : x.pub ? 'publica' : 'entrega';
+  const arrastrable = puedeCorrer(o) && !pantallaTactil();
+  const ver = (e) => { e.stopPropagation(); abrir(o, { cual }); };
   const prio = o.prioridad === 'Urgente' || o.prioridad === 'Alta' ? o.prioridad : '';
   const late = esEntrega ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
   const top = [
@@ -1322,8 +1402,13 @@ function calCard(x) {
     prio ? h('span', { class: 'prio ' + prio }, prio) : null,
   ].filter(Boolean);
   const rs = resps(o);
-  return h('button', { class: 'cc' + (prio ? ' cc-prio' + (prio === 'Alta' ? ' cc-alta' : '') : '') + (o.estado === 'publicado' ? ' cc-pub' : '') + (esEntrega ? ' cc-ent' : '') + (late ? ' cc-late' : ''), type: 'button',
-      title: (esEntrega ? 'Entrega: ' : '') + o.titulo, onclick: (e) => { e.stopPropagation(); abrir(o); } },
+  /* Es un div con rol de botón (no <button>) porque Firefox no deja arrastrar botones. */
+  return h('div', { class: 'cc' + (prio ? ' cc-prio' + (prio === 'Alta' ? ' cc-alta' : '') : '') + (o.estado === 'publicado' ? ' cc-pub' : '') + (esEntrega ? ' cc-ent' : '') + (late ? ' cc-late' : ''), role: 'button', tabindex: '0',
+      title: (esEntrega ? 'Entrega: ' : '') + o.titulo + (arrastrable ? ' · arrastrala a otro día para moverla' : ''), onclick: ver,
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ver(e); } },
+      draggable: arrastrable ? 'true' : null,
+      ondragstart: arrastrable ? (e) => { arrastre = { o, cual, desde: x.f ? o.fecha : x.pub ? o.publica : o.entrega }; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', o.titulo); } catch (er) {} e.currentTarget.classList.add('arrastrando'); } : null,
+      ondragend: arrastrable ? (e) => { arrastre = null; e.currentTarget.classList.remove('arrastrando'); document.querySelectorAll('.drop').forEach((d) => d.classList.remove('drop')); } : null },
     top.length ? h('span', { class: 'cc-top' }, ...top) : null,
     h('span', { class: 'cc-t' }, h('i', { class: 'mk', style: 'background:' + marca(o.marca).color, title: marca(o.marca).nombre }), o.titulo),
     h('span', { class: 'cc-row' }, estadoPill(o.estado || 'pedido')),
@@ -1362,15 +1447,21 @@ function vistaCalendario() {
   const hoy = () => { ui.calSem = null; ui.calMes = null; guardarUi(); render(); };
   const vista = (v) => { ui.calVista = v; guardarUi(); render(); };
   const crear = (s) => (e) => { if (!e.target.closest('.cc')) abrirDia(s); };
+  /* Día donde se puede soltar una tarjeta: se resalta mientras se arrastra encima. */
+  const zona = (s) => !esAdmin() ? {} : {
+    ondragover: (e) => { if (!arrastre) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (arrastre.desde !== s) e.currentTarget.classList.add('drop'); },
+    ondragleave: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.classList.remove('drop'); },
+    ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop'); const a = arrastre; arrastre = null; if (a && a.desde !== s) correrFecha(a.o, a.cual, s); },
+  };
   const DOW = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
   const grilla = semana
     ? h('div', { class: 'cal-wrap' }, h('div', { class: 'week' }, ...dias.map((d, i) => { const s = iso(d); const it = enDia(s);
-        return h('div', { class: 'wday' + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá un espacio libre para crear algo este día' : null, onclick: crear(s) },
+        return h('div', { class: 'wday' + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá un espacio libre para crear algo este día' : null, onclick: crear(s), ...zona(s) },
           h('div', { class: 'wday-h' }, h('span', { class: 'num' }, d.getDate()), h('span', { class: 'dw' }, DOW[i]), h('span', { class: 'cnt' }, it.length || '')),
           ...it.map(calCard)); })))
     : h('div', { class: 'cal-wrap' }, h('div', { class: 'cal' },
         ...DOW.map((d) => h('div', { class: 'dow' }, d)),
-        ...dias.map((d) => { const s = iso(d); return h('div', { class: 'day' + (d.getMonth() !== m ? ' out' : '') + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá un espacio libre para crear algo este día' : null, onclick: crear(s) }, h('span', { class: 'num' }, d.getDate()), ...enDia(s).map(calCard)); })));
+        ...dias.map((d) => { const s = iso(d); return h('div', { class: 'day' + (d.getMonth() !== m ? ' out' : '') + (s === HOY ? ' today' : '') + (esAdmin() ? ' clickable' : ''), title: esAdmin() ? 'Tocá un espacio libre para crear algo este día' : null, onclick: crear(s), ...zona(s) }, h('span', { class: 'num' }, d.getDate()), ...enDia(s).map(calCard)); })));
   /* En el celu: lista por día. En el mes actual arranca desde hoy; cualquier otro período se muestra completo. */
   const esActual = semana ? dias.some((d) => iso(d) === HOY) : HOY.slice(0, 7) === y + '-' + pad(m + 1);
   const proximos = dias.map(iso).filter((s) => (!esActual || semana || s >= HOY) && (semana || parse(s).getMonth() === m) && enDia(s).length);
@@ -1378,7 +1469,7 @@ function vistaCalendario() {
     esAdmin() ? h('button', { class: 'btn', style: 'justify-self:start', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null,
     ...(proximos.length ? proximos.map((s) => h('div', { class: 'group' }, h('h3', {}, s === HOY ? 'Hoy' : fCorta(s), h('span', { class: 'n' }, enDia(s).length)), h('div', { class: 'list cc-list' }, ...enDia(s).map(calCard)))) : [h('div', { class: 'empty' }, 'Nada cargado en este período.')]));
   return h('div', { style: 'display:grid;gap:14px' },
-    cabecera(titulo, esAdmin() ? 'Tocá un día para crear un pedido o una fecha.' : 'Publicaciones, entregas y fechas de las marcas.',
+    cabecera(titulo, esAdmin() ? (pantallaTactil() ? 'Tocá un día para crear algo. Para cambiar de día, tocá la tarjeta y elegí Mover a…' : 'Tocá un día para crear algo. Arrastrá una tarjeta a otro día para moverla.') : 'Publicaciones, entregas y fechas de las marcas.',
       h('span', { class: 'seg', role: 'group', 'aria-label': 'Vista' },
         h('button', { class: 'chip', 'aria-pressed': String(semana), onclick: () => vista('semana') }, 'Semana'),
         h('button', { class: 'chip', 'aria-pressed': String(!semana), onclick: () => vista('mes') }, 'Mes')),
@@ -2349,7 +2440,7 @@ function conversacion(x) {
   return { franja, bloque };
 }
 
-function abrirTarea(t, base) {
+function abrirTarea(t, base, op) {
   const nueva = !t;
   const admin = esAdmin();
   const propia = t && esDe(t, ui.yo);
@@ -2475,6 +2566,7 @@ function abrirTarea(t, base) {
   const pie = h('div', { class: 'sheet-foot' },
     t && admin ? botonPeligro('Eliminar tarea', () => { S.tareas = S.tareas.filter((y) => y !== t); guardar(); cerrarModal(); render(); toast('Tarea eliminada'); }) : null,
     h('div', { class: 'right' },
+      t ? botonMoverA(t, op && op.cual) : null,
       t && admin ? h('button', { class: 'btn', onclick: () => duplicar(t) }, 'Duplicar') : null,
       t && admin && x.estado === 'revision' ? h('button', { class: 'btn', onclick: () => { cerrarModal(); devolver(t); } }, 'Devolver con cambios') : null,
       h('button', { class: 'btn', onclick: cerrarModal }, puedeEntregar ? 'Cancelar' : 'Cerrar'),
@@ -2508,7 +2600,7 @@ function abrirFecha(fe, fechaInicial) {
   pintarToggles();
   const pie = h('div', { class: 'sheet-foot' },
     fe && admin ? botonPeligro('Eliminar fecha', () => { S.fechas = S.fechas.filter((y) => y !== fe); guardar(); cerrarModal(); render(); toast('Fecha eliminada'); }) : null,
-    h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, admin || mia ? 'Cancelar' : 'Cerrar'), admin || mia ? h('button', { class: 'btn primary', onclick: () => {
+    h('div', { class: 'right' }, fe ? botonMoverA(fe) : null, h('button', { class: 'btn', onclick: cerrarModal }, admin || mia ? 'Cancelar' : 'Cerrar'), admin || mia ? h('button', { class: 'btn primary', onclick: () => {
       if (!admin) { x.estado = estadoSel.value; x.horasReal = Number(hReal.value) || 0; guardar(); cerrarModal(); render(); toast('Estado actualizado'); return; }
       const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné un título'); return; }
       Object.assign(x, { titulo, tipo: f.tipo.value, formatos, marca: f.marca.value, fecha: f.fecha.value || HOY, hora: f.hora.value, notas: f.notas.value, resps: respSel.valor(), estado: estadoSel.value, prioridad: prioSel.value, horasEst: Number(hEst.value) || 0, horasReal: Number(hReal.value) || 0 });
