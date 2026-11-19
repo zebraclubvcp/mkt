@@ -2177,6 +2177,8 @@ function selectorPersonas(inicial, soloLectura) {
 const nombre1 = (id) => (persona(id).nombre || 'Alguien').split(' ')[0];
 const trabadaPill = (o) => { const p = pendienteDe(o); return h('span', { class: 'pill p-bad', title: p ? nombre1(p.de) + ' espera a ' + nombre1(p.para) + ': ' + p.texto : '' }, 'Trabada'); };
 const horaDe = (ts) => { const d = new Date(ts); return cuando(iso(d)) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+/* Lo nuevo todavía no tiene id: sin id no hay a qué colgarle comentarios. */
+const sinConversacion = (txt) => h('div', { class: 'full field' }, h('div', { class: 'cm-h' }, h('label', {}, 'Conversación')), h('small', { style: 'font-size:12px;color:var(--muted)' }, txt));
 function conversacion(x) {
   const puedeAvisar = () => esAdmin() || esDe(x, ui.yo);
   const resolver = (c) => {
@@ -2317,7 +2319,7 @@ function abrirTarea(t, base) {
   pintarThumbs();
   const refsLinks = (x.referencias || '').split(/\s+/).filter((u) => /^https?:\/\//.test(u));
   /* Conversación de la tarea: comentarios, pendientes y devoluciones (ver conversacion()). */
-  const conv = t ? conversacion(x) : null;
+  const conv = t && x.id ? conversacion(x) : null;
   const seccion = (txt) => h('p', { class: 'full', style: 'margin:6px 0 0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)' }, txt);
   const cuerpo = h('div', { class: 'form' },
     conv ? conv.franja : null,
@@ -2334,7 +2336,7 @@ function abrirTarea(t, base) {
     campo('Link del entregable (Drive)', f.link, true),
     t && x.link ? h('a', { class: 'full link-out', href: x.link, target: '_blank', rel: 'noopener' }, 'Abrir el entregable ↗') : null,
     campo('Estado', f.estado), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', f.horasEst), campo('Horas reales', f.horasReal)),
-    conv ? conv.bloque : null,
+    conv ? conv.bloque : sinConversacion('Guardá la tarea para poder comentar.'),
     t ? h('p', { class: 'full', style: 'margin:0;font-size:12px;color:var(--muted)' }, 'Pedido por ' + (persona(x.pedidoPor).nombre || '—')) : null,
     !admin && !propia ? h('p', { class: 'full warnbox', style: 'color:var(--muted);background:var(--surface-2)' }, 'Esta tarea es de ' + nombresResp(x) + '. Solo la puede editar esa persona o quien asigna tareas.') : null);
   const guardarTarea = () => {
@@ -2412,12 +2414,12 @@ function abrirFecha(fe, fechaInicial) {
       avisar(x, 'asignada', resps(x).filter((id) => !antesF.includes(id)));
       guardar(); cerrarModal(); render(); toast(fe ? 'Fecha guardada' : 'Fecha agregada');
     } }, fe ? 'Guardar' : 'Agregar fecha') : null));
-  const conv = fe ? conversacion(x) : null;
+  const conv = fe && x.id ? conversacion(x) : null;
   modal(fe ? (admin ? 'Editar fecha' : x.titulo) : 'Nueva fecha', h('div', { class: 'form' }, conv ? conv.franja : null, campo('Título', f.titulo, true), campo('Tipo', f.tipo), campo('Marca', f.marca),
     h('div', { class: 'field full' }, h('label', {}, 'Formato (marcá todos los que van)'), toggles),
     campo('Fecha', f.fecha), campo('Hora', f.hora),
     h('div', { class: 'field full' }, h('label', {}, 'Responsables'), respSel.el),
-    campo('Estado', estadoSel), h('div', { class: 'field full' }, h('label', {}, 'Prioridad'), prioSel), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', hEst), campo('Horas reales', hReal)), campo('Notas', f.notas, true), conv ? conv.bloque : null), pie);
+    campo('Estado', estadoSel), h('div', { class: 'field full' }, h('label', {}, 'Prioridad'), prioSel), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', hEst), campo('Horas reales', hReal)), campo('Notas', f.notas, true), conv ? conv.bloque : sinConversacion('Guardá la fecha para poder comentar.')), pie);
 }
 
 function abrirCampania(c) {
