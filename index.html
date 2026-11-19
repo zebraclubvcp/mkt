@@ -1717,13 +1717,13 @@ const botonMoverA = (o, cual) => puedeCorrer(o) ? h('button', { class: 'btn', on
 
 function calCard(x) {
   const o = x.f || x.t;
-  const esEntrega = !x.f && !x.pub;
+  const esEntrega = !x.f && !x.pub && !x.prod;
   const cual = x.f ? 'fecha' : x.pub ? 'publica' : 'entrega';
   const arrastrable = puedeCorrer(o) && !pantallaTactil();
   const ver = (e) => { e.stopPropagation(); abrir(o, { cual }); };
   /* En la tarjeta solo lo que ayuda a decidir: título, responsable, estado, formato y si es urgente. */
   const prio = o.prioridad === 'Urgente' ? o.prioridad : '';
-  const late = esEntrega ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
+  const late = esEntrega || x.prod ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
   const top = [
     x.f && o.hora ? h('span', { class: 'cc-hora' }, o.hora) : null,
     esEntrega ? h('span', { class: 'cc-tag' }, 'Entrega') : null,
@@ -1765,7 +1765,12 @@ function vistaCalendario() {
   const ts = todas.filter((t) => t.estado !== 'publicado');
   const fs = S.fechas.filter((f) => (ui.marca === 'todas' || f.marca === ui.marca || f.marca === 'general') && (ui.persona === 'todas' || !resps(f).length || esDe(f, ui.persona)));
   const orden = (a, b) => ((a.f && a.f.hora) || (a.pub || a.f ? '00' : '99')).localeCompare((b.f && b.f.hora) || (b.pub || b.f ? '00' : '99'));
-  const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...todas.filter((t) => t.publica === s).map((t) => ({ t, pub: true })), ...(verEntregas ? ts.filter((t) => t.entrega === s && t.publica !== s).map((t) => ({ t })) : [])].sort(orden);
+  /* Producción ve cada tarea una sola vez, en su día de entrega y como tarjeta común (sin publicación ni etiqueta "Entrega"). */
+  const prod = !esAdmin();
+  const deTareas = (s) => prod
+    ? todas.filter((t) => t.entrega === s).map((t) => ({ t, prod: true }))
+    : [...todas.filter((t) => t.publica === s).map((t) => ({ t, pub: true })), ...(verEntregas ? ts.filter((t) => t.entrega === s && t.publica !== s).map((t) => ({ t })) : [])];
+  const enDia = (s) => [...fs.filter((f) => f.fecha === s).map((f) => ({ f })), ...deTareas(s)].sort(orden);
   const mover = (k) => {
     if (semana) { const d = ui.calSem ? parse(ui.calSem) : lunesDe(parse(HOY)); d.setDate(d.getDate() + 7 * k); ui.calSem = iso(d); }
     else { const d = new Date(y, m + k, 1); ui.calMes = d.getFullYear() + '-' + pad(d.getMonth() + 1); }
@@ -1796,7 +1801,7 @@ function vistaCalendario() {
     esAdmin() ? h('button', { class: 'btn', style: 'justify-self:start', onclick: () => abrirTarea(null) }, '+ Nuevo pedido') : null,
     ...(proximos.length ? proximos.map((s) => h('div', { class: 'group' }, h('h3', {}, s === HOY ? 'Hoy' : fCorta(s), h('span', { class: 'n' }, enDia(s).length)), h('div', { class: 'list cc-list' }, ...enDia(s).map(calCard)))) : [h('div', { class: 'empty' }, 'Nada cargado en este período.')]));
   return h('div', { style: 'display:grid;gap:14px' },
-    cabecera(titulo, esAdmin() ? (pantallaTactil() ? 'Tocá un día para crear algo. Para cambiar de día, tocá la tarjeta y elegí Mover a…' : 'Tocá un día para crear algo. Arrastrá una tarjeta a otro día para moverla.') : 'Publicaciones, entregas y fechas de las marcas.',
+    cabecera(titulo, esAdmin() ? (pantallaTactil() ? 'Tocá un día para crear algo. Para cambiar de día, tocá la tarjeta y elegí Mover a…' : 'Tocá un día para crear algo. Arrastrá una tarjeta a otro día para moverla.') : 'Entregas y fechas de las marcas.',
       h('span', { class: 'seg', role: 'group', 'aria-label': 'Vista' },
         h('button', { class: 'chip', 'aria-pressed': String(semana), onclick: () => vista('semana') }, 'Semana'),
         h('button', { class: 'chip', 'aria-pressed': String(!semana), onclick: () => vista('mes') }, 'Mes')),
@@ -1805,7 +1810,7 @@ function vistaCalendario() {
       h('button', { class: 'btn small', onclick: () => mover(1), 'aria-label': semana ? 'Semana siguiente' : 'Mes siguiente' }, '→'),
       esAdmin() ? h('button', { class: 'btn primary', onclick: () => abrirFecha(null) }, '+ Fecha') : null),
     h('div', { class: 'chips', style: 'justify-content:space-between;align-items:center' }, filtros(true),
-      h('button', { class: 'chip', 'aria-pressed': String(verEntregas), title: 'Mostrar también los días de entrega de cada pedido', onclick: () => { ui.calEntregas = !verEntregas; guardarUi(); render(); } }, verEntregas ? 'Entregas: se ven' : 'Entregas: ocultas')),
+      prod ? null : h('button', { class: 'chip', 'aria-pressed': String(verEntregas), title: 'Mostrar también los días de entrega de cada pedido', onclick: () => { ui.calEntregas = !verEntregas; guardarUi(); render(); } }, verEntregas ? 'Entregas: se ven' : 'Entregas: ocultas')),
     grilla, agenda);
 }
 
