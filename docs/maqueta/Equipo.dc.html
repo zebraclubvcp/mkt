@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Equipo y carga</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f3f4f2;color:#151714;font-family:"Onest",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+a{color:#1f4fbf}a:hover{color:#163a8f}
+h1,h2,h3,p{margin:0}
+.nav a,.nav span{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;color:#4f544c;text-decoration:none;font-weight:500;white-space:nowrap}
+.nav a:hover{background:#e8eae5;color:#151714}
+.nav a.on{background:#151714;color:#ffffff}
+.nav span{color:#8a8f86}
+.cnt{font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:999px;background:#fbe7e5;color:#a42a20;text-align:center}
+.card{background:#ffffff;border:1px solid #e2e4df;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.st-pedido{background:#eef0ec;color:#4a4f47}.st-proceso{background:#e7eefc;color:#1f4fbf}.st-revision{background:#fbf0dc;color:#7a4800}.st-aprobado{background:#efe8fb;color:#5a37b0}.st-publicado{background:#e5f4ea;color:#17703c}.st-bloq{background:#fbe7e5;color:#a42a20}
+.f-Historia{background:#fbe6f0;color:#9c2459}.f-Post{background:#e7eefc;color:#1f4fbf}.f-Reel{background:#efe8fb;color:#5a37b0}.f-Carrusel{background:#e3f1f6;color:#145f78}.f-Pauta{background:#e5f4ea;color:#17703c}.f-Flyer{background:#fbf0dc;color:#7a4800}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffffff;flex:none;border:2px solid #ffffff}
+.btn{border:0;background:#151714;color:#ffffff;border-radius:10px;padding:0 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#2c302b;color:#ffffff}
+.btn2{border:1px solid #d5d8d1;background:#ffffff;color:#151714;border-radius:10px;padding:0 12px;font-weight:600;font-size:13px;cursor:pointer;min-height:36px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn2:hover{background:#f3f4f2;color:#151714}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:#5f645c}
+.small{font-size:12px}
+.k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f645c}
+.help{display:flex;gap:10px;align-items:flex-start;background:#f7f8f6;border:1px dashed #cfd3cb;border-radius:12px;padding:10px 14px;color:#454a43;font-size:13px}
+.bar{height:8px;border-radius:999px;background:#eceee9;overflow:hidden;display:flex}
+.row{display:flex;align-items:center;gap:12px}
+input,textarea,select{font-family:inherit;font-size:14px;color:#151714;border:1px solid #d5d8d1;border-radius:10px;padding:9px 11px;background:#ffffff;box-sizing:border-box}
+@media (max-width:760px){.nav{grid-auto-flow:column;overflow-x:auto}}
+</style>
+</helmet>
+<div style="min-height:100%;display:flex;flex-wrap:wrap;align-items:flex-start;background:#f3f4f2">
+<nav aria-label="Secciones" style="flex:1 1 200px;max-width:240px;box-sizing:border-box;padding:22px 14px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:10px;padding:0 6px"><div aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:1.5px solid #151714;background:repeating-linear-gradient(-45deg,#151714 0 5px,#ffffff 5px 9px);flex:none"></div><div><b style="font-size:16px;letter-spacing:-.01em">Marcebra</b><div class="muted" style="font-size:11px">Mica · Planificación</div></div></div><div class="nav" style="display:grid;gap:2px"><a href="Main.dc.html">Inicio<b class="cnt">6</b></a><a href="Calendario.dc.html">Calendario</a><span>Tablero <i class="small" style="font-style:normal">igual que hoy</i></span><a href="Equipo.dc.html" class="on">Equipo y carga</a><a href="Pauta.dc.html">Pauta</a><a href="HojaDeRuta.dc.html">Hoja de ruta</a><a href="Reuniones.dc.html">Reuniones</a></div></nav>
+<main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:24px 24px 48px">
+<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+<header style="display:flex;flex-direction:column;gap:4px">
+  <h1 style="font-size:26px;letter-spacing:-.02em">Equipo y carga</h1>
+  <p class="muted">Quién tiene cuánto, y cuánto más puede recibir.</p>
+</header>
+
+<div class="help"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg><span>Cada persona tiene un <b>tope de tareas activas</b> (sin empezar + en proceso + en revisión). Al llegar al tope, <b>no se le puede asignar nada más</b> hasta que entregue algo. Mica y Agustina ajustan el tope de cada uno con − y +.</span></div>
+
+<div class="card" style="padding:6px 0">
+  <sc-for list="{{gente}}" as="g" hint-placeholder-count="6">
+    <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid #eef0ec;flex-wrap:wrap">
+      <span class="av" style="{{g.p.c}};width:34px;height:34px;font-size:12px">{{g.p.i}}</span>
+      <div style="flex:1 1 160px;min-width:0"><b>{{g.p.n}}</b><p class="small muted">{{g.p.rol}}</p></div>
+      <div style="flex:2 1 260px;display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;gap:3px">
+          <sc-for list="{{g.slots}}" as="sl" hint-placeholder-count="5"><div style="{{sl}}"></div></sc-for>
+        </div>
+        <div class="small" style="display:flex;justify-content:space-between;gap:8px"><span class="muted">{{g.detalle}}</span><b style="{{g.estS}}">{{g.est}}</b></div>
+      </div>
+      <div class="row" style="gap:6px">
+        <span class="small muted">Tope</span>
+        <button type="button" class="btn2" style="min-width:36px;padding:0" aria-label="Bajar tope" onClick="{{g.menos}}">−</button>
+        <b style="min-width:18px;text-align:center">{{g.tope}}</b>
+        <button type="button" class="btn2" style="min-width:36px;padding:0" aria-label="Subir tope" onClick="{{g.mas}}">+</button>
+      </div>
+      <div class="small muted" style="flex:0 1 150px">Esta semana: <b style="color:#151714">{{g.ent}}</b> entregadas · {{g.atiempo}} a tiempo</div>
+    </div>
+  </sc-for>
+</div>
+
+<div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+  <div><h2 style="font-size:16px">Así se ve al asignar un pedido</h2><p class="muted small">Ejemplo: “Placa promo after” · entrega lun 23</p></div>
+  <p class="k">Responsable</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    <sc-for list="{{opciones}}" as="o" hint-placeholder-count="6">
+      <button type="button" onClick="{{o.pick}}" style="{{o.btn}}">
+        <span class="av" style="{{o.p.c}}">{{o.p.i}}</span>
+        <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2"><b style="font-size:13px">{{o.p.n}}</b><span class="small" style="{{o.subS}}">{{o.sub}}</span></span>
+      </button>
+    </sc-for>
+  </div>
+  <sc-if value="{{aviso}}" hint-placeholder-val="{{ false }}">
+    <div role="alert" style="padding:10px 14px;border-radius:10px;{{avisoS}}">{{aviso}}</div>
+  </sc-if>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1280, "height": 1080}}'>
+
+const PE = {"manu": {"n": "Manu", "i": "M", "c": "background:#151714", "rol": "Jefe de marketing"}, "mica": {"n": "Mica", "i": "Mi", "c": "background:#b02a6c", "rol": "Planificación · CM Zebra"}, "agus": {"n": "Agustina", "i": "A", "c": "background:#6b43c4", "rol": "Creatividad · CM Kosmos"}, "luciano": {"n": "Luciano", "i": "L", "c": "background:#2b5fd9", "rol": "Diseño principal"}, "salva": {"n": "Salvador", "i": "S", "c": "background:#11786f", "rol": "Diseño"}, "maxi": {"n": "Maxi", "i": "Mx", "c": "background:#a34c00", "rol": "Edición de video"}, "santi": {"n": "Santi", "i": "St", "c": "background:#1f7a45", "rol": "Pauta"}};
+const BASE = [
+  { k: 'luciano', a: [2, 1, 2], tope: 5, ent: 4, atiempo: '75%' },
+  { k: 'salva', a: [2, 1, 0], tope: 5, ent: 3, atiempo: '67%' },
+  { k: 'maxi', a: [1, 2, 1], tope: 5, ent: 5, atiempo: '100%' },
+  { k: 'santi', a: [1, 1, 0], tope: 4, ent: 2, atiempo: '100%' },
+  { k: 'agus', a: [1, 2, 0], tope: 6, ent: 6, atiempo: '83%' },
+  { k: 'mica', a: [2, 2, 0], tope: 6, ent: 7, atiempo: '86%' },
+];
+const COL = ['#c9cec5', '#2b5fd9', '#d08a1e'];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { topes: {}, elegido: '', aviso: '', ok: false }; }
+  renderVals() {
+    const s = this.state;
+    const gente = BASE.map((g) => {
+      const tope = s.topes[g.k] ?? g.tope;
+      const act = g.a[0] + g.a[1] + g.a[2];
+      const slots = [];
+      g.a.forEach((n, i) => { for (let j = 0; j < n; j++) slots.push('flex:1;height:14px;border-radius:4px;background:' + COL[i]); });
+      for (let j = act; j < tope; j++) slots.push('flex:1;height:14px;border-radius:4px;background:#ffffff;border:1.5px dashed #c9cec5;box-sizing:border-box');
+      const lleno = act >= tope, libres = tope - act;
+      return { ...g, tope, act, slots, p: PE[g.k],
+        detalle: g.a[0] + ' sin empezar · ' + g.a[1] + ' en proceso · ' + g.a[2] + ' en revisión',
+        est: lleno ? 'Al tope (' + act + '/' + tope + ')' : libres === 1 ? 'Le queda 1 lugar' : 'Le quedan ' + libres,
+        estS: lleno ? 'color:#a42a20' : libres === 1 ? 'color:#7a4800' : 'color:#17703c',
+        menos: () => this.setState({ topes: { ...s.topes, [g.k]: Math.max(1, tope - 1) } }),
+        mas: () => this.setState({ topes: { ...s.topes, [g.k]: tope + 1 } }) };
+    });
+    const opciones = gente.filter((g) => g.k !== 'mica').map((g) => {
+      const lleno = g.act >= g.tope, sel = s.elegido === g.k;
+      return { p: g.p, sub: lleno ? 'Al tope' : (g.tope - g.act) + ' libres', subS: lleno ? 'color:#a42a20' : 'color:#5f645c',
+        btn: 'display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;font-family:inherit;min-height:48px;cursor:' + (lleno ? 'not-allowed;opacity:.55;background:#f3f4f2;border:1px dashed #c9cec5' : 'pointer;background:#ffffff;') + (sel ? 'border:2px solid #151714' : lleno ? '' : 'border:1px solid #d5d8d1'),
+        pick: () => lleno
+          ? this.setState({ elegido: '', ok: false, aviso: g.p.n + ' está al tope (' + g.act + ' de ' + g.tope + '). Elegí a otra persona, o pedile que cierre algo antes.' })
+          : this.setState({ elegido: g.k, ok: true, aviso: 'Asignada a ' + g.p.n + '. Le quedan ' + (g.tope - g.act - 1) + ' lugares.' }) };
+    });
+    return { gente, opciones, aviso: s.aviso,
+      avisoS: s.ok ? 'background:#e5f4ea;color:#17703c' : 'background:#fbe7e5;color:#7d1f17' };
+  }
+}
+
+</script>
+</body>
+</html>

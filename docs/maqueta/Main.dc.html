@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio de Mica</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f3f4f2;color:#151714;font-family:"Onest",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+a{color:#1f4fbf}a:hover{color:#163a8f}
+h1,h2,h3,p{margin:0}
+.nav a,.nav span{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;color:#4f544c;text-decoration:none;font-weight:500;white-space:nowrap}
+.nav a:hover{background:#e8eae5;color:#151714}
+.nav a.on{background:#151714;color:#ffffff}
+.nav span{color:#8a8f86}
+.cnt{font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:999px;background:#fbe7e5;color:#a42a20;text-align:center}
+.card{background:#ffffff;border:1px solid #e2e4df;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.st-pedido{background:#eef0ec;color:#4a4f47}.st-proceso{background:#e7eefc;color:#1f4fbf}.st-revision{background:#fbf0dc;color:#7a4800}.st-aprobado{background:#efe8fb;color:#5a37b0}.st-publicado{background:#e5f4ea;color:#17703c}.st-bloq{background:#fbe7e5;color:#a42a20}
+.f-Historia{background:#fbe6f0;color:#9c2459}.f-Post{background:#e7eefc;color:#1f4fbf}.f-Reel{background:#efe8fb;color:#5a37b0}.f-Carrusel{background:#e3f1f6;color:#145f78}.f-Pauta{background:#e5f4ea;color:#17703c}.f-Flyer{background:#fbf0dc;color:#7a4800}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffffff;flex:none;border:2px solid #ffffff}
+.btn{border:0;background:#151714;color:#ffffff;border-radius:10px;padding:0 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#2c302b;color:#ffffff}
+.btn2{border:1px solid #d5d8d1;background:#ffffff;color:#151714;border-radius:10px;padding:0 12px;font-weight:600;font-size:13px;cursor:pointer;min-height:36px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn2:hover{background:#f3f4f2;color:#151714}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:#5f645c}
+.small{font-size:12px}
+.k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f645c}
+.help{display:flex;gap:10px;align-items:flex-start;background:#f7f8f6;border:1px dashed #cfd3cb;border-radius:12px;padding:10px 14px;color:#454a43;font-size:13px}
+.bar{height:8px;border-radius:999px;background:#eceee9;overflow:hidden;display:flex}
+.row{display:flex;align-items:center;gap:12px}
+input,textarea,select{font-family:inherit;font-size:14px;color:#151714;border:1px solid #d5d8d1;border-radius:10px;padding:9px 11px;background:#ffffff;box-sizing:border-box}
+@media (max-width:760px){.nav{grid-auto-flow:column;overflow-x:auto}}
+</style>
+</helmet>
+<div style="min-height:100%;display:flex;flex-wrap:wrap;align-items:flex-start;background:#f3f4f2">
+<nav aria-label="Secciones" style="flex:1 1 200px;max-width:240px;box-sizing:border-box;padding:22px 14px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:10px;padding:0 6px"><div aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:1.5px solid #151714;background:repeating-linear-gradient(-45deg,#151714 0 5px,#ffffff 5px 9px);flex:none"></div><div><b style="font-size:16px;letter-spacing:-.01em">Marcebra</b><div class="muted" style="font-size:11px">Mica · Planificación</div></div></div><div class="nav" style="display:grid;gap:2px"><a href="Main.dc.html" class="on">Inicio<b class="cnt">6</b></a><a href="Calendario.dc.html">Calendario</a><span>Tablero <i class="small" style="font-style:normal">igual que hoy</i></span><a href="Equipo.dc.html">Equipo y carga</a><a href="Pauta.dc.html">Pauta</a><a href="HojaDeRuta.dc.html">Hoja de ruta</a><a href="Reuniones.dc.html">Reuniones</a></div></nav>
+<main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:24px 24px 48px">
+<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+<header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px">
+  <div>
+    <p class="k">Jueves 19 de noviembre</p>
+    <h1 style="font-size:26px;letter-spacing:-.02em">Hola, Mica</h1>
+    <p class="muted">Arriba está lo que frena al equipo si no lo resolvés. Abajo, lo que sale esta semana.</p>
+  </div>
+  <a class="btn" href="Equipo.dc.html">+ Nuevo pedido</a>
+</header>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+  <sc-for list="{{filtros}}" as="f" hint-placeholder-count="5">
+    <button type="button" onClick="{{f.pick}}" style="{{f.style}}">
+      <b style="font-size:20px;line-height:1">{{f.n}}</b><span style="font-size:13px">{{f.label}}</span>
+    </button>
+  </sc-for>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start">
+  <section style="flex:2 1 520px;min-width:0;display:flex;flex-direction:column;gap:18px">
+    <div class="card" style="padding:6px 0">
+      <div style="padding:12px 18px 6px;display:flex;justify-content:space-between;align-items:center">
+        <h2 style="font-size:16px">Necesita tu atención</h2>
+        <span class="muted small">{{cuantos}}</span>
+      </div>
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid #eef0ec">
+          <span class="av" style="{{it.avs}}">{{it.av}}</span>
+          <div style="flex:1;min-width:0">
+            <div class="row" style="gap:8px;flex-wrap:wrap"><span class="chip {{it.cls}}">{{it.etiqueta}}</span><b style="font-weight:600">{{it.titulo}}</b></div>
+            <p class="muted small" style="margin-top:2px">{{it.sub}}</p>
+          </div>
+          <a class="btn2" href="{{it.href}}">{{it.accion}}</a>
+        </div>
+      </sc-for>
+    </div>
+
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2 style="font-size:16px">Sale esta semana</h2>
+        <a href="Calendario.dc.html" class="small">Ver calendario</a>
+      </div>
+      <sc-for list="{{dias}}" as="d" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <p class="k">{{d.dia}}</p>
+          <sc-for list="{{d.tareas}}" as="t" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f7f8f6;flex-wrap:wrap">
+              <span style="{{t.marca}}" aria-hidden="true"></span>
+              <b style="font-weight:600;flex:1 1 180px;min-width:0">{{t.t}}</b>
+              <span class="chip f-{{t.f}}">{{t.f}}</span>
+              <span class="av" style="{{t.p.c}}" title="{{t.p.n}}">{{t.p.i}}</span>
+              <span class="chip {{t.ecls}}">{{t.e}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <aside style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:18px">
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="font-size:16px">Carga del equipo</h2><a href="Equipo.dc.html" class="small">Ver todo</a></div>
+      <sc-for list="{{carga}}" as="c" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between" class="small"><span>{{c.n}}</span><b style="{{c.txt}}">{{c.lbl}}</b></div>
+          <div class="bar"><div style="{{c.w}}"></div></div>
+        </div>
+      </sc-for>
+    </div>
+    <a href="Reuniones.dc.html" class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:#151714">
+      <p class="k">Próxima reunión</p>
+      <b style="font-size:15px">Lunes 23/11 · Marketing</b>
+      <span class="muted small">3 temas anotados · 2 acuerdos de la anterior sin cumplir</span>
+    </a>
+    <a href="HojaDeRuta.dc.html" class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:#151714">
+      <p class="k">Hoja de ruta</p>
+      <div style="display:flex;justify-content:space-between"><b>Rebranding Kosmos</b><b>4 de 7</b></div>
+      <div class="bar"><div style="width:57%;background:#6b43c4"></div></div>
+      <span class="muted small">Próximo paso: elegir paleta final · vie 20</span>
+    </a>
+  </aside>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1280, "height": 1080}}'>
+
+const PE = {"manu": {"n": "Manu", "i": "M", "c": "background:#151714", "rol": "Jefe de marketing"}, "mica": {"n": "Mica", "i": "Mi", "c": "background:#b02a6c", "rol": "Planificación · CM Zebra"}, "agus": {"n": "Agustina", "i": "A", "c": "background:#6b43c4", "rol": "Creatividad · CM Kosmos"}, "luciano": {"n": "Luciano", "i": "L", "c": "background:#2b5fd9", "rol": "Diseño principal"}, "salva": {"n": "Salvador", "i": "S", "c": "background:#11786f", "rol": "Diseño"}, "maxi": {"n": "Maxi", "i": "Mx", "c": "background:#a34c00", "rol": "Edición de video"}, "santi": {"n": "Santi", "i": "St", "c": "background:#1f7a45", "rol": "Pauta"}};
+const MARCA = { zebra: '#151714', kosmos: '#7a4fd6' };
+const ITEMS = [
+  { tipo: 'revision', etiqueta: 'Para revisar', cls: 'st-revision', titulo: 'Flyer sábado 21/11', sub: 'Luciano lo mandó hace 2 h · Zebra Club', accion: 'Revisar', href: 'Tarea.dc.html', p: 'luciano' },
+  { tipo: 'revision', etiqueta: 'Para revisar', cls: 'st-revision', titulo: 'Reel previa viernes', sub: 'Maxi lo mandó hace 5 h · Kosmos', accion: 'Revisar', href: 'Tarea.dc.html', p: 'maxi' },
+  { tipo: 'revision', etiqueta: 'Para revisar', cls: 'st-revision', titulo: 'Carrusel line-up diciembre', sub: 'Salvador lo mandó ayer · Zebra Club', accion: 'Revisar', href: 'Tarea.dc.html', p: 'salva' },
+  { tipo: 'pide', etiqueta: 'Te piden', cls: 'st-bloq', titulo: '“Pasame el set time confirmado del sábado”', sub: 'Luciano · en Diseño set time sábado 21/11 · la tarea está trabada hace 1 día', accion: 'Responder', href: 'Tarea.dc.html', p: 'luciano' },
+  { tipo: 'pide', etiqueta: 'Te piden', cls: 'st-bloq', titulo: '“¿Cuánto presupuesto va para Kosmos?”', sub: 'Santi · en Pauta Kosmos fin de semana · hace 3 h', accion: 'Responder', href: 'Tarea.dc.html', p: 'santi' },
+  { tipo: 'vencida', etiqueta: 'Vencida', cls: 'st-bloq', titulo: 'Historias Kosmos jueves', sub: 'Salvador · venció ayer y sigue sin empezar', accion: 'Ver', href: 'Tarea.dc.html', p: 'salva' },
+  { tipo: 'tope', etiqueta: 'Al tope', cls: 'st-revision', titulo: 'Luciano tiene 5 de 5 tareas activas', sub: 'No se le puede asignar más hasta que entregue algo', accion: 'Ver carga', href: 'Equipo.dc.html', p: 'luciano' },
+];
+const FILTROS = [
+  { id: 'todo', label: 'Todo' },
+  { id: 'revision', label: 'Para revisar' },
+  { id: 'pide', label: 'Te piden' },
+  { id: 'vencida', label: 'Vencidas' },
+  { id: 'tope', label: 'Gente al tope' },
+];
+const DIAS = [
+  { dia: 'Hoy · jue 19', tareas: [
+    { t: 'Historias previa jueves', f: 'Historia', p: 'mica', e: 'En proceso', ecls: 'st-proceso', m: 'zebra' },
+    { t: 'Historias Kosmos jueves', f: 'Historia', p: 'salva', e: 'Vencida', ecls: 'st-bloq', m: 'kosmos' } ] },
+  { dia: 'Mañana · vie 20', tareas: [
+    { t: 'Reel previa viernes', f: 'Reel', p: 'maxi', e: 'En revisión', ecls: 'st-revision', m: 'kosmos' },
+    { t: 'Pauta Kosmos fin de semana', f: 'Pauta', p: 'santi', e: 'Trabada', ecls: 'st-bloq', m: 'kosmos' } ] },
+  { dia: 'Sáb 21', tareas: [
+    { t: 'Flyer sábado 21/11', f: 'Flyer', p: 'luciano', e: 'En revisión', ecls: 'st-revision', m: 'zebra' },
+    { t: 'Diseño set time sábado', f: 'Historia', p: 'luciano', e: 'Trabada', ecls: 'st-bloq', m: 'zebra' } ] },
+];
+const CARGA = [ ['luciano', 5, 5], ['salva', 3, 5], ['maxi', 4, 5], ['santi', 2, 4], ['agus', 3, 6] ];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { filtro: 'todo' }; }
+  renderVals() {
+    const fil = this.state.filtro;
+    const filtros = FILTROS.map((f) => {
+      const n = f.id === 'todo' ? ITEMS.length : ITEMS.filter((i) => i.tipo === f.id).length;
+      const on = fil === f.id;
+      return { ...f, n, pick: () => this.setState({ filtro: f.id }),
+        style: 'display:flex;align-items:baseline;gap:8px;padding:10px 14px;border-radius:12px;cursor:pointer;font-family:inherit;min-height:44px;' + (on ? 'background:#151714;color:#ffffff;border:1px solid #151714' : 'background:#ffffff;color:#151714;border:1px solid #e2e4df') };
+    });
+    const items = ITEMS.filter((i) => fil === 'todo' || i.tipo === fil).map((i) => ({ ...i, av: PE[i.p].i, avs: PE[i.p].c }));
+    const dias = DIAS.map((d) => ({ ...d, tareas: d.tareas.map((t) => ({ ...t, p: PE[t.p], marca: 'width:8px;height:8px;border-radius:50%;flex:none;background:' + MARCA[t.m] })) }));
+    const carga = CARGA.map(([k, a, tope]) => {
+      const lleno = a >= tope;
+      return { n: PE[k].n, lbl: a + ' de ' + tope, txt: lleno ? 'color:#a42a20' : 'color:#151714',
+        w: 'width:' + Math.round(a / tope * 100) + '%;background:' + (lleno ? '#c2362b' : a / tope >= .8 ? '#d08a1e' : '#1f8a4c') };
+    });
+    return { filtros, items, cuantos: items.length + (items.length === 1 ? ' cosa' : ' cosas'), dias, carga };
+  }
+}
+
+</script>
+</body>
+</html>

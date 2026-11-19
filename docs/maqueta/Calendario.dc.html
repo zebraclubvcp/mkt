@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Calendario semanal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f3f4f2;color:#151714;font-family:"Onest",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+a{color:#1f4fbf}a:hover{color:#163a8f}
+h1,h2,h3,p{margin:0}
+.nav a,.nav span{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;color:#4f544c;text-decoration:none;font-weight:500;white-space:nowrap}
+.nav a:hover{background:#e8eae5;color:#151714}
+.nav a.on{background:#151714;color:#ffffff}
+.nav span{color:#8a8f86}
+.cnt{font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:999px;background:#fbe7e5;color:#a42a20;text-align:center}
+.card{background:#ffffff;border:1px solid #e2e4df;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.st-pedido{background:#eef0ec;color:#4a4f47}.st-proceso{background:#e7eefc;color:#1f4fbf}.st-revision{background:#fbf0dc;color:#7a4800}.st-aprobado{background:#efe8fb;color:#5a37b0}.st-publicado{background:#e5f4ea;color:#17703c}.st-bloq{background:#fbe7e5;color:#a42a20}
+.f-Historia{background:#fbe6f0;color:#9c2459}.f-Post{background:#e7eefc;color:#1f4fbf}.f-Reel{background:#efe8fb;color:#5a37b0}.f-Carrusel{background:#e3f1f6;color:#145f78}.f-Pauta{background:#e5f4ea;color:#17703c}.f-Flyer{background:#fbf0dc;color:#7a4800}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffffff;flex:none;border:2px solid #ffffff}
+.btn{border:0;background:#151714;color:#ffffff;border-radius:10px;padding:0 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#2c302b;color:#ffffff}
+.btn2{border:1px solid #d5d8d1;background:#ffffff;color:#151714;border-radius:10px;padding:0 12px;font-weight:600;font-size:13px;cursor:pointer;min-height:36px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn2:hover{background:#f3f4f2;color:#151714}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:#5f645c}
+.small{font-size:12px}
+.k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f645c}
+.help{display:flex;gap:10px;align-items:flex-start;background:#f7f8f6;border:1px dashed #cfd3cb;border-radius:12px;padding:10px 14px;color:#454a43;font-size:13px}
+.bar{height:8px;border-radius:999px;background:#eceee9;overflow:hidden;display:flex}
+.row{display:flex;align-items:center;gap:12px}
+input,textarea,select{font-family:inherit;font-size:14px;color:#151714;border:1px solid #d5d8d1;border-radius:10px;padding:9px 11px;background:#ffffff;box-sizing:border-box}
+@media (max-width:760px){.nav{grid-auto-flow:column;overflow-x:auto}}
+</style>
+</helmet>
+<div style="min-height:100%;display:flex;flex-wrap:wrap;align-items:flex-start;background:#f3f4f2">
+<nav aria-label="Secciones" style="flex:1 1 200px;max-width:240px;box-sizing:border-box;padding:22px 14px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:10px;padding:0 6px"><div aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:1.5px solid #151714;background:repeating-linear-gradient(-45deg,#151714 0 5px,#ffffff 5px 9px);flex:none"></div><div><b style="font-size:16px;letter-spacing:-.01em">Marcebra</b><div class="muted" style="font-size:11px">Mica · Planificación</div></div></div><div class="nav" style="display:grid;gap:2px"><a href="Main.dc.html">Inicio<b class="cnt">6</b></a><a href="Calendario.dc.html" class="on">Calendario</a><span>Tablero <i class="small" style="font-style:normal">igual que hoy</i></span><a href="Equipo.dc.html">Equipo y carga</a><a href="Pauta.dc.html">Pauta</a><a href="HojaDeRuta.dc.html">Hoja de ruta</a><a href="Reuniones.dc.html">Reuniones</a></div></nav>
+<main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:24px 24px 48px">
+<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+<header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px">
+  <div>
+    <h1 style="font-size:26px;letter-spacing:-.02em">Calendario</h1>
+    <p class="muted">Semana del 16 al 22 de noviembre</p>
+  </div>
+  <div class="row" style="gap:8px;flex-wrap:wrap">
+    <button type="button" class="btn2" aria-label="Semana anterior">‹</button>
+    <button type="button" class="btn2">Hoy</button>
+    <button type="button" class="btn2" aria-label="Semana siguiente">›</button>
+    <div style="display:flex;border:1px solid #d5d8d1;border-radius:10px;overflow:hidden">
+      <button type="button" style="border:0;background:#151714;color:#ffffff;padding:0 14px;min-height:36px;font-family:inherit;font-weight:600">Semana</button>
+      <button type="button" style="border:0;background:#ffffff;color:#151714;padding:0 14px;min-height:36px;font-family:inherit;font-weight:600">Mes</button>
+    </div>
+  </div>
+</header>
+
+<div class="help"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg><span><b>Arrastrá una tarjeta a otro día</b> para cambiar la fecha de entrega. Se le avisa al responsable. En el celu: tocá la tarjeta y elegí <b>Mover a…</b></span></div>
+
+<sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="align-self:flex-start;background:#151714;color:#ffffff;border-radius:12px;padding:10px 14px;font-weight:600">{{toast}}</div>
+</sc-if>
+
+<div style="overflow-x:auto;padding-bottom:4px">
+  <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;min-width:980px">
+    <sc-for list="{{dias}}" as="d" hint-placeholder-count="7">
+      <div onDragOver="{{d.over}}" onDragLeave="{{d.leave}}" onDrop="{{d.drop}}" style="{{d.col}}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:2px 4px 6px">
+          <b style="{{d.headS}}">{{d.nom}}</b><span class="small muted">{{d.n}}</span>
+        </div>
+        <sc-for list="{{d.tareas}}" as="t" hint-placeholder-count="2">
+          <div draggable="true" onDragStart="{{t.start}}" onDragEnd="{{t.end}}" style="{{t.card}}">
+            <b style="font-weight:600;font-size:13px;line-height:1.3">{{t.t}}</b>
+            <div class="row" style="gap:4px"><span class="av" style="{{t.p.c}}" title="{{t.p.n}}">{{t.p.i}}</span><span class="small">{{t.p.n}}</span></div>
+            <div class="row" style="gap:4px;flex-wrap:wrap"><span class="chip {{t.ecls}}" style="font-size:11px">{{t.e}}</span><span class="chip f-{{t.f}}" style="font-size:11px">{{t.f}}</span></div>
+            <sc-if value="{{t.urg}}" hint-placeholder-val="{{ false }}"><span class="small" style="color:#a42a20;font-weight:700">Urgente</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+<div class="row small muted" style="gap:14px;flex-wrap:wrap">
+  <span>Tarjeta: título · responsable · estado · formato · prioridad</span>
+  <span class="row" style="gap:6px"><span style="width:14px;height:10px;border-radius:3px;border:1.5px dashed #8a8f86"></span>borde punteado = entrega interna (no se publica ese día)</span>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1280, "height": 1080}}'>
+
+const PE = {"manu": {"n": "Manu", "i": "M", "c": "background:#151714", "rol": "Jefe de marketing"}, "mica": {"n": "Mica", "i": "Mi", "c": "background:#b02a6c", "rol": "Planificación · CM Zebra"}, "agus": {"n": "Agustina", "i": "A", "c": "background:#6b43c4", "rol": "Creatividad · CM Kosmos"}, "luciano": {"n": "Luciano", "i": "L", "c": "background:#2b5fd9", "rol": "Diseño principal"}, "salva": {"n": "Salvador", "i": "S", "c": "background:#11786f", "rol": "Diseño"}, "maxi": {"n": "Maxi", "i": "Mx", "c": "background:#a34c00", "rol": "Edición de video"}, "santi": {"n": "Santi", "i": "St", "c": "background:#1f7a45", "rol": "Pauta"}};
+const DIAS = [ ['lun', 16], ['mar', 17], ['mié', 18], ['jue', 19], ['vie', 20], ['sáb', 21], ['dom', 22] ];
+const INI = [
+  { id: 1, d: 17, t: 'Placa aviso cumpleaños', p: 'salva', e: 'Publicada', ecls: 'st-publicado', f: 'Post' },
+  { id: 2, d: 18, t: 'Copy line-up diciembre', p: 'agus', e: 'Publicada', ecls: 'st-publicado', f: 'Post' },
+  { id: 3, d: 19, t: 'Historias previa jueves', p: 'mica', e: 'En proceso', ecls: 'st-proceso', f: 'Historia' },
+  { id: 4, d: 19, t: 'Historias Kosmos jueves', p: 'salva', e: 'Vencida', ecls: 'st-bloq', f: 'Historia', urg: true },
+  { id: 5, d: 20, t: 'Reel previa viernes', p: 'maxi', e: 'En revisión', ecls: 'st-revision', f: 'Reel' },
+  { id: 6, d: 20, t: 'Pauta Kosmos finde', p: 'santi', e: 'Trabada', ecls: 'st-bloq', f: 'Pauta' },
+  { id: 7, d: 21, t: 'Flyer sábado 21/11', p: 'luciano', e: 'En revisión', ecls: 'st-revision', f: 'Flyer', urg: true },
+  { id: 8, d: 21, t: 'Diseño set time sábado', p: 'luciano', e: 'Trabada', ecls: 'st-bloq', f: 'Historia', interna: true },
+  { id: 9, d: 22, t: 'Fotos de la noche', p: 'maxi', e: 'Sin empezar', ecls: 'st-pedido', f: 'Carrusel' },
+];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { mov: {}, over: 0, toast: '' }; this.drag = null; }
+  renderVals() {
+    const s = this.state;
+    const tareas = INI.map((t) => ({ ...t, d: s.mov[t.id] || t.d }));
+    const dias = DIAS.map(([nom, n]) => {
+      const hoy = n === 19, sobre = s.over === n;
+      return {
+        nom: hoy ? 'Hoy' : nom, n: n + '/11',
+        headS: hoy ? 'color:#1f4fbf' : 'color:#151714',
+        col: 'min-height:430px;border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:8px;transition:background .12s;' + (sobre ? 'background:#e7eefc;outline:2px dashed #2b5fd9' : hoy ? 'background:#ffffff;border:1px solid #c9d6f5' : 'background:#ebede8'),
+        over: (e) => { e.preventDefault(); if (s.over !== n) this.setState({ over: n }); },
+        leave: () => {},
+        drop: (e) => {
+          e.preventDefault();
+          const id = this.drag; this.drag = null;
+          if (!id) return this.setState({ over: 0 });
+          const t = INI.find((x) => x.id === id);
+          this.setState({ over: 0, mov: { ...s.mov, [id]: n }, toast: '“' + t.t + '” ahora entrega el ' + nom + ' ' + n + '/11 · le avisamos a ' + PE[t.p].n });
+        },
+        tareas: tareas.filter((t) => t.d === n).map((t) => ({ ...t, p: PE[t.p],
+          card: 'background:#ffffff;border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;gap:6px;cursor:grab;box-shadow:0 1px 2px rgba(20,23,20,.06);border:1.5px ' + (t.interna ? 'dashed #8a8f86' : 'solid #e2e4df'),
+          start: (e) => { this.drag = t.id; try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(t.id)); } catch (x) {} },
+          end: () => { if (s.over) this.setState({ over: 0 }); } })),
+      };
+    });
+    return { dias, toast: s.toast };
+  }
+}
+
+</script>
+</body>
+</html>

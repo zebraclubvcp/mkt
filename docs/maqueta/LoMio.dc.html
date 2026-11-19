@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lo mío de Luciano</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f3f4f2;color:#151714;font-family:"Onest",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+a{color:#1f4fbf}a:hover{color:#163a8f}
+h1,h2,h3,p{margin:0}
+.nav a,.nav span{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;color:#4f544c;text-decoration:none;font-weight:500;white-space:nowrap}
+.nav a:hover{background:#e8eae5;color:#151714}
+.nav a.on{background:#151714;color:#ffffff}
+.nav span{color:#8a8f86}
+.cnt{font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:999px;background:#fbe7e5;color:#a42a20;text-align:center}
+.card{background:#ffffff;border:1px solid #e2e4df;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.st-pedido{background:#eef0ec;color:#4a4f47}.st-proceso{background:#e7eefc;color:#1f4fbf}.st-revision{background:#fbf0dc;color:#7a4800}.st-aprobado{background:#efe8fb;color:#5a37b0}.st-publicado{background:#e5f4ea;color:#17703c}.st-bloq{background:#fbe7e5;color:#a42a20}
+.f-Historia{background:#fbe6f0;color:#9c2459}.f-Post{background:#e7eefc;color:#1f4fbf}.f-Reel{background:#efe8fb;color:#5a37b0}.f-Carrusel{background:#e3f1f6;color:#145f78}.f-Pauta{background:#e5f4ea;color:#17703c}.f-Flyer{background:#fbf0dc;color:#7a4800}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffffff;flex:none;border:2px solid #ffffff}
+.btn{border:0;background:#151714;color:#ffffff;border-radius:10px;padding:0 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#2c302b;color:#ffffff}
+.btn2{border:1px solid #d5d8d1;background:#ffffff;color:#151714;border-radius:10px;padding:0 12px;font-weight:600;font-size:13px;cursor:pointer;min-height:36px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn2:hover{background:#f3f4f2;color:#151714}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:#5f645c}
+.small{font-size:12px}
+.k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f645c}
+.help{display:flex;gap:10px;align-items:flex-start;background:#f7f8f6;border:1px dashed #cfd3cb;border-radius:12px;padding:10px 14px;color:#454a43;font-size:13px}
+.bar{height:8px;border-radius:999px;background:#eceee9;overflow:hidden;display:flex}
+.row{display:flex;align-items:center;gap:12px}
+input,textarea,select{font-family:inherit;font-size:14px;color:#151714;border:1px solid #d5d8d1;border-radius:10px;padding:9px 11px;background:#ffffff;box-sizing:border-box}
+@media (max-width:760px){.nav{grid-auto-flow:column;overflow-x:auto}}
+</style>
+</helmet>
+<div style="min-height:100%;display:flex;flex-wrap:wrap;align-items:flex-start;background:#f3f4f2">
+<nav aria-label="Secciones" style="flex:1 1 200px;max-width:240px;box-sizing:border-box;padding:22px 14px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:10px;padding:0 6px"><div aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:1.5px solid #151714;background:repeating-linear-gradient(-45deg,#151714 0 5px,#ffffff 5px 9px);flex:none"></div><div><b style="font-size:16px;letter-spacing:-.01em">Marcebra</b><div class="muted" style="font-size:11px">Luciano · Diseño</div></div></div><div class="nav" style="display:grid;gap:2px"><a href="LoMio.dc.html" class="on">Lo mío<b class="cnt">2</b></a><a href="Calendario.dc.html">Calendario</a></div></nav>
+<main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:24px 24px 48px">
+<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+<header style="display:flex;flex-direction:column;gap:4px">
+  <p class="k">Jueves 19 de noviembre</p>
+  <h1 style="font-size:26px;letter-spacing:-.02em">Lo tuyo, Luciano</h1>
+  <p class="muted">Ordenado por fecha de entrega. Cada tarea te dice cuál es el próximo paso.</p>
+</header>
+
+<div class="card" style="padding:16px 18px;display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+  <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;justify-content:space-between"><b>Tu carga</b><b style="{{cargaTxt}}">{{cargaLbl}}</b></div>
+    <div class="bar" style="height:10px"><div style="{{cargaW}}"></div></div>
+  </div>
+  <p class="small" style="flex:2 1 300px;{{cargaTxt}}">{{cargaMsg}}</p>
+</div>
+
+<sc-if value="{{hayTrabas}}" hint-placeholder-val="{{ true }}">
+  <div class="card" style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;border-color:#f0c9c4;background:#fffafa">
+    <h2 style="font-size:15px">Esperando a otros</h2>
+    <sc-for list="{{trabas}}" as="tr" hint-placeholder-count="1">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="chip st-bloq">Trabada</span>
+        <span style="flex:1 1 240px"><b style="font-weight:600">{{tr.tarea}}</b> <span class="muted">· le pediste a {{tr.quien}}: “{{tr.que}}” · {{tr.hace}}</span></span>
+        <a class="btn2" href="Tarea.dc.html">Ver</a>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<div class="card" style="padding:6px 0">
+  <div style="padding:12px 18px 6px"><h2 style="font-size:16px">Para hacer</h2></div>
+  <sc-for list="{{tareas}}" as="t" hint-placeholder-count="5">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid #eef0ec;flex-wrap:wrap">
+      <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:4px">
+        <div class="row" style="gap:8px;flex-wrap:wrap"><b style="font-weight:600;font-size:15px">{{t.t}}</b><span class="chip f-{{t.f}}">{{t.f}}</span></div>
+        <div class="row small" style="gap:8px;flex-wrap:wrap"><span class="chip {{t.ecls}}">{{t.enom}}</span><span style="{{t.cuandoS}}">Entrega {{t.cuando}}</span><span class="muted">· {{t.marca}}</span></div>
+        <sc-if value="{{t.nota}}" hint-placeholder-val="{{ false }}"><p class="small" style="color:#7a4800">{{t.nota}}</p></sc-if>
+      </div>
+      <sc-if value="{{t.puede}}" hint-placeholder-val="{{ true }}">
+        <button type="button" class="btn" onClick="{{t.next}}">{{t.accion}}</button>
+      </sc-if>
+      <sc-if value="{{t.espera}}" hint-placeholder-val="{{ false }}">
+        <span class="muted small" style="max-width:200px">{{t.espera}}</span>
+      </sc-if>
+    </div>
+  </sc-for>
+</div>
+
+<sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="align-self:flex-start;background:#151714;color:#ffffff;border-radius:12px;padding:10px 14px;font-weight:600">{{toast}}</div>
+</sc-if>
+
+<div class="card" style="padding:14px 18px;display:flex;flex-direction:column;gap:6px">
+  <h2 style="font-size:15px">Novedades</h2>
+  <p class="small"><b>Mica</b> te dejó una devolución en <b>Flyer sábado 21/11</b>: “Subí el logo de la marca y achicá la fecha”. <span class="muted">hace 40 min</span></p>
+  <p class="small"><b>Agustina</b> te asignó <b>Portada evento Kosmos diciembre</b> para el mar 24. <span class="muted">hace 3 h</span></p>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1280, "height": 1080}}'>
+
+const TAREAS = [
+  { id: 1, t: 'Flyer sábado 21/11', f: 'Flyer', marca: 'Zebra Club', e: 'proceso', dias: 1, nota: 'Tiene una devolución de Mica para corregir' },
+  { id: 2, t: 'Diseño set time sábado', f: 'Historia', marca: 'Zebra Club', e: 'pedido', dias: 2, bloq: true },
+  { id: 3, t: 'Placa promo cumpleaños', f: 'Post', marca: 'Zebra Club', e: 'pedido', dias: 3 },
+  { id: 4, t: 'Portada evento Kosmos diciembre', f: 'Post', marca: 'Kosmos', e: 'pedido', dias: 5 },
+  { id: 5, t: 'Carrusel recap Halloween', f: 'Carrusel', marca: 'Zebra Club', e: 'revision', dias: 0 },
+];
+const EST = {
+  pedido: { nom: 'Sin empezar', cls: 'st-pedido', acc: 'Empezar', sig: 'proceso' },
+  proceso: { nom: 'En proceso', cls: 'st-proceso', acc: 'Mandar a revisión', sig: 'revision' },
+  revision: { nom: 'En revisión', cls: 'st-revision', acc: '', sig: '' },
+};
+const TOPE = 5;
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { est: {}, toast: '' }; }
+  renderVals() {
+    const est = this.state.est;
+    const lista = TAREAS.map((t) => ({ ...t, e: est[t.id] || t.e }));
+    const activas = lista.length;
+    const tareas = lista.map((t) => {
+      const E = EST[t.e];
+      const cuando = t.dias === 0 ? 'hoy' : t.dias === 1 ? 'mañana' : 'en ' + t.dias + ' días';
+      let espera = '';
+      if (t.bloq) espera = 'Trabada: esperás el set time de Mica';
+      else if (t.e === 'revision') espera = 'Lo está revisando Mica. Te avisa si hay cambios.';
+      return { ...t, enom: t.bloq ? 'Trabada' : E.nom, ecls: t.bloq ? 'st-bloq' : E.cls, accion: E.acc, cuando,
+        cuandoS: t.dias <= 1 ? 'font-weight:600;color:#a42a20' : 'color:#454a43',
+        puede: !!E.acc && !t.bloq, espera,
+        next: () => this.setState({ est: { ...est, [t.id]: E.sig }, toast: '“' + t.t + '” pasó a ' + EST[E.sig].nom.toLowerCase() + (E.sig === 'revision' ? '. Le avisamos a Mica.' : '.') }) };
+    });
+    const lleno = activas >= TOPE;
+    return {
+      tareas, toast: this.state.toast,
+      cargaLbl: activas + ' de ' + TOPE + ' tareas activas',
+      cargaTxt: lleno ? 'color:#a42a20' : 'color:#151714',
+      cargaW: 'width:' + Math.min(100, activas / TOPE * 100) + '%;background:' + (lleno ? '#c2362b' : '#1f8a4c'),
+      cargaMsg: lleno ? 'Estás al tope: nadie te puede asignar más hasta que entregues algo. Empezá por lo que vence primero.' : 'Te quedan ' + (TOPE - activas) + ' lugares libres.',
+      hayTrabas: true,
+      trabas: [{ tarea: 'Diseño set time sábado', quien: 'Mica', que: 'Pasame el set time confirmado', hace: 'hace 1 día' }],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

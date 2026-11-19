@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reuniones</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f3f4f2;color:#151714;font-family:"Onest",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+a{color:#1f4fbf}a:hover{color:#163a8f}
+h1,h2,h3,p{margin:0}
+.nav a,.nav span{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;color:#4f544c;text-decoration:none;font-weight:500;white-space:nowrap}
+.nav a:hover{background:#e8eae5;color:#151714}
+.nav a.on{background:#151714;color:#ffffff}
+.nav span{color:#8a8f86}
+.cnt{font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:999px;background:#fbe7e5;color:#a42a20;text-align:center}
+.card{background:#ffffff;border:1px solid #e2e4df;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.st-pedido{background:#eef0ec;color:#4a4f47}.st-proceso{background:#e7eefc;color:#1f4fbf}.st-revision{background:#fbf0dc;color:#7a4800}.st-aprobado{background:#efe8fb;color:#5a37b0}.st-publicado{background:#e5f4ea;color:#17703c}.st-bloq{background:#fbe7e5;color:#a42a20}
+.f-Historia{background:#fbe6f0;color:#9c2459}.f-Post{background:#e7eefc;color:#1f4fbf}.f-Reel{background:#efe8fb;color:#5a37b0}.f-Carrusel{background:#e3f1f6;color:#145f78}.f-Pauta{background:#e5f4ea;color:#17703c}.f-Flyer{background:#fbf0dc;color:#7a4800}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffffff;flex:none;border:2px solid #ffffff}
+.btn{border:0;background:#151714;color:#ffffff;border-radius:10px;padding:0 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#2c302b;color:#ffffff}
+.btn2{border:1px solid #d5d8d1;background:#ffffff;color:#151714;border-radius:10px;padding:0 12px;font-weight:600;font-size:13px;cursor:pointer;min-height:36px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn2:hover{background:#f3f4f2;color:#151714}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:#5f645c}
+.small{font-size:12px}
+.k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f645c}
+.help{display:flex;gap:10px;align-items:flex-start;background:#f7f8f6;border:1px dashed #cfd3cb;border-radius:12px;padding:10px 14px;color:#454a43;font-size:13px}
+.bar{height:8px;border-radius:999px;background:#eceee9;overflow:hidden;display:flex}
+.row{display:flex;align-items:center;gap:12px}
+input,textarea,select{font-family:inherit;font-size:14px;color:#151714;border:1px solid #d5d8d1;border-radius:10px;padding:9px 11px;background:#ffffff;box-sizing:border-box}
+@media (max-width:760px){.nav{grid-auto-flow:column;overflow-x:auto}}
+</style>
+</helmet>
+<div style="min-height:100%;display:flex;flex-wrap:wrap;align-items:flex-start;background:#f3f4f2">
+<nav aria-label="Secciones" style="flex:1 1 200px;max-width:240px;box-sizing:border-box;padding:22px 14px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:10px;padding:0 6px"><div aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:1.5px solid #151714;background:repeating-linear-gradient(-45deg,#151714 0 5px,#ffffff 5px 9px);flex:none"></div><div><b style="font-size:16px;letter-spacing:-.01em">Marcebra</b><div class="muted" style="font-size:11px">Manu · Jefe de marketing</div></div></div><div class="nav" style="display:grid;gap:2px"><a href="Main.dc.html">Inicio<b class="cnt">6</b></a><a href="Calendario.dc.html">Calendario</a><span>Tablero <i class="small" style="font-style:normal">igual que hoy</i></span><a href="Equipo.dc.html">Equipo y carga</a><a href="Pauta.dc.html">Pauta</a><a href="HojaDeRuta.dc.html">Hoja de ruta</a><a href="Reuniones.dc.html" class="on">Reuniones</a></div></nav>
+<main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:24px 24px 48px">
+<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+<header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px">
+  <div>
+    <h1 style="font-size:26px;letter-spacing:-.02em">Reuniones</h1>
+    <p class="muted">Reuniones del equipo de marketing: lo que se habló, lo que se acordó y si se cumplió. Las ven Manu, Mica y Agustina.</p>
+  </div>
+  <button type="button" class="btn">+ Nueva reunión</button>
+</header>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">
+  <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+    <div class="card" style="padding:12px 16px"><p class="k">{{k.l}}</p><b style="{{k.s}}">{{k.v}}</b><p class="small muted">{{k.sub}}</p></div>
+  </sc-for>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start">
+  <section style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:10px">
+    <label for="buscar" class="k">Buscar en las notas</label>
+    <input id="buscar" type="search" placeholder="Ej. set time, pauta, Halloween" value="{{q}}" onInput="{{buscar}}">
+    <div class="card" style="padding:4px 0">
+      <sc-for list="{{lista}}" as="r" hint-placeholder-count="4">
+        <button type="button" onClick="{{r.pick}}" style="{{r.s}}">
+          <div style="display:flex;justify-content:space-between;gap:8px;width:100%"><b style="font-size:14px">{{r.t}}</b><span class="small muted">{{r.fecha}}</span></div>
+          <div class="row small" style="gap:8px;width:100%"><span class="muted">{{r.asisTxt}} · acuerdos {{r.ac}}</span></div>
+          <sc-if value="{{r.match}}" hint-placeholder-val="{{ false }}"><span class="small" style="color:#7a4800;text-align:left">“…{{r.match}}…”</span></sc-if>
+        </button>
+      </sc-for>
+      <sc-if value="{{vacio}}" hint-placeholder-val="{{ false }}"><p class="muted small" style="padding:14px 18px">No hay reuniones con eso. Probá con otra palabra.</p></sc-if>
+    </div>
+  </section>
+
+  <sc-if value="{{haySel}}" hint-placeholder-val="{{ true }}">
+    <section class="card" style="flex:1.6 1 440px;min-width:0;padding:18px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div class="row" style="gap:8px;flex-wrap:wrap"><span class="small muted">{{sel.fecha}}</span></div>
+        <h2 style="font-size:20px;margin-top:4px">{{sel.t}}</h2>
+        <div class="row" style="gap:0;margin-top:6px">
+          <sc-for list="{{sel.asis}}" as="a" hint-placeholder-count="3"><span class="av" style="{{a.c}};margin-right:-6px" title="{{a.n}}">{{a.i}}</span></sc-for>
+          <span class="small muted" style="margin-left:14px">{{sel.asisTxt}}</span>
+        </div>
+      </div>
+
+      <sc-if value="{{sel.hayPrev}}" hint-placeholder-val="{{ false }}">
+        <div style="padding:10px 14px;border-radius:10px;background:#fff8ec;border:1px solid #f0dcb4;display:flex;flex-direction:column;gap:4px">
+          <b class="small" style="color:#7a4800">Quedó pendiente de la reunión anterior</b>
+          <sc-for list="{{sel.prev}}" as="pv" hint-placeholder-count="2"><span class="small">· {{pv}}</span></sc-for>
+        </div>
+      </sc-if>
+
+      <div><p class="k">Qué se habló</p>
+        <ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{sel.notas}}" as="n" hint-placeholder-count="3"><li>{{n}}</li></sc-for>
+        </ul>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px"><p class="k">Acuerdos</p>
+        <sc-for list="{{sel.acuerdos}}" as="ac" hint-placeholder-count="3">
+          <button type="button" onClick="{{ac.toggle}}" style="{{ac.s}}">
+            <span aria-hidden="true" style="{{ac.box}}">{{ac.tick}}</span>
+            <span style="flex:1;text-align:left;{{ac.txt}}">{{ac.t}}</span>
+            <span class="av" style="{{ac.p.c}}" title="{{ac.p.n}}">{{ac.p.i}}</span>
+            <span class="chip {{ac.cls}}">{{ac.est}}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="padding-top:12px;border-top:1px solid #eef0ec;display:flex;flex-direction:column;gap:6px">
+        <p class="k">Temas para la próxima</p>
+        <p class="small muted">Lo que antes estaba en “Temas” queda acá como agenda de la próxima reunión.</p>
+        <span class="small">· Presupuesto de pauta de diciembre (lo trae Santi)</span>
+        <span class="small">· Quién cubre las historias los domingos</span>
+      </div>
+    </section>
+  </sc-if>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1280, "height": 1080}}'>
+
+const PE = {"manu": {"n": "Manu", "i": "M", "c": "background:#151714", "rol": "Jefe de marketing"}, "mica": {"n": "Mica", "i": "Mi", "c": "background:#b02a6c", "rol": "Planificación · CM Zebra"}, "agus": {"n": "Agustina", "i": "A", "c": "background:#6b43c4", "rol": "Creatividad · CM Kosmos"}, "luciano": {"n": "Luciano", "i": "L", "c": "background:#2b5fd9", "rol": "Diseño principal"}, "salva": {"n": "Salvador", "i": "S", "c": "background:#11786f", "rol": "Diseño"}, "maxi": {"n": "Maxi", "i": "Mx", "c": "background:#a34c00", "rol": "Edición de video"}, "santi": {"n": "Santi", "i": "St", "c": "background:#1f7a45", "rol": "Pauta"}};
+const REUS = [
+  { id: 1, eq: 'Marketing', t: 'Semanal de marketing', fecha: 'lun 16/11', d: 16, asis: ['manu', 'mica', 'agus'],
+    notas: ['El calendario se usa poco: muchas tareas se piden por WhatsApp.', 'Halloween: Kosmos funcionó mejor con video que con flyer.', 'Luciano está saturado; repartir diseño con Salvador.'],
+    acuerdos: [ ['Todo pedido de diseño entra por Marcebra, no por WhatsApp', 'mica', 'vie 20', 1], ['Pasarle a Salvador 2 piezas de Luciano', 'agus', 'mar 17', 1], ['Conclusión de pauta Zebra 14/11', 'santi', 'jue 19', 0], ['Set time del sábado confirmado', 'mica', 'mié 18', 0] ],
+    prev: ['Definir horario fijo de la semanal (Mica)'] },
+  { id: 3, eq: 'Marketing', t: 'Semanal de marketing', fecha: 'lun 9/11', d: 9, asis: ['manu', 'mica', 'agus'],
+    notas: ['Plan de Halloween cerrado.', 'Arrancar el rebranding de Kosmos con referencias.'],
+    acuerdos: [ ['Referencias para el rebranding', 'agus', 'lun 9', 1], ['Definir horario fijo de la semanal', 'mica', 'lun 16', 0] ], prev: [] },
+  { id: 4, eq: 'Marketing', t: 'Pauta de Halloween con Santi', fecha: 'lun 2/11', d: 2, asis: ['manu', 'mica', 'agus', 'santi'],
+    notas: ['Presupuesto total de Halloween para Zebra y Kosmos.', 'Kosmos prueba video; Zebra sigue con flyer.'],
+    acuerdos: [ ['Armar las dos campañas', 'santi', 'lun 2', 1], ['Pasarle los videos de Kosmos a Santi', 'maxi', 'mar 3', 1] ], prev: [] },
+];
+const EQS = ['Todos', 'Marketing', 'Encargados', 'RRPP', 'Dueños'];
+const sinTilde = (x) => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { q: '', eq: 'Todos', sel: 1, ok: {} }; }
+  renderVals() {
+    const s = this.state;
+    const reus = REUS.map((r) => ({ ...r, acuerdos: r.acuerdos.map((a, k) => ({ t: a[0], p: a[1], dia: a[2], ok: (s.ok[r.id + '-' + k] ?? a[3]) === 1, k })) }));
+    const q = sinTilde(s.q.trim());
+    const lista = reus.map((r) => {
+      let match = '';
+      if (q) {
+        const textos = [r.t].concat(r.notas, r.acuerdos.map((a) => a.t));
+        const hit = textos.find((x) => sinTilde(x).includes(q));
+        if (!hit) return null;
+        match = hit.length > 60 ? hit.slice(0, 60) : hit;
+      }
+      const hechos = r.acuerdos.filter((a) => a.ok).length;
+      return { ...r, match, asisTxt: r.asis.length + ' personas', ac: hechos + '/' + r.acuerdos.length, pick: () => this.setState({ sel: r.id }),
+        s: 'width:100%;display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:12px 16px;border:0;border-top:1px solid #eef0ec;font-family:inherit;color:#151714;cursor:pointer;min-height:44px;background:' + (s.sel === r.id ? '#eef2fb' : '#ffffff') };
+    }).filter(Boolean);
+    const todos = reus.flatMap((r) => r.acuerdos);
+    const cumplidos = todos.filter((a) => a.ok).length;
+    const vencidos = todos.filter((a) => !a.ok && /mar 17|mié 18|lun 16|jue 19/.test(a.dia)).length;
+    const kpis = [
+      { l: 'Acuerdos cumplidos', v: cumplidos + ' de ' + todos.length, sub: Math.round(cumplidos / todos.length * 100) + '% del total', s: 'font-size:22px;color:#17703c' },
+      { l: 'Pendientes', v: String(todos.length - cumplidos), sub: 'sin tildar', s: 'font-size:22px;color:#151714' },
+      { l: 'Vencidos', v: String(vencidos), sub: 'pasó la fecha y no se cumplió', s: 'font-size:22px;color:#a42a20' },
+      { l: 'Reuniones este mes', v: String(reus.length), sub: 'del equipo de marketing', s: 'font-size:22px;color:#151714' },
+    ];
+    const equipos = EQS.map((e) => ({ l: e, pick: () => this.setState({ eq: e }),
+      s: 'padding:0 12px;min-height:34px;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;' + (s.eq === e ? 'background:#151714;color:#ffffff;border:1px solid #151714' : 'background:#ffffff;color:#151714;border:1px solid #d5d8d1') }));
+    const r = reus.find((x) => x.id === s.sel);
+    const sel = r && { ...r, asis: r.asis.map((k) => PE[k]), asisTxt: r.asis.map((k) => PE[k].n).join(', '), hayPrev: r.prev.length > 0,
+      acuerdos: r.acuerdos.map((a) => {
+        const venc = !a.ok && /mar 17|mié 18|lun 16|jue 19/.test(a.dia);
+        return { ...a, p: PE[a.p], tick: a.ok ? '✓' : '',
+          est: a.ok ? 'Cumplido' : venc ? 'Vencido · ' + a.dia : 'Para el ' + a.dia, cls: a.ok ? 'st-publicado' : venc ? 'st-bloq' : 'st-pedido',
+          box: 'width:22px;height:22px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;' + (a.ok ? 'background:#1f8a4c;color:#ffffff' : 'border:2px solid #c9cec5'),
+          txt: a.ok ? 'color:#5f645c;text-decoration:line-through' : 'color:#151714',
+          s: 'width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid #eef0ec;background:#ffffff;font-family:inherit;font-size:14px;cursor:pointer;min-height:44px;flex-wrap:wrap',
+          toggle: () => this.setState({ ok: { ...s.ok, [r.id + '-' + a.k]: a.ok ? 0 : 1 } }) };
+      }) };
+    return { kpis, equipos, lista, vacio: lista.length === 0, q: s.q, buscar: (e) => this.setState({ q: e.target.value }), sel, haySel: !!sel };
+  }
+}
+
+</script>
+</body>
+</html>

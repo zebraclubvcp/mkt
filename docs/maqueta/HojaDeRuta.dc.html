@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Hoja de ruta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f3f4f2;color:#151714;font-family:"Onest",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45}
+a{color:#1f4fbf}a:hover{color:#163a8f}
+h1,h2,h3,p{margin:0}
+.nav a,.nav span{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;color:#4f544c;text-decoration:none;font-weight:500;white-space:nowrap}
+.nav a:hover{background:#e8eae5;color:#151714}
+.nav a.on{background:#151714;color:#ffffff}
+.nav span{color:#8a8f86}
+.cnt{font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:999px;background:#fbe7e5;color:#a42a20;text-align:center}
+.card{background:#ffffff;border:1px solid #e2e4df;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.st-pedido{background:#eef0ec;color:#4a4f47}.st-proceso{background:#e7eefc;color:#1f4fbf}.st-revision{background:#fbf0dc;color:#7a4800}.st-aprobado{background:#efe8fb;color:#5a37b0}.st-publicado{background:#e5f4ea;color:#17703c}.st-bloq{background:#fbe7e5;color:#a42a20}
+.f-Historia{background:#fbe6f0;color:#9c2459}.f-Post{background:#e7eefc;color:#1f4fbf}.f-Reel{background:#efe8fb;color:#5a37b0}.f-Carrusel{background:#e3f1f6;color:#145f78}.f-Pauta{background:#e5f4ea;color:#17703c}.f-Flyer{background:#fbf0dc;color:#7a4800}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffffff;flex:none;border:2px solid #ffffff}
+.btn{border:0;background:#151714;color:#ffffff;border-radius:10px;padding:0 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#2c302b;color:#ffffff}
+.btn2{border:1px solid #d5d8d1;background:#ffffff;color:#151714;border-radius:10px;padding:0 12px;font-weight:600;font-size:13px;cursor:pointer;min-height:36px;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn2:hover{background:#f3f4f2;color:#151714}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:#5f645c}
+.small{font-size:12px}
+.k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f645c}
+.help{display:flex;gap:10px;align-items:flex-start;background:#f7f8f6;border:1px dashed #cfd3cb;border-radius:12px;padding:10px 14px;color:#454a43;font-size:13px}
+.bar{height:8px;border-radius:999px;background:#eceee9;overflow:hidden;display:flex}
+.row{display:flex;align-items:center;gap:12px}
+input,textarea,select{font-family:inherit;font-size:14px;color:#151714;border:1px solid #d5d8d1;border-radius:10px;padding:9px 11px;background:#ffffff;box-sizing:border-box}
+@media (max-width:760px){.nav{grid-auto-flow:column;overflow-x:auto}}
+</style>
+</helmet>
+<div style="min-height:100%;display:flex;flex-wrap:wrap;align-items:flex-start;background:#f3f4f2">
+<nav aria-label="Secciones" style="flex:1 1 200px;max-width:240px;box-sizing:border-box;padding:22px 14px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:10px;padding:0 6px"><div aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:1.5px solid #151714;background:repeating-linear-gradient(-45deg,#151714 0 5px,#ffffff 5px 9px);flex:none"></div><div><b style="font-size:16px;letter-spacing:-.01em">Marcebra</b><div class="muted" style="font-size:11px">Mica · Planificación</div></div></div><div class="nav" style="display:grid;gap:2px"><a href="Main.dc.html">Inicio<b class="cnt">6</b></a><a href="Calendario.dc.html">Calendario</a><span>Tablero <i class="small" style="font-style:normal">igual que hoy</i></span><a href="Equipo.dc.html">Equipo y carga</a><a href="Pauta.dc.html">Pauta</a><a href="HojaDeRuta.dc.html" class="on">Hoja de ruta</a><a href="Reuniones.dc.html">Reuniones</a></div></nav>
+<main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:24px 24px 48px">
+<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+<header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px">
+  <div>
+    <h1 style="font-size:26px;letter-spacing:-.02em">Hoja de ruta</h1>
+    <p class="muted">Las ideas grandes, paso a paso. Tocá una para ver y tildar sus pasos.</p>
+  </div>
+  <button type="button" class="btn">+ Nueva idea</button>
+</header>
+
+<div class="card" style="padding:18px;display:flex;flex-wrap:wrap;gap:20px;align-items:center">
+  <div style="flex:2 1 320px;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:15px">Noviembre</b><b style="font-size:22px">{{hechos}} <span class="muted" style="font-size:14px;font-weight:500">de {{total}} pasos</span></b></div>
+    <div class="bar" style="height:12px"><div style="{{totalW}}"></div></div>
+  </div>
+  <div style="flex:1 1 220px;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:#e5f4ea;color:#17703c">
+    <b style="font-size:24px">{{semana}}</b><span class="small">pasos tildados esta semana entre Manu, Mica y Agustina</span>
+  </div>
+</div>
+
+<sc-for list="{{horizontes}}" as="h" hint-placeholder-count="2">
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <div class="row" style="gap:8px"><p class="k">{{h.nom}}</p><span class="small muted">{{h.nota}}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">
+      <sc-for list="{{h.ideas}}" as="i" hint-placeholder-count="3">
+        <button type="button" onClick="{{i.pick}}" style="{{i.card}}">
+          <div style="display:flex;gap:14px;align-items:center;width:100%">
+            <div style="{{i.ring}}"><div style="width:44px;height:44px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">{{i.pct}}</div></div>
+            <div style="flex:1;min-width:0;text-align:left">
+              <b style="font-size:15px;display:block">{{i.t}}</b>
+              <span class="small muted">{{i.marca}} · {{i.cuenta}}</span>
+            </div>
+          </div>
+          <div style="text-align:left;width:100%;padding:8px 10px;border-radius:10px;background:#f7f8f6" class="small">
+            <span class="muted">{{i.proxLbl}}</span> <b style="font-weight:600">{{i.prox}}</b>
+          </div>
+          <div class="row" style="gap:0;width:100%">
+            <sc-for list="{{i.ps}}" as="pp" hint-placeholder-count="2"><span class="av" style="{{pp.c}};margin-right:-6px">{{pp.i}}</span></sc-for>
+            <span class="small muted" style="margin-left:auto">{{i.estado}}</span>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+</sc-for>
+
+<sc-if value="{{haySel}}" hint-placeholder-val="{{ true }}">
+  <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:12px;border:2px solid #151714">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <div><p class="k">Pasos</p><h2 style="font-size:18px">{{sel.t}}</h2><p class="small muted">{{sel.obj}}</p></div>
+      <b style="font-size:18px">{{sel.cuenta}}</b>
+    </div>
+    <div class="bar" style="height:10px"><div style="{{sel.w}}"></div></div>
+    <sc-if value="{{festejo}}" hint-placeholder-val="{{ false }}">
+      <p role="status" style="font-weight:600;color:#17703c">{{festejo}}</p>
+    </sc-if>
+    <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{sel.pasos}}" as="p" hint-placeholder-count="5">
+        <li>
+          <button type="button" onClick="{{p.toggle}}" style="{{p.s}}">
+            <span aria-hidden="true" style="{{p.box}}">{{p.tick}}</span>
+            <span style="{{p.txt}}">{{p.t}}</span>
+            <span class="small muted" style="margin-left:auto">{{p.quien}} · {{p.dia}}</span>
+          </button>
+        </li>
+      </sc-for>
+    </ul>
+  </div>
+</sc-if>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1280, "height": 1080}}'>
+
+const PE = {"manu": {"n": "Manu", "i": "M", "c": "background:#151714", "rol": "Jefe de marketing"}, "mica": {"n": "Mica", "i": "Mi", "c": "background:#b02a6c", "rol": "Planificación · CM Zebra"}, "agus": {"n": "Agustina", "i": "A", "c": "background:#6b43c4", "rol": "Creatividad · CM Kosmos"}, "luciano": {"n": "Luciano", "i": "L", "c": "background:#2b5fd9", "rol": "Diseño principal"}, "salva": {"n": "Salvador", "i": "S", "c": "background:#11786f", "rol": "Diseño"}, "maxi": {"n": "Maxi", "i": "Mx", "c": "background:#a34c00", "rol": "Edición de video"}, "santi": {"n": "Santi", "i": "St", "c": "background:#1f7a45", "rol": "Pauta"}};
+const IDEAS = [
+  { id: 1, h: 'ahora', t: 'Rebranding Kosmos', marca: 'Kosmos', color: '#6b43c4', obj: 'Nueva identidad para la temporada de verano', ps: ['agus', 'manu'], estado: 'En marcha',
+    pasos: [ ['Relevar referencias de marcas similares', 'agus', 'lun 9', 1], ['Definir concepto y tono', 'manu', 'mié 11', 1], ['Bocetos de logo (3 opciones)', 'agus', 'vie 13', 1], ['Elegir logo con los dueños', 'manu', 'mar 17', 1], ['Elegir paleta final', 'agus', 'vie 20', 0], ['Armar plantillas de historias', 'agus', 'mar 24', 0], ['Lanzamiento en redes', 'mica', 'sáb 28', 0] ] },
+  { id: 2, h: 'ahora', t: 'Temporada de verano 2027', marca: 'Zebra Club', color: '#151714', obj: 'Plan de comunicación de enero y febrero', ps: ['manu', 'mica'], estado: 'En desarrollo',
+    pasos: [ ['Calendario de fechas fuertes', 'mica', 'jue 12', 1], ['Presupuesto de pauta por mes', 'manu', 'mar 17', 1], ['Propuesta de artistas para comunicar', 'manu', 'vie 20', 0], ['Piezas madre de campaña', 'mica', 'jue 26', 0], ['Presentación a dueños', 'manu', 'lun 30', 0] ] },
+  { id: 3, h: 'ahora', t: 'Contenido con clientes', marca: 'Zebra Club', color: '#151714', obj: 'Más video de gente real en la noche', ps: ['mica', 'maxi'], estado: 'En marcha',
+    pasos: [ ['Guion de 3 formatos', 'mica', 'lun 9', 1], ['Prueba en una noche', 'maxi', 'sáb 14', 1], ['Revisar qué funcionó', 'mica', 'mié 18', 1], ['Fijar el formato ganador', 'mica', 'vie 20', 0] ] },
+  { id: 4, h: 'proximo', t: 'Base de datos de clientes', marca: 'General', color: '#11786f', obj: 'Juntar contactos de quienes compran', ps: ['manu'], estado: 'Idea',
+    pasos: [ ['Ver qué datos da la ticketera', 'manu', 'dic', 0], ['Definir qué se guarda y con qué permiso', 'manu', 'dic', 0] ] },
+];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sel: 1, hechos: {}, festejo: '', semana: 6 }; }
+  renderVals() {
+    const s = this.state;
+    const ideas = IDEAS.map((i) => {
+      const pasos = i.pasos.map((p, k) => ({ t: p[0], quien: PE[p[1]].n, dia: p[2], ok: (s.hechos[i.id + '-' + k] ?? p[3]) === 1, k }));
+      const n = pasos.filter((p) => p.ok).length, pct = Math.round(n / pasos.length * 100);
+      const prox = pasos.find((p) => !p.ok);
+      const on = s.sel === i.id;
+      return { ...i, pasos, n, pct: pct + '%', cuenta: n + ' de ' + pasos.length + ' pasos', ps: i.ps.map((k) => PE[k]),
+        proxLbl: prox ? 'Próximo:' : '¡Terminada!', prox: prox ? prox.t + ' · ' + prox.dia : '',
+        ring: 'width:58px;height:58px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:conic-gradient(' + i.color + ' 0 ' + pct + '%, #eceee9 0)',
+        card: 'display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:16px;border-radius:14px;background:#ffffff;cursor:pointer;font-family:inherit;color:#151714;' + (on ? 'border:2px solid #151714' : 'border:1px solid #e2e4df'),
+        w: 'width:' + pct + '%;background:' + i.color + ';transition:width .3s',
+        pick: () => this.setState({ sel: i.id, festejo: '' }) };
+    });
+    const total = ideas.reduce((a, i) => a + i.pasos.length, 0), hechos = ideas.reduce((a, i) => a + i.n, 0);
+    const horizontes = [ ['ahora', 'Ahora', 'lo que se mueve este mes'], ['proximo', 'Próximo', 'arranca cuando se libere algo'] ]
+      .map(([id, nom, nota]) => ({ nom, nota, ideas: ideas.filter((i) => i.h === id) }));
+    const sel0 = ideas.find((i) => i.id === s.sel);
+    const sel = sel0 && { ...sel0, pasos: sel0.pasos.map((p) => ({ ...p,
+      tick: p.ok ? '✓' : '',
+      box: 'width:24px;height:24px;border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;' + (p.ok ? 'background:' + sel0.color + ';color:#ffffff' : 'border:2px solid #c9cec5'),
+      txt: p.ok ? 'color:#5f645c;text-decoration:line-through' : 'color:#151714;font-weight:500',
+      s: 'width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;border:1px solid #eef0ec;background:' + (p.ok ? '#f7f8f6' : '#ffffff') + ';cursor:pointer;font-family:inherit;font-size:14px;text-align:left;min-height:44px',
+      toggle: () => {
+        const nuevo = p.ok ? 0 : 1;
+        const restan = sel0.pasos.length - sel0.n - (nuevo ? 1 : -1);
+        this.setState({ hechos: { ...s.hechos, [sel0.id + '-' + p.k]: nuevo }, semana: s.semana + (nuevo ? 1 : -1),
+          festejo: nuevo ? (restan === 0 ? '¡Idea terminada! Pasa a Terminadas.' : '¡Bien! Faltan ' + restan + (restan === 1 ? ' paso.' : ' pasos.')) : '' });
+      } })) };
+    return { horizontes, sel, haySel: !!sel, festejo: s.festejo, hechos, total, semana: s.semana,
+      totalW: 'width:' + Math.round(hechos / total * 100) + '%;background:#1f8a4c;transition:width .3s' };
+  }
+}
+
+</script>
+</body>
+</html>
