@@ -421,6 +421,23 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .coment .c small { display: block; color: var(--muted); font-size: 11px; }
 .coment .c span { white-space: pre-wrap; }
 .coment .c.dv div { background: var(--warn-bg); border-color: transparent; }
+.coment .c.pend > div { background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 30%, var(--line)); }
+.coment .c small .pill { vertical-align: 1px; }
+.coment .c .c-acc { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.coment .c .c-acc .btn.danger { font-size: 12px; }
+.trabada { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--bad-bg); color: var(--bad); font-size: 13px; border: 1px solid color-mix(in srgb, var(--bad) 30%, transparent); }
+.trabada span { flex: 1 1 220px; color: var(--fg); }
+.cm-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.cm-h small, .cm-add > small { font-size: 12px; color: var(--muted); }
+.cm-add { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+.cm-add textarea { min-height: 56px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); resize: vertical; font: inherit; color: inherit; }
+.cm-ops { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.cm-ops .btn { margin-left: auto; }
+.cm-op { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.field .cm-op { font-size: 13px; color: var(--fg); }
+.field .cm-op input, .field .cm-op select { width: auto; padding: 6px 8px; }
+.field .cm-op input[type="checkbox"] { width: 18px; height: 18px; padding: 0; margin: 0; }
+.field .cm-h label { font-size: 13px; font-weight: 600; color: var(--fg); }
 .coment-add { display: flex; gap: 6px; align-items: flex-end; }
 .coment-add textarea { flex: 1; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); resize: vertical; }
 @media (max-width: 900px) {
@@ -657,7 +674,7 @@ const FIREBASE_CONFIG = {
 const COLS = ['tareas', 'fechas', 'campanias', 'freelancers'];
 
 /* ===== estado ===== */
-let S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [] };
+let S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [] };
 let temasBloqueado = false, temasListo = false;
 let notasBloqueado = false, notasListo = false;
 const ultimo = { tareas: new Map(), fechas: new Map(), campanias: new Map(), freelancers: new Map(), temas: new Map(), notas: new Map() };
@@ -716,6 +733,7 @@ async function guardar() {
       if (op.borrar) {
         await db.collection(op.col).doc(op.borrar).delete();
         if (op.col === 'tareas') { const qs = await db.collection('imagenes').where('tarea', '==', op.borrar).get(); qs.forEach((d) => d.ref.delete()); }
+        if (op.col === 'tareas' || op.col === 'fechas') borrarComentarios(op.borrar);
         continue;
       }
       if (op.col === 'tareas' && op.c.imagenes && op.c.imagenes.some((x) => typeof x === 'string' && x.startsWith('data:'))) {
@@ -747,9 +765,9 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function cortarEscucha() {
   desuscribir.forEach((f) => { try { f(); } catch (e) {} }); desuscribir = [];
   document.querySelectorAll('.wa-bar').forEach((x) => x.remove());
-  S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [] };
+  S = { tareas: [], fechas: [], campanias: [], freelancers: [], temas: [], notas: [], comentarios: [] };
   Object.values(ultimo).forEach((m) => m.clear());
-  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false;
+  listo = false; temasListo = false; temasBloqueado = false; notasListo = false; notasBloqueado = false; comentsListo = false; comentsBloqueado = false; porTarea = new Map();
 }
 function escuchar() {
   let pendientes = new Set(COLS);
@@ -775,6 +793,7 @@ function escuchar() {
     const cambios = typeof qs.docChanges === 'function' ? qs.docChanges().length : 1;
     if (!pendientes.size && (!listo || primera || cambios)) { listo = true; pedirRender(); }
   }, (err) => { console.error(err); gate('No tenés permiso para ver estos datos. Pedile a Manu que agregue tu mail.', true); })));
+  escucharComentarios();
   if (esAdmin()) { escucharTemas(); escucharNotas(); }
 }
 function escucharTemas() {
@@ -813,6 +832,28 @@ function escucharNotas() {
     notasListo = true; notasBloqueado = false;
     if (listo) pedirRender();
   }, (err) => { console.error(err); notasBloqueado = true; notasListo = true; if (listo) pedirRender(); }));
+}
+/* Comentarios: colección propia, un documento por comentario (no pasa por guardar(), así dos personas pueden escribir a la vez).
+   "tarea" es el id de la tarea o de la fecha del calendario. Se escucha completa y se agrupa por tarea. */
+let comentsListo = false, comentsBloqueado = false, porTarea = new Map();
+let hiloVivo = null; /* repinta la conversación del modal abierto cuando llegan comentarios nuevos */
+function escucharComentarios() {
+  desuscribir.push(db.collection('comentarios').onSnapshot((qs) => {
+    const out = []; qs.forEach((d) => out.push({ ...d.data(), id: d.id }));
+    S.comentarios = out;
+    porTarea = new Map();
+    out.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0)).forEach((c) => { if (!porTarea.has(c.tarea)) porTarea.set(c.tarea, []); porTarea.get(c.tarea).push(c); });
+    comentsListo = true; comentsBloqueado = false;
+    if (hiloVivo) hiloVivo();
+    if (listo) pedirRender();
+  }, (err) => { console.error(err); comentsBloqueado = true; comentsListo = true; if (hiloVivo) hiloVivo(); if (listo) pedirRender(); }));
+}
+const comentsDe = (o) => (o && o.id && porTarea.get(o.id)) || [];
+const pendienteDe = (o) => comentsDe(o).find((c) => c.pendiente && !c.resuelto) || null;
+const trabada = (o) => !!pendienteDe(o);
+async function borrarComentarios(id) {
+  try { const qs = await db.collection('comentarios').where('tarea', '==', id).get(); qs.forEach((d) => d.ref.delete().catch((e) => console.error(e))); }
+  catch (e) { console.error(e); }
 }
 async function cargarImagen(id) {
   if (imgCache.has(id)) return imgCache.get(id);
@@ -920,6 +961,8 @@ const TXT_AVISO = {
   paso: (o, a, ev) => a + ' te asignó un paso en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
   proyecto: (o, a) => a + ' te puso a cargo del proyecto "' + o.titulo + '"',
   comentario: (o, a, ev) => a + ' comentó en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
+  pendiente: (o, a, ev) => a + ' te pidió algo en "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
+  resuelto: (o, a, ev) => a + ' resolvió el pendiente de "' + o.titulo + '"' + (ev.txt ? ': ' + ev.txt : ''),
   dato: (o, a, ev) => a + ' te pidió un dato en la campaña "' + (o.nombre || o.titulo) + '"' + (ev.txt ? ': ' + ev.txt : ''),
 };
 const textoAviso = (o, ev) => (TXT_AVISO[ev.tipo] || TXT_AVISO.comentario)(o, persona(ev.autor).nombre.split(' ')[0] || 'Alguien', ev);
@@ -1062,7 +1105,7 @@ function tarjeta(t, opts = {}) {
   const ent = h('span', { class: vencida(t) ? 'late' : (!hecha(t) && n <= 1 ? 'soon' : '') }, (vencida(t) ? 'Vencida · ' : 'Entrega ') + cuando(t.entrega));
   const sig = siguiente(t);
   const card = h('div', { class: 'task', style: '--bcol:' + marca(t.marca).color },
-    h('div', { class: 'task-top' }, h('span', { class: 'task-title' }, t.titulo), estadoPill(t.estado)),
+    h('div', { class: 'task-top' }, h('span', { class: 'task-title' }, t.titulo), trabada(t) ? trabadaPill(t) : null, estadoPill(t.estado)),
     h('div', { class: 'task-meta' }, marcaChip(t.marca), h('span', {}, tipoTxt(t)), t._fecha ? h('span', { class: 'pill p-muted' }, 'Calendario') : null, ent, t.publica ? h('span', {}, 'Publica ' + fCorta(t.publica)) : null, t.prioridad === 'Urgente' || t.prioridad === 'Alta' ? h('span', { class: 'pill ' + (t.prioridad === 'Urgente' ? 'p-bad' : 'p-warn') }, t.prioridad) : null),
     h('div', { class: 'task-meta' }, opts.sinResp ? null : h('span', { style: 'display:inline-flex;gap:6px;align-items:center' }, ...resps(t).map(av), nombresResp(t)),
       h('span', {}, (t.horasReal || 0) + ' / ' + (t.horasEst || 0) + ' h'), t.link ? h('span', {}, 'Entregable en Drive') : null, t.imagenes && t.imagenes.length ? h('span', {}, t.imagenes.length + ' imág.') : null, t.devoluciones && t.devoluciones.length ? h('span', {}, t.devoluciones.length + (t.devoluciones.length === 1 ? ' devolución' : ' devoluciones')) : null),
@@ -1093,10 +1136,10 @@ function fila(t, opts = {}) {
   const r = h('div', { class: 'row', tabindex: '0', role: 'button', 'aria-label': t.titulo, onclick: () => abrir(t), onkeydown: (e) => { if (e.key === 'Enter') abrir(t); } },
     h('span', { class: 'st' }, estadoPill(t.estado)),
     h('div', { class: 'tt' },
-      h('b', {}, h('i', { class: 'mk', style: 'background:' + marca(t.marca).color }), h('span', { class: 't' }, t.titulo), t.prioridad === 'Urgente' || t.prioridad === 'Alta' ? h('span', { class: 'prio ' + t.prioridad }, t.prioridad) : null),
+      h('b', {}, h('i', { class: 'mk', style: 'background:' + marca(t.marca).color }), h('span', { class: 't' }, t.titulo), trabada(t) ? trabadaPill(t) : null, t.prioridad === 'Urgente' || t.prioridad === 'Alta' ? h('span', { class: 'prio ' + t.prioridad }, t.prioridad) : null),
       h('small', {}, h('span', {}, marca(t.marca).nombre), h('span', {}, tipoTxt(t)), t._fecha ? h('span', {}, 'Calendario') : null,
         (t.devoluciones || []).length ? h('span', {}, t.devoluciones.length + (t.devoluciones.length === 1 ? ' devolución' : ' devoluciones')) : null,
-        (t.comentarios || []).length ? h('span', {}, t.comentarios.length + ' coment.') : null,
+        (t.comentarios || []).length + comentsDe(t).length ? h('span', {}, ((t.comentarios || []).length + comentsDe(t).length) + ' coment.') : null,
         t.link ? h('span', {}, 'Drive ✓') : null)),
     h('div', { class: 'fe' + (late ? ' late' : soon ? ' soon' : '') }, h('b', {}, (late ? 'Vencida · ' : '') + cuando(fecha).replace(/^./, (c) => c.toUpperCase())), otra ? h('small', {}, otra) : null),
     h('div', { class: 'avs' }, ...resps(t).map(av)),
@@ -1219,6 +1262,7 @@ function calCard(x) {
   const top = [
     x.f && o.hora ? h('span', { class: 'cc-hora' }, o.hora) : null,
     esEntrega ? h('span', { class: 'cc-tag' }, 'Entrega') : null,
+    trabada(o) ? trabadaPill(o) : null,
     prio ? h('span', { class: 'prio ' + prio }, prio) : null,
   ].filter(Boolean);
   const rs = resps(o);
@@ -2070,7 +2114,7 @@ function verImagenes(refs, inicio, titulo) {
 }
 
 /* ===== modales ===== */
-function cerrarModal() { $('#modal').replaceChildren(); document.removeEventListener('keydown', escModal); }
+function cerrarModal() { hiloVivo = null; $('#modal').replaceChildren();document.removeEventListener('keydown', escModal); }
 function escModal(e) { if (e.key === 'Escape') cerrarModal(); }
 function modal(titulo, cuerpo, pie, opts = {}) {
   const scrim = opts.panel
@@ -2082,7 +2126,7 @@ function modal(titulo, cuerpo, pie, opts = {}) {
     h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': titulo }, h('h2', {}, titulo), cuerpo, pie));
   $('#modal').replaceChildren(scrim);
   document.addEventListener('keydown', escModal);
-  if (!opts.panel) { const first = scrim.querySelector('input:not([readonly]), select:not([disabled]), textarea:not([readonly])'); if (first) first.focus(); }
+  if (!opts.panel) { const first = scrim.querySelector('input:not([readonly]):not([data-nofoco]), select:not([disabled]):not([data-nofoco]), textarea:not([readonly]):not([data-nofoco])'); if (first) first.focus(); }
 }
 const campo = (label, input, full) => h('div', { class: 'field' + (full ? ' full' : '') }, h('label', { for: input.id }, label), input);
 /* Selector de chips: se usa como un select (tiene .value), pero se ve todo de un vistazo y se elige con un toque. */
@@ -2125,6 +2169,81 @@ function selectorPersonas(inicial, soloLectura) {
     p.nombre + (S.freelancers.includes(p) ? ' · free' : ''))));
   pintar();
   return { el, valor: () => elegidos.slice() };
+}
+
+/* Conversación de una tarea o fecha: devoluciones (resaltadas), comentarios viejos guardados dentro de la tarea
+   y comentarios de la colección "comentarios". Un comentario puede ser un pedido pendiente para alguien: mientras
+   no se resuelva, la tarea queda trabada. Devuelve la franja de "Trabada" (va arriba del modal) y el bloque. */
+const nombre1 = (id) => (persona(id).nombre || 'Alguien').split(' ')[0];
+const trabadaPill = (o) => { const p = pendienteDe(o); return h('span', { class: 'pill p-bad', title: p ? nombre1(p.de) + ' espera a ' + nombre1(p.para) + ': ' + p.texto : '' }, 'Trabada'); };
+const horaDe = (ts) => { const d = new Date(ts); return cuando(iso(d)) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+function conversacion(x) {
+  const puedeAvisar = () => esAdmin() || esDe(x, ui.yo);
+  const resolver = (c) => {
+    db.collection('comentarios').doc(c.id).update({ resuelto: true, resueltoPor: ui.yo, resueltoTs: Date.now() })
+      .catch((e) => { console.error(e); toast(e && e.code === 'permission-denied' ? 'No tenés permiso para resolver esto' : 'No se pudo guardar: revisá la conexión'); });
+    if (puedeAvisar()) { avisar(x, 'resuelto', [c.de, c.para], c.texto); guardar(); }
+    render(); toast(comentsDe(x).filter((y) => y.pendiente && !y.resuelto && y.id !== c.id).length ? 'Resuelto. Queda otro pendiente.' : 'Resuelto. La tarea ya no está trabada.');
+  };
+  const puedeResolver = (c) => ui.yo === c.de || ui.yo === c.para;
+  const franja = h('div', { class: 'full', hidden: true });
+  const hilo = h('div', { class: 'coment' });
+  const tiempo = (c) => c.ts || parse(c.fecha).getTime();
+  const pintar = () => {
+    const p = pendienteDe(x);
+    franja.hidden = !p;
+    franja.replaceChildren(...(p ? [h('div', { class: 'trabada', role: 'status' }, h('b', {}, 'Trabada'),
+      h('span', {}, nombre1(p.de) + ' espera a ' + nombre1(p.para) + ': “' + p.texto + '”'),
+      puedeResolver(p) ? h('button', { type: 'button', class: 'btn small primary', onclick: () => resolver(p) }, 'Ya lo resolví') : null)] : []));
+    const items = [
+      ...(x.devoluciones || []).map((d) => ({ autor: d.autor, fecha: d.fecha, texto: d.texto, dv: true })),
+      ...(x.comentarios || []).map((c) => ({ autor: c.autor, fecha: c.fecha, ts: c.ts, texto: c.texto })),
+      ...comentsDe(x).map((c) => ({ autor: c.de, ts: c.ts, texto: c.texto, doc: c })),
+    ].sort((a, b) => tiempo(a) - tiempo(b));
+    hilo.replaceChildren(...(items.length ? items.map((c) => {
+      const d = c.doc, abierto = d && d.pendiente && !d.resuelto;
+      const chip = d && d.pendiente ? h('span', { class: 'pill ' + (abierto ? 'p-bad' : 'p-ok') }, abierto ? 'Pendiente · lo debe ' + nombre1(d.para) : 'Resuelto' + (d.resueltoPor ? ' por ' + nombre1(d.resueltoPor) : '')) : null;
+      const acciones = d ? [
+        abierto && puedeResolver(d) ? h('button', { type: 'button', class: 'btn small', onclick: () => resolver(d) }, 'Ya lo resolví') : null,
+        d.de === ui.yo ? (() => { const b = botonPeligro('Borrar', () => db.collection('comentarios').doc(d.id).delete().then(() => toast('Comentario borrado')).catch((e) => { console.error(e); toast('No se pudo borrar'); })); b.classList.add('small'); return b; })() : null,
+      ].filter(Boolean) : [];
+      return h('div', { class: 'c' + (c.dv ? ' dv' : '') + (abierto ? ' pend' : '') }, av(c.autor),
+        h('div', {}, h('small', {}, persona(c.autor).nombre + ' · ' + (c.ts ? horaDe(c.ts) : cuando(c.fecha)) + (c.dv ? ' · pidió cambios' : ''), chip ? ' ' : '', chip),
+          h('span', {}, c.texto),
+          acciones.length ? h('p', { class: 'c-acc' }, ...acciones) : null));
+    }) : [h('span', { style: 'font-size:12px;color:var(--muted)' }, 'Todavía no hay comentarios. Escribí acá dudas, cambios o lo que te falta para avanzar.')]));
+  };
+  hiloVivo = pintar;
+  pintar();
+  const ta = h('textarea', { id: 'cm-texto', 'data-nofoco': true, placeholder: 'Escribí un comentario o una duda…', rows: 2 });
+  const opciones = EQUIPO.filter((p) => p.id !== ui.yo);
+  const sugerido = esDe(x, ui.yo) ? (x.pedidoPor && x.pedidoPor !== ui.yo ? x.pedidoPor : 'mica') : (resps(x).find((id) => id !== ui.yo && EQUIPO.some((p) => p.id === id)) || 'mica');
+  const para = sel('cm-para', opciones.map((p) => [p.id, p.nombre]), opciones.some((p) => p.id === sugerido) ? sugerido : opciones[0].id);
+  para.dataset.nofoco = '';
+  const paraWrap = h('label', { class: 'cm-op', hidden: true }, 'A quién', para);
+  const chk = h('input', { type: 'checkbox', id: 'cm-pend', 'data-nofoco': true, onchange: () => { paraWrap.hidden = !chk.checked; } });
+  const enviar = h('button', { type: 'button', class: 'btn small primary', onclick: () => {
+    const txt = ta.value.trim(); if (!txt) { toast('Escribí algo antes de enviar'); ta.focus(); return; }
+    const pend = chk.checked, aQuien = pend ? para.value : '';
+    db.collection('comentarios').doc().set({ tarea: x.id, de: ui.yo, texto: txt, ts: Date.now(), pendiente: pend, para: aQuien, resuelto: false })
+      .catch((e) => { console.error(e); toast(e && e.code === 'permission-denied' ? 'No tenés permiso para comentar' : 'No se pudo enviar: revisá la conexión'); });
+    if (puedeAvisar()) {
+      const otros = [...resps(x), ...(x.pedidoPor ? [x.pedidoPor] : [])].filter((id) => id !== aQuien);
+      if (pend) { registrarAviso(x, 'comentario', otros, txt); avisar(x, 'pendiente', [aQuien], txt); }
+      else avisar(x, 'comentario', otros, txt);
+      guardar();
+    }
+    ta.value = ''; chk.checked = false; paraWrap.hidden = true;
+    render(); toast(pend ? 'Listo: quedó pendiente para ' + nombre1(aQuien) : 'Comentario enviado');
+  } }, 'Enviar');
+  const bloque = h('div', { class: 'full field' },
+    h('div', { class: 'cm-h' }, h('label', { for: 'cm-texto' }, 'Conversación'), h('small', {}, 'La ven quien pide y quien hace')),
+    hilo,
+    comentsBloqueado ? h('p', { class: 'warnbox', style: 'margin:0' }, 'Los comentarios todavía no están activados. Avisale a Manu.')
+      : h('div', { class: 'cm-add' }, ta,
+        h('div', { class: 'cm-ops' }, h('label', { class: 'cm-op' }, chk, 'Es un pedido que queda pendiente'), paraWrap, enviar),
+        h('small', {}, 'Si es un pedido pendiente, la tarea queda trabada hasta que esa persona lo resuelva.')));
+  return { franja, bloque };
 }
 
 function abrirTarea(t, base) {
@@ -2197,24 +2316,11 @@ function abrirTarea(t, base) {
   };
   pintarThumbs();
   const refsLinks = (x.referencias || '').split(/\s+/).filter((u) => /^https?:\/\//.test(u));
-  /* Conversación de la tarea: comentarios del equipo y devoluciones (resaltadas), en orden. */
-  const hilo = h('div', { class: 'coment' });
-  const pintarHilo = () => {
-    const items = [...(x.devoluciones || []).map((d) => ({ ...d, dv: true })), ...(x.comentarios || [])].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || '') || (a.ts || 0) - (b.ts || 0));
-    hilo.replaceChildren(...(items.length ? items.map((c) => h('div', { class: 'c' + (c.dv ? ' dv' : '') }, av(c.autor), h('div', {}, h('small', {}, persona(c.autor).nombre + ' · ' + cuando(c.fecha) + (c.dv ? ' · pidió cambios' : '')), h('span', {}, c.texto))))
-      : [h('span', { style: 'font-size:12px;color:var(--muted)' }, 'Todavía no hay comentarios.')]));
-  };
-  pintarHilo();
-  const comentTa = h('textarea', { id: 'tt-coment', placeholder: 'Escribí un comentario o una duda…', rows: 1 });
-  const hist = t ? h('div', { class: 'full field' }, h('label', { for: 'tt-coment' }, 'Comentarios'), hilo,
-    puedeEntregar ? h('div', { class: 'coment-add' }, comentTa, h('button', { type: 'button', class: 'btn small primary', onclick: () => {
-      const txt = comentTa.value.trim(); if (!txt) { comentTa.focus(); return; }
-      x.comentarios = [...(x.comentarios || []), { autor: ui.yo, fecha: HOY, ts: Date.now(), texto: txt }];
-      avisar(x, 'comentario', [...resps(x), ...(x.pedidoPor ? [x.pedidoPor] : [])], txt);
-      comentTa.value = ''; pintarHilo(); guardar(); render(); toast('Comentario enviado');
-    } }, 'Enviar')) : null) : null;
+  /* Conversación de la tarea: comentarios, pendientes y devoluciones (ver conversacion()). */
+  const conv = t ? conversacion(x) : null;
   const seccion = (txt) => h('p', { class: 'full', style: 'margin:6px 0 0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)' }, txt);
   const cuerpo = h('div', { class: 'form' },
+    conv ? conv.franja : null,
     seccion('El pedido'),
     campo('Qué hay que hacer', f.titulo, true), campo('Marca', f.marca), campo('Tipo', f.tipo),
     h('div', { class: 'field full' }, h('label', {}, 'Responsables (podés marcar más de uno)'), respSel.el), campo('Fecha de entrega', f.entrega), campo('Fecha de publicación', f.publica), fechasNota, campo('Prioridad', f.prioridad),
@@ -2228,7 +2334,7 @@ function abrirTarea(t, base) {
     campo('Link del entregable (Drive)', f.link, true),
     t && x.link ? h('a', { class: 'full link-out', href: x.link, target: '_blank', rel: 'noopener' }, 'Abrir el entregable ↗') : null,
     campo('Estado', f.estado), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', f.horasEst), campo('Horas reales', f.horasReal)),
-    hist,
+    conv ? conv.bloque : null,
     t ? h('p', { class: 'full', style: 'margin:0;font-size:12px;color:var(--muted)' }, 'Pedido por ' + (persona(x.pedidoPor).nombre || '—')) : null,
     !admin && !propia ? h('p', { class: 'full warnbox', style: 'color:var(--muted);background:var(--surface-2)' }, 'Esta tarea es de ' + nombresResp(x) + '. Solo la puede editar esa persona o quien asigna tareas.') : null);
   const guardarTarea = () => {
@@ -2306,11 +2412,12 @@ function abrirFecha(fe, fechaInicial) {
       avisar(x, 'asignada', resps(x).filter((id) => !antesF.includes(id)));
       guardar(); cerrarModal(); render(); toast(fe ? 'Fecha guardada' : 'Fecha agregada');
     } }, fe ? 'Guardar' : 'Agregar fecha') : null));
-  modal(fe ? (admin ? 'Editar fecha' : x.titulo) : 'Nueva fecha', h('div', { class: 'form' }, campo('Título', f.titulo, true), campo('Tipo', f.tipo), campo('Marca', f.marca),
+  const conv = fe ? conversacion(x) : null;
+  modal(fe ? (admin ? 'Editar fecha' : x.titulo) : 'Nueva fecha', h('div', { class: 'form' }, conv ? conv.franja : null, campo('Título', f.titulo, true), campo('Tipo', f.tipo), campo('Marca', f.marca),
     h('div', { class: 'field full' }, h('label', {}, 'Formato (marcá todos los que van)'), toggles),
     campo('Fecha', f.fecha), campo('Hora', f.hora),
     h('div', { class: 'field full' }, h('label', {}, 'Responsables'), respSel.el),
-    campo('Estado', estadoSel), h('div', { class: 'field full' }, h('label', {}, 'Prioridad'), prioSel), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', hEst), campo('Horas reales', hReal)), campo('Notas', f.notas, true)), pie);
+    campo('Estado', estadoSel), h('div', { class: 'field full' }, h('label', {}, 'Prioridad'), prioSel), h('div', { class: 'form', style: 'grid-template-columns:1fr 1fr;gap:12px' }, campo('Horas estimadas', hEst), campo('Horas reales', hReal)), campo('Notas', f.notas, true), conv ? conv.bloque : null), pie);
 }
 
 function abrirCampania(c) {
