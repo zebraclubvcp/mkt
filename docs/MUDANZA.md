@@ -46,6 +46,7 @@ un valor por defecto si faltan. Al importar, tratar cada campo nuevo como opcion
 | Colección | Campo | Qué es |
 |---|---|---|
 | `tareas` | `reunionId`, `acuerdoId` | si la tarea salió de un acuerdo de reunión |
+| `tareas` | `estado: 'asignar'` | valor nuevo de `estado`: **Por asignar** (sin responsables). Va antes de `pedido` |
 | `tareas` / `fechas` | `log[].tipo` nuevos | `comentario`, `pendiente`, `resuelto`, `movida` (ver Avisos) |
 | `campanias` | `conclusion` | `{ texto, decision: 'repetir' \| 'ajustar' \| 'no', por, ts }` |
 | `temas` (proyectos) | `pasos[].hechoTs` | momento exacto en que se tildó el paso (epoch ms) |
@@ -63,7 +64,7 @@ dos tablas.
 ### Tope de tareas y bloqueo
 
 - **Tareas activas** de una persona = tareas donde está entre los responsables (`resps`) y el estado es `pedido`,
-  `proceso` o `revision`. Las fechas del calendario no cuentan.
+  `proceso` o `revision`. Las fechas del calendario no cuentan. Las **Por asignar** tampoco (no son de nadie).
 - **Tope:** el de `config/equipo`; si no hay, **5** para producción y freelancers, **6** para Mica y Agustina.
   **Manu no tiene tope.** Se ajusta entre 1 y 20 con − y + en Equipo y carga.
 - **Bloqueo:** en todo lugar donde se agrega un responsable (crear o editar tarea, duplicar, pasar un tema, un
@@ -71,6 +72,26 @@ dos tablas.
   se puede elegir. Mensaje: "X está al tope. Elegí a otra persona o pedile que cierre algo antes."
 - Las tareas ya asignadas no se tocan aunque alguien quede pasado del tope.
 - Hoy se valida **solo en la pantalla**. En el super admin conviene validarlo también en el servidor.
+
+### Por asignar (planificar sin responsable y delegar después)
+
+- Manu, Mica y Agustina pueden crear una tarea **sin responsables**. Queda en estado `asignar` ("Por asignar"),
+  el primero de la lista, antes de "Sin empezar". El estado no se elige a mano: sale de tener o no responsables.
+- Sacarle todos los responsables a una tarea solo se puede si no empezó (`pedido`); vuelve a "Por asignar".
+  Una tarea en proceso o más adelante necesita al menos uno.
+- **No cuenta para el tope** y **no vence para nadie** (no aparece como vencida ni atrasada, aunque pase la entrega).
+- **Producción no la ve**: ni en Lo mío ni en el calendario; si abre un link directo, ve "Esta tarea todavía no
+  está asignada". Por ahora producción **no puede tomarla**.
+- **Inicio:** sección "Por asignar" ordenada por fecha de entrega, con botón **Asignar** por fila. Si a la entrega le
+  faltan **3 días o menos** (o ya pasó), aparece también en "Necesita tu atención" (filtro "Por asignar").
+- **Asignar:** abre el selector de personas con el bloqueo del tope. Al confirmar: `resps` = elegidos, `estado`
+  pasa a `pedido`, se registra el aviso `asignada` a cada uno y se ofrece el botón de WhatsApp. Asignar desde el
+  detalle de la tarea hace lo mismo.
+- **Calendario** (Manu, Mica, Agustina): tarjeta más suave con etiqueta "Por asignar". En Tablero tiene su columna
+  y en Lista de tareas ("Todo el equipo") su grupo arriba.
+- Un **paso de la hoja de ruta**, un **tema** o un **acuerdo de reunión** se pueden pasar a tarea sin responsable:
+  se deja vacío el selector al crearla.
+- En el super admin conviene validar en el servidor que una tarea sin responsables solo pueda estar en `asignar`.
 
 ### Pendientes en la conversación de la tarea
 
@@ -126,8 +147,8 @@ dos tablas.
 
 ## Pantallas a reproducir
 
-- **Inicio** (Manu, Mica, Agustina): contadores que filtran (Para revisar, Te piden, Vencidas, Gente al tope),
-  lista "Necesita tu atención" con un botón por fila, "Sale esta semana" (hoy + 6 días, por fecha de publicación
+- **Inicio** (Manu, Mica, Agustina): contadores que filtran (Para revisar, Te piden, Vencidas, Por asignar, Gente al
+  tope), lista "Necesita tu atención" con un botón por fila, "Por asignar" con botón Asignar, "Sale esta semana" (hoy + 6 días, por fecha de publicación
   o de entrega) y al costado carga del equipo, próxima reunión y la idea de la hoja de ruta con el próximo paso
   más cercano.
 - **Lo mío** (producción): barra de carga con el tope, "Esperando a otros" / "Te piden", "Para hacer" por fecha de
@@ -137,7 +158,7 @@ dos tablas.
   sin cumplir, a tiempo, devoluciones recibidas, horas reales vs. estimadas, anotaciones) y Horas.
 - **Calendario:** tarjeta con título, responsable, estado, formato y si es urgente; arrastrar para mover.
 - **Pauta**, **Hoja de ruta** y **Reuniones** como se describe arriba. **Novedades** es un botón fijo arriba con el número de sin leer en rojo; si hay sin leer, Inicio y Lo mío muestran una franja "Tenés N novedades sin leer · Ver".
-- **Tablero** quedó igual que antes.
+- **Tablero** quedó igual que antes, con una columna nueva al principio: "Por asignar".
 
 ## Avisos (novedades)
 

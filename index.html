@@ -105,6 +105,7 @@ select.chip { padding-right: 8px; }
 .stat.bad b { color: var(--bad); }
 
 .pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.st-asignar { background: transparent; color: var(--muted); border: 1px dashed var(--line); }
 .st-pedido { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
 .st-proceso { background: var(--info-bg); color: var(--info); }
 .st-revision { background: var(--warn-bg); color: var(--warn); }
@@ -570,6 +571,10 @@ details.sec:not([open]) > .sec-h { border-bottom: 0; }
 .cc.cc-pub { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, var(--line)); }
 .cc.cc-ent { border-style: dashed; }
 .cc.cc-late .cc-t { color: var(--bad); }
+/* Por asignar: más suave, para que se distinga de lo que ya tiene a alguien encargado. */
+.cc.cc-asig { background: var(--surface-2); opacity: .78; }
+.cc.cc-asig .cc-t { color: var(--muted); }
+.cc.cc-asig:hover { opacity: 1; }
 .cc-top { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .cc-hora { background: var(--ink); color: var(--ink-fg); font-weight: 700; font-size: 11px; padding: 1px 6px; border-radius: 5px; }
 .cc-tag { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; padding: 0 6px; border-radius: 5px; }
@@ -799,7 +804,9 @@ const EQUIPO = [
   { id: 'santi', tel: '5491130427401', nombre: 'Santi', rol: 'Pauta', pauta: true, email: 'maxterom@gmail.com' },
 ];
 const TIPOS = ['Post', 'Carrusel', 'Reel', 'Historias', 'Flyer', 'Video', 'Fotos', 'Diseño', 'Copy', 'Pauta', 'Otro'];
+/* "Por asignar": tarea planificada sin responsable. No cuenta para el tope, no vence y producción no la ve. Al elegir a alguien pasa a "Sin empezar". */
 const ESTADOS = [
+  { id: 'asignar', nombre: 'Por asignar' },
   { id: 'pedido', nombre: 'Sin empezar' },
   { id: 'proceso', nombre: 'En proceso' },
   { id: 'revision', nombre: 'En revisión' },
@@ -1169,8 +1176,11 @@ const abrir = (t, op) => (t._fecha ? abrirFecha(t) : abrirTarea(t, null, op));
 const SIN_ENTREGA = ['Reunión', 'Evento'];
 const hecha = (t) => t.estado === 'aprobado' || t.estado === 'publicado' || (!!t._fecha && SIN_ENTREGA.includes(t.tipo) && diff(t.fecha) < 0);
 /* En revisión ya está entregada por quien la hizo: si la revisión se demora, no cuenta como vencida para el diseñador. */
-const vencida = (t) => !hecha(t) && !ENTREGADO.includes(t.estado) && diff(t.entrega) < 0;
-const estadoPill = (id) => { const e = ESTADOS.find((x) => x.id === id) || ESTADOS[0]; return h('span', { class: 'pill st-' + e.id }, e.nombre); };
+/* Por asignar no vence para nadie: todavía no es de nadie. */
+const porAsignar = (t) => t.estado === 'asignar';
+const vencida = (t) => !hecha(t) && !porAsignar(t) && !ENTREGADO.includes(t.estado) && diff(t.entrega) < 0;
+const estadoDe = (id) => ESTADOS.find((x) => x.id === id) || ESTADOS.find((x) => x.id === 'pedido');
+const estadoPill = (id) => { const e = estadoDe(id); return h('span', { class: 'pill st-' + e.id }, e.nombre); };
 const marcaChip = (id) => h('span', { class: 'task-meta', style: 'gap:6px' }, h('span', { class: 'dot', style: 'background:' + marca(id).color }), marca(id).nombre);
 
 let toastT;
@@ -1281,6 +1291,7 @@ const gentesConTope = () => [...EQUIPO.filter((p) => !p.admin), ...S.freelancers
 const estadoCorto = (t) => trabada(t) ? h('span', { class: 'pill p-bad' }, 'Trabada') : vencida(t) ? h('span', { class: 'pill p-bad' }, 'Vencida') : estadoPill(t.estado);
 const formatoChip = (t) => { const fm = formatoDe(t._fecha ? { f: t } : { t })[0] || ''; return fm ? h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm) : null; };
 const barraCarga = (n, tope) => h('div', { class: 'mini-bar', role: 'img', 'aria-label': n + ' de ' + tope }, h('i', { class: n >= tope ? 'bad' : n / tope >= 0.8 ? 'warn' : '', style: 'width:' + Math.min(100, Math.round(n / tope * 100)) + '%' }));
+const tareasPorAsignar = () => S.tareas.filter(porAsignar).sort((a, b) => a.entrega.localeCompare(b.entrega));
 /* "Necesita tu atención": lo que frena al equipo si Manu, Mica o Agus no lo resuelven. */
 function atencion() {
   if (!esAdmin()) return [];
@@ -1295,9 +1306,14 @@ function atencion() {
     out.push({ tipo: 'pide', quien: c.de, etiqueta: ['p-bad', 'Te piden'], titulo: '“' + c.texto + '”',
       sub: nombre1(c.de) + ' · en ' + t.titulo + ' · ' + haceCuanto(c.ts || Date.now()) + ' · la tarea está trabada', accion: 'Responder', ir: () => abrir(t) });
   });
+  /* Por asignar con la entrega a 3 días o menos (o ya pasada): hay que elegir a alguien ya. */
+  tareasPorAsignar().filter((t) => diff(t.entrega) <= 3).forEach((t) => {
+    out.push({ tipo: 'asignar', quien: '', etiqueta: ['p-warn', 'Por asignar'], titulo: t.titulo,
+      sub: 'Nadie la tiene · entrega ' + cuando(t.entrega) + ' · ' + marca(t.marca).nombre, accion: 'Asignar', ir: () => asignar(t) });
+  });
   trabajos().filter(vencida).sort((a, b) => a.entrega.localeCompare(b.entrega)).forEach((t) => {
     out.push({ tipo: 'vencida', quien: resps(t)[0], etiqueta: ['p-bad', 'Vencida'], titulo: t.titulo,
-      sub: nombresResp(t) + ' · venció ' + cuando(t.entrega) + ' y sigue ' + (ESTADOS.find((e) => e.id === t.estado) || ESTADOS[0]).nombre.toLowerCase(), accion: 'Ver', ir: () => abrir(t) });
+      sub: nombresResp(t) + ' · venció ' + cuando(t.entrega) + ' y sigue ' + estadoDe(t.estado).nombre.toLowerCase(), accion: 'Ver', ir: () => abrir(t) });
   });
   gentesConTope().filter((p) => alTope(p.id)).forEach((p) => {
     out.push({ tipo: 'tope', quien: p.id, etiqueta: ['p-warn', 'Al tope'], titulo: p.nombre + ' tiene ' + activasDe(p.id).length + ' de ' + topeDe(p.id) + ' tareas activas',
@@ -1307,19 +1323,29 @@ function atencion() {
 }
 function vistaInicio() {
   const items = atencion();
-  const FILTROS = [['todo', 'Todo'], ['revision', 'Para revisar'], ['pide', 'Te piden'], ['vencida', 'Vencidas'], ['tope', 'Gente al tope']];
+  const FILTROS = [['todo', 'Todo'], ['revision', 'Para revisar'], ['pide', 'Te piden'], ['vencida', 'Vencidas'], ['asignar', 'Por asignar'], ['tope', 'Gente al tope']];
   if (!FILTROS.some(([id]) => id === ui.iniFiltro)) ui.iniFiltro = 'todo';
   const fil = ui.iniFiltro;
   const vis = items.filter((i) => fil === 'todo' || i.tipo === fil);
-  const VACIO = { todo: 'Nada te espera. Cuando alguien mande algo a revisión, te pida algo o se venza una tarea, aparece acá.', revision: 'No hay piezas esperando revisión.', pide: 'Nadie te está esperando.', vencida: 'No hay tareas vencidas. ¡Bien!', tope: 'Nadie está al tope: todos pueden recibir tareas.' };
+  const VACIO = { todo: 'Nada te espera. Cuando alguien mande algo a revisión, te pida algo o se venza una tarea, aparece acá.', revision: 'No hay piezas esperando revisión.', pide: 'Nadie te está esperando.', vencida: 'No hay tareas vencidas. ¡Bien!', asignar: 'Nada por asignar que entregue en los próximos 3 días.', tope: 'Nadie está al tope: todos pueden recibir tareas.' };
   const filtrosEl = h('div', { class: 'filtros-ini', role: 'group', 'aria-label': 'Filtrar' }, ...FILTROS.map(([id, txt]) => h('button', { type: 'button', 'aria-pressed': String(fil === id), onclick: () => { ui.iniFiltro = id; guardarUi(); render(); } },
     h('b', {}, id === 'todo' ? items.length : items.filter((i) => i.tipo === id).length), h('span', {}, txt))));
   const atn = h('div', { class: 'card lst' },
     h('div', { class: 'lst-h' }, h('h2', {}, 'Necesita tu atención'), h('small', {}, vis.length + (vis.length === 1 ? ' cosa' : ' cosas'))),
-    ...(vis.length ? vis.map((i) => h('div', { class: 'it' }, av(i.quien),
+    ...(vis.length ? vis.map((i) => h('div', { class: 'it' }, i.quien ? av(i.quien) : h('span', { class: 'av', title: 'Sin asignar' }, '?'),
       h('div', { class: 'it-t' }, h('span', { class: 'l1' }, h('span', { class: 'pill ' + i.etiqueta[0] }, i.etiqueta[1]), h('b', {}, i.titulo)), h('small', {}, i.sub)),
       h('button', { class: 'btn small', onclick: i.ir }, i.accion)))
       : [h('p', { class: 'it-vacio' }, VACIO[fil])]));
+  /* Por asignar: lo planificado que todavía no tiene quién lo haga, por fecha de entrega. */
+  const pa = tareasPorAsignar();
+  const porAsig = pa.length ? h('div', { class: 'card lst' },
+    h('div', { class: 'lst-h' }, h('h2', {}, 'Por asignar'), h('small', {}, pa.length + (pa.length === 1 ? ' tarea' : ' tareas'))),
+    ...pa.map((t) => h('div', { class: 'it' },
+      h('i', { class: 'dot', style: 'background:' + marca(t.marca).color, title: marca(t.marca).nombre }),
+      h('div', { class: 'it-t', role: 'button', tabindex: '0', style: 'cursor:pointer', onclick: () => abrir(t), onkeydown: (e) => { if (e.key === 'Enter') abrir(t); } },
+        h('span', { class: 'l1' }, h('b', {}, t.titulo), formatoChip(t)),
+        h('small', { class: diff(t.entrega) <= 3 ? 'apurada' : '' }, 'Entrega ' + cuando(t.entrega) + (t.publica ? ' · sale ' + fCorta(t.publica) : '') + ' · ' + marca(t.marca).nombre)),
+      botonAsignar(t)))) : null;
   /* Sale esta semana: hoy y los 6 días que siguen, por la fecha en que sale (o la entrega si no tiene). */
   const fechaSale = (t) => t.publica || t.entrega;
   const sale = trabajos().filter((t) => t.estado !== 'publicado' && !(t._fecha && SIN_ENTREGA.includes(t.tipo)) && diff(fechaSale(t)) >= 0 && diff(fechaSale(t)) <= 6);
@@ -1364,7 +1390,7 @@ function vistaInicio() {
     h('div', { class: 'pagehead' }, h('div', {}, h('p', { class: 'kicker' }, fechaLarga()), h('h1', {}, 'Hola, ' + yo().nombre), h('p', {}, 'Arriba está lo que frena al equipo si no lo resolvés. Abajo, lo que sale esta semana.')),
       h('div', { class: 'chips' }, h('button', { class: 'btn', onclick: () => ir('lista') }, 'Lista de tareas'), h('button', { class: 'btn primary', onclick: () => abrirTarea(null) }, '+ Nuevo pedido'))),
     filtrosEl,
-    h('div', { class: 'ini-grid' }, h('div', { class: 'ini-col' }, atn, semana), h('div', { class: 'ini-col' }, carga, reunion, idea)));
+    h('div', { class: 'ini-grid' }, h('div', { class: 'ini-col' }, atn, porAsig, semana), h('div', { class: 'ini-col' }, carga, reunion, idea)));
 }
 /* Lo mío: lo que tiene que hacer cada persona de producción, con un solo botón de próximo paso por tarea. */
 function vistaLoMio() {
@@ -1475,7 +1501,8 @@ const filtrar = (ts, conPersona) => ts.filter((t) => (ui.marca === 'todas' || t.
 function siguiente(t) {
   const i = ESTADOS.findIndex((e) => e.id === t.estado);
   const sig = ESTADOS[i + 1];
-  if (!sig) return null;
+  /* De "Por asignar" no se avanza con un botón: se sale eligiendo a alguien (Asignar). */
+  if (!sig || t.estado === 'asignar') return null;
   if ((sig.id === 'aprobado' || sig.id === 'publicado') && !esAdmin()) return null;
   return sig;
 }
@@ -1497,6 +1524,23 @@ function mandarRevision(t) {
       t.link = l; t.estado = 'revision'; avisar(t, 'revision', quienPidio(t)); guardar(); cerrarModal(); render(); toast('Mandada a revisión');
     } }, 'Mandar a revisión'))));
 }
+
+/* Asignar una tarea "Por asignar": elegir quién la hace (con el bloqueo del tope). Pasa a "Sin empezar" y se le avisa. */
+function asignar(t) {
+  if (!esAdmin()) return;
+  const selP = selectorPersonas([], false, { tope: true });
+  modal('Asignar', h('div', { class: 'form' },
+      h('p', { class: 'full', style: 'margin:0' }, h('b', {}, t.titulo), h('span', { style: 'color:var(--muted)' }, ' · entrega ' + cuando(t.entrega))),
+      h('div', { class: 'field full' }, h('label', {}, 'Quién la hace (podés marcar más de uno)'), selP.el)),
+    h('div', { class: 'sheet-foot' }, h('div', { class: 'right' }, h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'), h('button', { class: 'btn primary', onclick: () => {
+      const elegidos = selP.valor();
+      if (!elegidos.length) { toast('Elegí al menos una persona'); return; }
+      const malos = selP.bloqueados(); if (malos.length) { toast(msgTope(malos[0])); return; }
+      t.resps = elegidos; t.resp = elegidos[0]; t.estado = 'pedido';
+      avisar(t, 'asignada', elegidos); guardar(); cerrarModal(); render(); toast('Asignada a ' + nombresResp(t));
+    } }, 'Asignar'))));
+}
+const botonAsignar = (t, cls) => h('button', { class: 'btn small' + (cls ? ' ' + cls : ''), onclick: (e) => { e.stopPropagation(); asignar(t); } }, 'Asignar');
 
 function devolver(t) {
   const ta = h('textarea', { id: 'dev-texto', placeholder: 'Qué hay que cambiar. Sé concreta: qué, dónde y cómo.' });
@@ -1535,6 +1579,7 @@ function tarjeta(t, opts = {}) {
     h('div', { class: 'task-actions' },
       sig && puedeMover(t) ? h('button', { class: 'btn small primary', onclick: (e) => { e.stopPropagation(); if (sig.id === 'revision') mandarRevision(t); else mover(t, sig.id); } }, sig.id === 'revision' ? 'Mandar a revisión' : sig.id === 'aprobado' ? 'Aprobar · para publicar' : sig.id === 'publicado' ? 'Marcar publicada' : 'Empezar') : null,
       t.estado === 'revision' && esAdmin() ? h('button', { class: 'btn small', onclick: (e) => { e.stopPropagation(); devolver(t); } }, 'Devolver con cambios') : null,
+      porAsignar(t) && esAdmin() ? botonAsignar(t, 'primary') : null,
       h('button', { class: 'btn small', onclick: (e) => { e.stopPropagation(); abrir(t); } }, puedeMover(t) ? 'Abrir' : 'Ver')));
   return card;
 }
@@ -1544,6 +1589,7 @@ const textoAccion = (sig) => sig.id === 'revision' ? 'Mandar a revisión' : sig.
 function accionRapida(t) {
   const sig = siguiente(t);
   if (t.estado === 'revision' && esAdmin()) return h('button', { class: 'btn small primary', onclick: (e) => { e.stopPropagation(); abrir(t); } }, 'Revisar');
+  if (porAsignar(t)) return esAdmin() ? botonAsignar(t, 'primary') : null;
   if (!sig || !puedeMover(t)) return null;
   return h('button', { class: 'btn small' + (sig.id === 'proceso' ? ' primary' : ''), onclick: (e) => { e.stopPropagation(); if (sig.id === 'revision') mandarRevision(t); else mover(t, sig.id); } }, textoAccion(sig));
 }
@@ -1552,7 +1598,7 @@ function fila(t, opts = {}) {
   const n = diff(fecha);
   /* Por entrega: abierta hasta que se manda a revisión. Por publicación: abierta hasta que se publica. */
   const abierta = opts.guia === 'publica' ? (t.estado !== 'publicado' && !(hecha(t) && t.estado !== 'aprobado')) : (!hecha(t) && !ENTREGADO.includes(t.estado));
-  const late = abierta && n < 0, soon = abierta && n >= 0 && n <= 1;
+  const late = abierta && n < 0 && !porAsignar(t), soon = abierta && n >= 0 && n <= 1;
   const otra = opts.guia === 'publica' ? 'Entrega ' + fCorta(t.entrega) : (t.publica ? 'Sale ' + fCorta(t.publica) : '');
   const dv = ultimaDevol(t);
   const r = h('div', { class: 'row', tabindex: '0', role: 'button', 'aria-label': t.titulo, onclick: () => abrir(t), onkeydown: (e) => { if (e.key === 'Enter') abrir(t); } },
@@ -1587,7 +1633,9 @@ function vistaMis() {
      "Lo que sale": terminada = publicada; lo aprobado sigue en la lista porque falta publicarlo. */
   const terminada = (t) => guia === 'publica' ? (t.estado === 'publicado' || hecha(t) && t.estado !== 'aprobado') : hecha(t);
   const esperando = guia === 'entrega' ? base.filter((t) => t.estado === 'revision' && !terminada(t)) : [];
-  const activas = base.filter((t) => !terminada(t) && !esperando.includes(t)).sort((a, b) => fechaDe(a).localeCompare(fechaDe(b)) || (PRIORIDADES.indexOf(b.prioridad) - PRIORIDADES.indexOf(a.prioridad)));
+  /* Por asignar va en su propio grupo (solo con "Todo el equipo": no es de nadie) y no cuenta como atrasada. */
+  const sinAsignar = base.filter(porAsignar).sort((a, b) => fechaDe(a).localeCompare(fechaDe(b)));
+  const activas = base.filter((t) => !terminada(t) && !esperando.includes(t) && !porAsignar(t)).sort((a, b) => fechaDe(a).localeCompare(fechaDe(b)) || (PRIORIDADES.indexOf(b.prioridad) - PRIORIDADES.indexOf(a.prioridad)));
   const deDia = (lo, hi) => activas.filter((t) => { const n = diff(fechaDe(t)); return n >= lo && n <= hi; });
   const atrasadas = activas.filter((t) => diff(fechaDe(t)) < 0);
   const hoy = deDia(0, 0), manana = deDia(1, 1);
@@ -1605,6 +1653,7 @@ function vistaMis() {
     const revisar = f(revisarTodo);
     const grupos = [
       revisar.length ? seccion2('rev', 'Para revisar', 'Te mandaron estas piezas', revisar, guia) : null,
+      f(sinAsignar).length ? seccion2('asig', 'Por asignar', 'Falta elegir quién las hace', f(sinAsignar), guia) : null,
       f(atrasadas).length ? seccion2('late', 'Atrasadas', 'Pasó la fecha y siguen abiertas', f(atrasadas), guia) : null,
       f(hoy).length ? seccion2('hoy', verbo + ' hoy', '', f(hoy), guia) : null,
       f(manana).length ? seccion2('man', verbo + ' mañana', '', f(manana), guia) : null,
@@ -1723,16 +1772,18 @@ function calCard(x) {
   const ver = (e) => { e.stopPropagation(); abrir(o, { cual }); };
   /* En la tarjeta solo lo que ayuda a decidir: título, responsable, estado, formato y si es urgente. */
   const prio = o.prioridad === 'Urgente' ? o.prioridad : '';
-  const late = esEntrega || x.prod ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
+  const asig = !x.f && porAsignar(o);
+  const late = asig ? false : esEntrega || x.prod ? vencida(o) : (o.estado !== 'publicado' && !hecha(o) && diff(x.f ? o.fecha : o.publica) < 0 && !SIN_ENTREGA.includes(o.tipo));
   const top = [
     x.f && o.hora ? h('span', { class: 'cc-hora' }, o.hora) : null,
+    asig ? h('span', { class: 'cc-tag' }, 'Por asignar') : null,
     esEntrega ? h('span', { class: 'cc-tag' }, 'Entrega') : null,
     trabada(o) ? trabadaPill(o) : null,
     prio ? h('span', { class: 'prio ' + prio }, prio) : null,
   ].filter(Boolean);
   const rs = resps(o);
   /* Es un div con rol de botón (no <button>) porque Firefox no deja arrastrar botones. */
-  return h('div', { class: 'cc' + (prio ? ' cc-prio' + (prio === 'Alta' ? ' cc-alta' : '') : '') + (o.estado === 'publicado' ? ' cc-pub' : '') + (esEntrega ? ' cc-ent' : '') + (late ? ' cc-late' : ''), role: 'button', tabindex: '0',
+  return h('div', { class: 'cc' + (prio ? ' cc-prio' + (prio === 'Alta' ? ' cc-alta' : '') : '') + (o.estado === 'publicado' ? ' cc-pub' : '') + (esEntrega ? ' cc-ent' : '') + (late ? ' cc-late' : '') + (asig ? ' cc-asig' : ''), role: 'button', tabindex: '0',
       title: (esEntrega ? 'Entrega: ' : '') + o.titulo + (arrastrable ? ' · arrastrala a otro día para moverla' : ''), onclick: ver,
       onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ver(e); } },
       draggable: arrastrable ? 'true' : null,
@@ -1740,8 +1791,9 @@ function calCard(x) {
       ondragend: arrastrable ? (e) => { arrastre = null; e.currentTarget.classList.remove('arrastrando'); document.querySelectorAll('.drop').forEach((d) => d.classList.remove('drop')); } : null },
     top.length ? h('span', { class: 'cc-top' }, ...top) : null,
     h('span', { class: 'cc-t' }, h('i', { class: 'mk', style: 'background:' + marca(o.marca).color, title: marca(o.marca).nombre }), o.titulo),
-    h('span', { class: 'cc-row', title: nombresResp(o) }, rs.length ? h('span', { class: 'cc-avs' }, ...rs.slice(0, 2).map(av)) : null, h('span', { class: rs.length ? 'cc-quien' : 'cc-sin' }, rs.length ? nombresResp(o) : 'Sin asignar')),
-    h('span', { class: 'cc-row cc-fmts' }, estadoPill(o.estado || 'pedido'), ...formatoDe(x).map((fm) => h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm))));
+    /* Por asignar: la etiqueta de arriba ya lo dice; no se repite en responsable ni estado. */
+    asig ? null : h('span', { class: 'cc-row', title: nombresResp(o) }, rs.length ? h('span', { class: 'cc-avs' }, ...rs.slice(0, 2).map(av)) : null, h('span', { class: rs.length ? 'cc-quien' : 'cc-sin' }, rs.length ? nombresResp(o) : 'Sin asignar')),
+    h('span', { class: 'cc-row cc-fmts' }, asig ? null : estadoPill(o.estado || 'pedido'), ...formatoDe(x).map((fm) => h('span', { class: 'cc-fmt k-' + claseFormato(fm) }, fm))));
 }
 
 function vistaCalendario() {
@@ -1761,7 +1813,8 @@ function vistaCalendario() {
     titulo = MESES[m].charAt(0).toUpperCase() + MESES[m].slice(1) + ' ' + y;
   }
   const verEntregas = ui.calEntregas !== false;
-  const todas = filtrar(S.tareas, true);
+  /* Producción no ve las tareas por asignar. */
+  const todas = filtrar(S.tareas, true).filter((t) => esAdmin() || !porAsignar(t));
   const ts = todas.filter((t) => t.estado !== 'publicado');
   const fs = S.fechas.filter((f) => (ui.marca === 'todas' || f.marca === ui.marca || f.marca === 'general') && (ui.persona === 'todas' || !resps(f).length || esDe(f, ui.persona)));
   const orden = (a, b) => ((a.f && a.f.hora) || (a.pub || a.f ? '00' : '99')).localeCompare((b.f && b.f.hora) || (b.pub || b.f ? '00' : '99'));
@@ -2317,7 +2370,7 @@ function abrirTema(t, decidir) {
         if (!leer()) return; guardar(); cerrarModal();
         const ent = x.limite && diff(x.limite) >= 0 ? x.limite : dia(3);
         abrirTarea(null, { titulo: x.titulo, contenido: x.decision || x.detalle || '', prioridad: x.tipo === 'urgente' ? 'Urgente' : 'Normal', entrega: ent, temaId: x.id });
-        toast('Completá el pedido y elegí quién lo hace');
+        toast('Completá el pedido. Si no sabés quién lo hace, dejalo por asignar');
       } }, 'Pasar a pedido'),
       h('button', { class: 'btn', onclick: cerrarModal }, 'Cancelar'),
       h('button', { class: 'btn primary', onclick: () => { if (!leer()) return; guardar(); cerrarModal(); render(); toast(nuevo ? 'Tema creado' : 'Tema guardado'); } }, nuevo ? 'Crear tema' : 'Guardar')));
@@ -2520,7 +2573,7 @@ function abrirProyecto(pr) {
         h('div', { class: 'paso-act' },
           !nuevo ? h('button', { class: 'btn small', title: 'Crea un pedido para diseño, edición o pauta', onclick: () => {
             cerrarModal(); abrirTarea(null, { titulo: p.texto, contenido: x.objetivo || '', entrega: p.fecha && diff(p.fecha) >= 0 ? p.fecha : dia(3), temaId: x.id, marca: x.marca !== 'general' ? x.marca : 'zebra' });
-            toast('Completá el pedido y elegí quién lo hace'); } }, 'Pedido') : null,
+            toast('Completá el pedido. Si no sabés quién lo hace, dejalo por asignar'); } }, 'Pedido') : null,
           h('button', { class: 'btn small', 'aria-label': 'Borrar paso', onclick: () => { pasos = pasos.filter((y) => y !== p); commit(); pintarPasos(); } }, '×')));
     }) : [h('p', { class: 'note', style: 'margin:0' }, 'Bajá la idea a pasos chicos: una acción, una persona, un día.')]));
   };
@@ -2984,12 +3037,15 @@ function abrirTarea(t, base, op) {
   const admin = esAdmin();
   const propia = t && esDe(t, ui.yo);
   if (nueva && !admin) return;
+  /* Producción no ve las tareas por asignar (ni por un link viejo). Por ahora no las puede tomar. */
+  if (t && !admin && porAsignar(t)) { toast('Esta tarea todavía no está asignada'); return; }
   const x = t || { titulo: '', marca: ui.marca !== 'todas' ? ui.marca : 'zebra', tipo: 'Post', resp: '', estado: 'pedido', entrega: dia(3), prioridad: 'Normal', horasEst: 2, horasReal: 0, pedidoPor: ui.yo, brief: '', contenido: '', referencias: '', imagenes: [], devoluciones: [], link: '', publica: '', ...(base || {}) };
   let imagenes = (x.imagenes || []).slice();
   const soloLectura = !admin;
   const respSel = selectorPersonas(resps(x), soloLectura, { tope: true, fijos: nueva ? [] : resps(x) });
   const puedeEntregar = admin || propia;
-  const estadosPermitidos = admin ? ESTADOS : ESTADOS.filter((e) => ['pedido', 'proceso', 'revision'].includes(e.id) || e.id === x.estado);
+  /* "Por asignar" no se elige a mano: sale solo de tener o no responsables. */
+  const estadosPermitidos = admin ? ESTADOS.filter((e) => e.id !== 'asignar' || x.estado === 'asignar') : ESTADOS.filter((e) => ['pedido', 'proceso', 'revision'].includes(e.id) || e.id === x.estado);
   const f = {
     titulo: h('input', { id: 'tt-titulo', value: x.titulo, placeholder: 'Ej. Flyer Halloween', readonly: soloLectura || null }),
     marca: chipSel('tt-marca', MARCAS.map((m) => [m.id, m.nombre, m.color]), x.marca, soloLectura),
@@ -3056,7 +3112,8 @@ function abrirTarea(t, base, op) {
     conv ? conv.franja : null,
     seccion('El pedido'),
     campo('Qué hay que hacer', f.titulo, true), campo('Marca', f.marca), campo('Tipo', f.tipo),
-    h('div', { class: 'field full' }, h('label', {}, 'Responsables (podés marcar más de uno)'), respSel.el), campo('Fecha de entrega', f.entrega), campo('Fecha de publicación', f.publica), fechasNota, campo('Prioridad', f.prioridad),
+    h('div', { class: 'field full' }, h('label', {}, 'Responsables (podés marcar más de uno)'), respSel.el,
+      admin && ['asignar', 'pedido'].includes(x.estado) ? h('small', { style: 'font-size:12px;color:var(--muted)' }, 'Si todavía no sabés quién la hace, dejalo vacío: queda "Por asignar" y la asignás después desde Inicio.') : null), campo('Fecha de entrega', f.entrega), campo('Fecha de publicación', f.publica), fechasNota, campo('Prioridad', f.prioridad),
     campo('Contenido que tiene que ir', f.contenido, true),
     seccion('Referencias'),
     campo('Links de referencia', f.referencias, true),
@@ -3074,7 +3131,8 @@ function abrirTarea(t, base, op) {
     const antesResps = nueva ? [] : resps(x).slice(), antesEstado = x.estado;
     if (admin) {
       const titulo = f.titulo.value.trim(); if (!titulo) { toast('Poné qué hay que hacer'); f.titulo.focus(); return; }
-      if (!respSel.valor().length) { toast('Elegí al menos un responsable'); return; }
+      /* Sin responsables solo se puede dejar algo que no empezó: queda "Por asignar". */
+      if (!respSel.valor().length && !['asignar', 'pedido'].includes(f.estado.value)) { toast('Una tarea empezada necesita al menos un responsable'); return; }
       { const malos = respSel.bloqueados(); if (malos.length) { toast(msgTope(malos[0])); return; } }
       if (f.estado.value === 'revision' && x.estado !== 'revision' && !f.link.value.trim()) { toast('Pegá el link del Drive para mandarla a revisión'); f.link.focus(); return; }
       Object.assign(x, { titulo, marca: f.marca.value, tipo: f.tipo.value, resps: respSel.valor(), resp: respSel.valor()[0], entrega: f.entrega.value || dia(3), publica: f.publica.value || '', prioridad: f.prioridad.value, horasEst: Number(f.horasEst.value) || 0,
@@ -3085,6 +3143,8 @@ function abrirTarea(t, base, op) {
       if (f.estado.value === 'revision' && x.estado !== 'revision' && !link) { toast('Pegá el link del Drive para mandarla a revisión'); f.link.focus(); return; }
       Object.assign(x, { estado: f.estado.value, horasReal: Number(f.horasReal.value) || 0, link });
     }
+    /* Sin responsables = Por asignar; al elegir a alguien pasa a Sin empezar. */
+    if (admin) { if (!resps(x).length) x.estado = 'asignar'; else if (x.estado === 'asignar') x.estado = 'pedido'; }
     if (nueva) {
       x.id = uid(); x.creado = HOY; S.tareas.push(x);
       const tm = x.temaId && S.temas.find((y) => y.id === x.temaId);
@@ -3102,7 +3162,7 @@ function abrirTarea(t, base, op) {
       r = r || re;
     }
     setTimeout(() => ofrecerWa(r), 0);
-    guardar(); cerrarModal(); render(); toast(nueva ? 'Tarea creada y asignada a ' + nombresResp(x) : 'Tarea guardada');
+    guardar(); cerrarModal(); render(); toast(nueva ? (porAsignar(x) ? 'Tarea creada. Queda por asignar' : 'Tarea creada y asignada a ' + nombresResp(x)) : antesEstado === 'asignar' && !porAsignar(x) ? 'Asignada a ' + nombresResp(x) : 'Tarea guardada');
   };
   const pie = h('div', { class: 'sheet-foot' },
     t && admin ? botonPeligro('Eliminar tarea', () => { S.tareas = S.tareas.filter((y) => y !== t); guardar(); cerrarModal(); render(); toast('Tarea eliminada'); }) : null,
@@ -3124,7 +3184,7 @@ function abrirFecha(fe, fechaInicial) {
   const mia = fe && esDe(fe, ui.yo);
   const respSel = selectorPersonas(resps(x), !admin);
   const antesF = fe ? resps(fe).slice() : [];
-  const estadoSel = sel('fe-estado', ESTADOS.map((e) => [e.id, e.nombre]), x.estado || 'pedido', !(admin || mia));
+  const estadoSel = sel('fe-estado', ESTADOS.filter((e) => e.id !== 'asignar').map((e) => [e.id, e.nombre]), x.estado || 'pedido', !(admin || mia));
   const hEst = h('input', { id: 'fe-hest', type: 'number', min: '0', step: '0.5', value: x.horasEst || '', readonly: !admin || null });
   const hReal = h('input', { id: 'fe-hreal', type: 'number', min: '0', step: '0.5', value: x.horasReal || '', readonly: !(admin || mia) || null });
   const f = {
